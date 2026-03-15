@@ -1,10 +1,10 @@
 {
-  "id": "/Finance-Tracker/",
+  "id": "./",
   "name": "Felix Finance OS",
   "short_name": "Felix",
   "description": "Personal finance tracker for managing income, expenses, accounts, and budgets.",
-  "start_url": "/Finance-Tracker/index.html",
-  "scope": "/Finance-Tracker/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0b14",
