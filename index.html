@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Felix — Finance OS</title>
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#3B6BFF">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -36,11 +33,11 @@ html,body{height:100%;font-family:'DM Sans',-apple-system,sans-serif;-webkit-fon
 
 /* ── SIDEBAR ── */
 .sidebar{width:216px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;transition:left .26s cubic-bezier(.4,0,.2,1);overflow:hidden}
-.sidebar-logo{padding:20px 16px 14px;display:flex;align-items:center;gap:9px}
-.logo-icon{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#3B6BFF,#8B3CF7);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(59,107,255,0.30)}
-.logo-icon svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
-.logo-text{font-size:16px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(135deg,#3B6BFF,#8B3CF7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:8.5px;color:var(--t3);letter-spacing:.10em;text-transform:uppercase;font-weight:500}
+.sidebar-logo{padding:20px 16px 16px;display:flex;align-items:center;gap:13px}
+.logo-icon{width:46px;height:46px;border-radius:13px;background:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border .2s}
+.logo-icon svg{width:46px;height:46px;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.logo-text{font-size:22px;font-weight:800;letter-spacing:1px;background:linear-gradient(135deg,#3B6BFF,#8B3CF7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
+.logo-sub{font-size:9px;color:var(--t3);letter-spacing:.20em;text-transform:uppercase;font-weight:600;margin-top:2px}
 .sidebar-divider{height:1px;background:var(--border);margin:0 0 4px}
 .nav{flex:1;padding:6px 8px;overflow-y:auto}
 .nav-section{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);padding:12px 10px 4px;font-weight:700}
@@ -716,7 +713,8 @@ html[data-theme="dark"] .df-btn.active{color:#fff}
 html[data-theme="dark"] .cr-btn{background:#161722 !important;border-color:rgba(255,255,255,0.10) !important;color:#c8d0f0}
 html[data-theme="dark"] .cr-btn.active{background:var(--blue) !important;color:#fff !important;border-color:var(--blue) !important}
 html[data-theme="dark"] .badge.bx{background:rgba(255,255,255,0.08);color:#8890b8;border:none}
-html[data-theme="dark"] .logo-text{background:linear-gradient(135deg,#5b8fff,#a566ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+html[data-theme="dark"] .logo-text{background:linear-gradient(135deg,#ffffff,#c8d0f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+html[data-theme="dark"] #logo-icon-wrap{border:1.5px solid rgba(255,255,255,0.18);box-shadow:0 0 0 3px rgba(59,107,255,0.12)}
 html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12)}
 /* Bills dark mode */
 html[data-theme="dark"] .bill-card{background:#0d0e1a;border-color:rgba(255,255,255,0.09)}
@@ -817,8 +815,13 @@ html[data-theme="dark"] #ip-calc strong{color:#ffffff}
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <div class="logo-icon" id="logo-icon-wrap" style="background:none;box-shadow:none;padding:0;overflow:hidden;border-radius:13px">
+      <svg width="46" height="46" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+        <rect id="icon-bg" width="72" height="72" rx="18" fill="#ffffff"/>
+        <rect x="14" y="36" width="44" height="7" rx="3.5" fill="#3B6BFF" transform="rotate(-35 36 36)"/>
+        <rect x="14" y="50" width="44" height="7" rx="3.5" fill="#8B3CF7" transform="rotate(-35 36 36)"/>
+        <circle cx="52" cy="20" r="6" fill="#20cc78"/>
+      </svg>
     </div>
     <div>
       <div class="logo-text">FELIX</div>
@@ -1560,6 +1563,8 @@ function applyTheme(){
   document.documentElement.setAttribute('data-theme',_darkMode?'dark':'');
   var icon=ge('theme-icon');
   if(icon)icon.innerHTML=_darkMode?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+  var iconBg=ge('icon-bg');
+  if(iconBg)iconBg.setAttribute('fill',_darkMode?'#0d0e1a':'#ffffff');
 }
 function toggleTheme(){_darkMode=!_darkMode;localStorage.setItem('felix_dark',_darkMode?'1':'0');applyTheme();}
 ge('theme-btn').addEventListener('click',toggleTheme);
