@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="apple-touch-icon" href="icon-192.png">
 <title>Felix — Finance OS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -265,19 +264,23 @@ select option{background:#fff;color:var(--t1)}
 .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:14px}
 .bcard{padding:18px;position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s;cursor:default}
 .bcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.bcard-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0}
+.bcard-stripe{position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;opacity:0.6}
+.bcard-glow{position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;pointer-events:none;opacity:1;filter:blur(40px);transition:opacity .3s}
 .bcard-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.bcard-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.bcard-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;overflow:hidden;flex-shrink:0}
+.bcard-icon img{width:100%;height:100%;object-fit:contain;border-radius:10px}
 .bname{font-size:14px;font-weight:700;color:var(--t1)}
 .btype{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;margin-bottom:8px}
 .bbal{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--t1)}
 .bnum{font-size:10px;color:var(--t3);margin-top:2px;font-family:'DM Mono',monospace;letter-spacing:.04em}
-.bcard-foot{display:flex;gap:6px;margin-top:12px}
-.bdel,.bedit{font-size:10.5px;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border:1px solid;transition:all .13s}
+.bcard-foot{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.bdel,.bedit,.barchive{font-size:10.5px;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;border:1px solid;transition:all .13s}
 .bdel{background:var(--red-s);color:var(--red);border-color:rgba(232,53,74,0.22)}
 .bdel:hover{background:var(--red);color:#fff}
 .bedit{background:var(--blue-s);color:var(--blue);border-color:rgba(59,107,255,0.22)}
 .bedit:hover{background:var(--blue);color:#fff}
+.barchive{background:var(--bg);color:var(--t3);border-color:var(--border)}
+.barchive:hover{background:var(--border);color:var(--t2)}
 .bcard.archived{opacity:0.55}
 /* credit card specific */
 .cc-limit-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -497,6 +500,8 @@ html[data-theme="dark"] .cc-used-row strong{color:#ffffff}
 html[data-theme="dark"] .bdel{background:rgba(255,85,102,0.10);border-color:rgba(255,85,102,0.25)}
 html[data-theme="dark"] .bdel:hover{background:var(--red);color:#fff}
 html[data-theme="dark"] .bedit{background:rgba(91,143,255,0.10);border-color:rgba(91,143,255,0.25)}
+html[data-theme="dark"] .barchive{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.10);color:#7880a8}
+html[data-theme="dark"] .barchive:hover{background:rgba(255,255,255,0.10);color:#c8d0f0}
 
 /* Tables */
 html[data-theme="dark"] .tbl th{background:#0a0b14;color:#7880a8;border-bottom-color:rgba(255,255,255,0.08)}
@@ -791,6 +796,7 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.
     <div id="panel-subscriptions" class="panel">
       <div class="ph"><div><div class="ph-t">Subscriptions</div><div class="ph-s">Recurring payments</div></div><button class="btn-add" id="btn-open-sub">+ Add subscription</button></div>
       <div class="card tcard"><div class="twrap"><table class="tbl"><thead><tr><th>Name</th><th>Category</th><th>Cycle</th><th class="hide-sm">Account</th><th>Next billing</th><th class="hide-sm">Status</th><th style="text-align:right">Amount</th><th></th></tr></thead><tbody id="tb-sub"></tbody></table></div></div>
+      <div class="card mob-log" id="mob-sub"></div>
     </div>
 
     <!-- BUDGET -->
@@ -1005,7 +1011,7 @@ function goPanel(name){
     var regAccs=S.accounts.filter(function(a){return!a.isCC&&!a.archived;});
     if(regAccs.length){
       var cv=ge('c-nw-bar');if(cv)cv.style.height=Math.max(120,regAccs.length*54)+'px';
-      drawHBar('c-nw-bar',regAccs.map(function(a){return a.name;}),regAccs.map(function(a){return a.balance;}),regAccs.map(function(a){return a.color;}));
+      drawHBar('c-nw-bar',regAccs.map(function(a){return a.name;}),regAccs.map(function(a){return a.balance;}),regAccs.map(function(a){return a.accentColor||a.color||'#3B6BFF';}));
     }
   },80);}
   if(name==='accounts')renderAccounts();
@@ -1198,8 +1204,22 @@ function themeText(){return _darkMode?'rgba(176,184,224,0.60)':'rgba(70,80,130,0
 function themeTextStrong(){return _darkMode?'#ffffff':'#0f1130';}
 function themeGrid(){return _darkMode?'rgba(255,255,255,0.06)':'rgba(100,120,200,0.07)';}
 function themeHole(){return _darkMode?'#0d0e1a':'#ffffff';}
-function canvasW(cv,def){return cv.parentElement?cv.parentElement.clientWidth||def:def;}
+function canvasW(cv,def){
+  if(!cv||!cv.parentElement)return def;
+  var w=cv.parentElement.getBoundingClientRect().width||cv.parentElement.clientWidth||def;
+  return Math.floor(w)-2; // -2 for border
+}
 function canvasH(cv,def){return parseInt(cv.style.height)||def;}
+function setupCanvas(cv,W,H){
+  var dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(W*dpr);
+  cv.height=Math.round(H*dpr);
+  cv.style.width='100%';
+  cv.style.height=H+'px';
+  var ctx=cv.getContext('2d');
+  ctx.scale(dpr,dpr);
+  return ctx;
+}
 
 // ── SUBSCRIPTIONS ENGINE ──────────────────────────────────────────────
 function processSubscriptions(){
@@ -1226,24 +1246,66 @@ function processSubscriptions(){
 
 // ── ACCOUNTS ──────────────────────────────────────────────
 ge('btn-open-acc').addEventListener('click',function(){
-  openModal('Add Account','<div class="fr3"><div class="fg"><label>Bank / issuer name</label><input type="text" id="ba-name" placeholder="e.g. BDO"></div><div class="fg"><label>Account type</label><select id="ba-type" onchange="toggleCCFields()"><option>Checking</option><option>Savings</option><option>Payroll</option><option>E-wallet</option><option>Investment</option><option>Credit Card</option><option>Cash</option></select></div><div class="fg"><label>Last 4 digits</label><input type="text" id="ba-num" maxlength="4" placeholder="1234"></div></div><div class="fr" id="ba-row-bal"><div class="fg"><label>Opening balance</label><input type="number" id="ba-bal" min="0" placeholder="0.00"></div><div class="fg"><label>Card color</label><select id="ba-color"><option value="#3B6BFF">Blue</option><option value="#8B3CF7">Purple</option><option value="#0EA860">Green</option><option value="#D97706">Amber</option><option value="#E8354A">Red</option><option value="#0891B2">Teal</option></select></div></div><div id="ba-cc-fields" style="display:none"><div class="fr3"><div class="fg"><label>Credit limit</label><input type="number" id="ba-limit" min="0" placeholder="e.g. 50000"></div><div class="fg"><label>Current balance owed</label><input type="number" id="ba-owed" min="0" placeholder="0.00"></div><div class="fg"><label>Billing due day</label><input type="number" id="ba-billing-day" min="1" max="31" placeholder="e.g. 15" title="Day of the month your bill is due"></div></div><div style="font-size:10.5px;color:var(--t3);margin-top:-4px;margin-bottom:8px">Billing due day = which day of the month your payment is due (e.g. 15 = every 15th).</div></div><div class="fa"><button class="btn-add modal-save">Save account</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
+  openModal('Add Account',
+    '<div class="fr3">'
+    +'<div class="fg"><label>Bank / issuer name</label><input type="text" id="ba-name" placeholder="e.g. BDO"></div>'
+    +'<div class="fg"><label>Account type</label><select id="ba-type" onchange="toggleCCFields()"><option>Checking</option><option>Savings</option><option>Payroll</option><option>E-wallet</option><option>Investment</option><option>Credit Card</option><option>Cash</option></select></div>'
+    +'<div class="fg"><label>Last 4 digits</label><input type="text" id="ba-num" maxlength="4" placeholder="1234"></div>'
+    +'</div>'
+    +'<div class="fr" id="ba-row-bal">'
+    +'<div class="fg"><label>Opening balance</label><input type="number" id="ba-bal" min="0" placeholder="0.00"></div>'
+    +'</div>'
+    +'<div id="ba-cc-fields" style="display:none">'
+    +'<div class="fr3"><div class="fg"><label>Credit limit</label><input type="number" id="ba-limit" min="0" placeholder="e.g. 50000"></div><div class="fg"><label>Current balance owed</label><input type="number" id="ba-owed" min="0" placeholder="0.00"></div><div class="fg"><label>Billing due day</label><input type="number" id="ba-billing-day" min="1" max="31" placeholder="e.g. 15"></div></div>'
+    +'<div style="font-size:10.5px;color:var(--t3);margin-top:-4px;margin-bottom:8px">Billing due day = which day of the month your payment is due.</div>'
+    +'</div>'
+    +'<div class="fg" style="margin-bottom:12px">'
+    +'<label>Bank logo <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — PNG/JPG, max 500KB)</span></label>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-top:4px">'
+    +'<div id="ba-logo-preview" style="width:44px;height:44px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0;background:var(--bg)">🏦</div>'
+    +'<div><button type="button" class="btn-ghost" onclick="ge(\'ba-logo-input\').click()" style="font-size:11.5px">Upload logo</button>'
+    +'<div style="font-size:10px;color:var(--t3);margin-top:3px" id="ba-logo-name">No file chosen</div></div>'
+    +'<input type="file" id="ba-logo-input" accept="image/*" style="display:none">'
+    +'</div></div>'
+    +'<div class="fa"><button class="btn-add modal-save">Save account</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
   function(){
     var name=gv('ba-name').trim();if(!name){toast('Enter a bank name.','error');return;}
     var type=gv('ba-type');
     var isCC=type==='Credit Card';
+    var logoData=ge('ba-logo-input')&&ge('ba-logo-input')._logoData||null;
+    var accentColor=ge('ba-logo-input')&&ge('ba-logo-input')._accentColor||null;
     if(isCC){
       var limit=parseFloat(gv('ba-limit'));if(isNaN(limit)||limit<=0){toast('Enter a credit limit.','error');return;}
       var owed=parseFloat(gv('ba-owed'))||0;
       var billingDay=parseInt(gv('ba-billing-day'))||0;
-      S.accounts.push({id:nxtId(),name:name,type:type,num:gv('ba-num'),balance:0,color:gv('ba-color')||'#E8354A',archived:false,isCC:true,creditLimit:limit,usedCredit:owed,billingDay:billingDay});
+      S.accounts.push({id:nxtId(),name:name,type:type,num:gv('ba-num'),balance:0,color:accentColor||'#3B6BFF',accentColor:accentColor,archived:false,isCC:true,creditLimit:limit,usedCredit:owed,billingDay:billingDay,logo:logoData});
     } else {
       var bal=parseFloat(gv('ba-bal'))||0;
-      S.accounts.push({id:nxtId(),name:name,type:type,num:gv('ba-num'),balance:bal,color:gv('ba-color'),archived:false,isCC:false});
+      S.accounts.push({id:nxtId(),name:name,type:type,num:gv('ba-num'),balance:bal,color:accentColor||'#3B6BFF',accentColor:accentColor,archived:false,isCC:false,logo:logoData});
     }
     save();renderAccounts();fillSelects();updateProfileStats();closeModal();toast('Account added ✓','success');
   });
-  // toggle CC fields after modal renders
-  setTimeout(function(){toggleCCFields();},30);
+  setTimeout(function(){
+    toggleCCFields();
+    // wire up logo preview
+    var inp=ge('ba-logo-input');
+    if(inp)inp.addEventListener('change',function(){
+      var file=this.files[0];if(!file)return;
+      if(file.size>500*1024){toast('Logo must be under 500KB.','error');this.value='';return;}
+      var reader=new FileReader();
+      reader.onload=function(ev){
+        inp._logoData=ev.target.result;
+        var prev=ge('ba-logo-preview');
+        if(prev)prev.innerHTML='<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">';
+        var nm=ge('ba-logo-name');if(nm)nm.textContent=file.name;
+        // extract dominant color and auto-update color picker
+        extractDominantColor(ev.target.result,function(hex){
+          inp._accentColor=hex;
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+  },30);
 });
 function toggleCCFields(){
   var type=gv('ba-type');var isCC=type==='Credit Card';
@@ -1251,49 +1313,105 @@ function toggleCCFields(){
   if(ccF)ccF.style.display=isCC?'block':'none';
   if(balR)balR.style.display=isCC?'none':'grid';
 }
+// ── DOMINANT COLOR EXTRACTION FROM LOGO ──────────────────────────────────────────────
+function extractDominantColor(src, callback){
+  var img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=function(){
+    try{
+      var cv=document.createElement('canvas');
+      cv.width=cv.height=32; // downsample for speed
+      var ctx2=cv.getContext('2d');
+      ctx2.drawImage(img,0,0,32,32);
+      var data=ctx2.getImageData(0,0,32,32).data;
+      var rSum=0,gSum=0,bSum=0,count=0;
+      for(var i=0;i<data.length;i+=4){
+        var r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
+        // skip very light (near-white), very dark, and transparent pixels
+        if(a<80)continue;
+        var brightness=(r+g+b)/3;
+        if(brightness>230||brightness<20)continue;
+        // skip very desaturated (grayish)
+        var max=Math.max(r,g,b),min=Math.min(r,g,b);
+        if(max-min<30)continue;
+        rSum+=r;gSum+=g;bSum+=b;count++;
+      }
+      if(count>0){
+        var r=Math.round(rSum/count),g=Math.round(gSum/count),b=Math.round(bSum/count);
+        callback('#'+('0'+r.toString(16)).slice(-2)+('0'+g.toString(16)).slice(-2)+('0'+b.toString(16)).slice(-2));
+      } else {
+        callback(null); // fallback — no good color found
+      }
+    }catch(e){callback(null);}
+  };
+  img.onerror=function(){callback(null);};
+  img.src=src;
+}
+
+function accLogoHtml(a){
+  if(a.logo)return'<img src="'+a.logo+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">';
+  return a.isCC?'💳':'🏦';
+}
 function renderAccounts(){
   var g=ge('bank-grid');
   if(!S.accounts.length){g.innerHTML='<div style="color:var(--t3);font-size:13px;padding:1rem 0">No accounts yet.</div>';return;}
   g.innerHTML=S.accounts.map(function(a){
-    var col=a.color||'#3B6BFF';
+    var col=a.accentColor||a.color||'#3B6BFF';
+    var logoBg=a.logo?'background:#fff;padding:3px':'background:'+hexA(col,.10);
+    // gradient — white dominant, accent bleeds from top-right corner
+    var cardBg=a.accentColor
+      ?'background:linear-gradient(135deg,'+hexA(a.accentColor,.13)+' 0%,'+hexA(a.accentColor,.06)+' 30%,#ffffff 65%)'
+      :'background:#ffffff';
+    var cardBorder=a.accentColor
+      ?'border-color:'+hexA(a.accentColor,.25)
+      :'';
+    // always-visible soft glow top-right
+    var glowStyle=a.accentColor
+      ?'background:radial-gradient(circle,'+hexA(a.accentColor,.20)+',transparent 70%);opacity:1'
+      :'opacity:0';
+    var stripeStyle=a.accentColor?'background:'+col+';opacity:0.7':'opacity:0';
+    var footBtns='<button class="bedit" data-id="'+a.id+'">Edit</button>'
+      +'<button class="barchive" data-id="'+a.id+'">'+(a.archived?'Unarchive':'Archive')+'</button>'
+      +'<button class="bdel" data-id="'+a.id+'">Remove</button>';
+
     if(a.isCC){
-      var used=a.usedCredit||0;
-      var limit=a.creditLimit||0;
-      var avail=Math.max(0,limit-used);
+      var used=a.usedCredit||0,limit=a.creditLimit||0,avail=Math.max(0,limit-used);
       var utilPct=limit>0?Math.min(100,(used/limit)*100):0;
       var utilColor=utilPct>=90?'var(--red)':utilPct>=70?'var(--amber)':'var(--green)';
       var availColor=utilPct>=90?'var(--red)':utilPct>=70?'var(--amber)':'var(--blue)';
-      // billing due date badge
       var dueBadge='';
       if(a.billingDay){
         var now=new Date();
         var thisMonth=new Date(now.getFullYear(),now.getMonth(),a.billingDay);
-        // if already passed this month, check next month
         var dueDate=thisMonth<=now?new Date(now.getFullYear(),now.getMonth()+1,a.billingDay):thisMonth;
         var daysLeft=Math.ceil((dueDate-now)/(864e5));
-        var dueStr='Due '+a.billingDay+(a.billingDay===1||a.billingDay===21||a.billingDay===31?'st':a.billingDay===2||a.billingDay===22?'nd':a.billingDay===3||a.billingDay===23?'rd':'th')+' of month';
-        if(daysLeft<=0)dueBadge='<span class="badge br">Due today</span>';
-        else if(daysLeft<=3)dueBadge='<span class="badge ba">Due in '+daysLeft+'d</span>';
-        else if(daysLeft<=7)dueBadge='<span class="badge bbl">Due in '+daysLeft+'d</span>';
-        else dueBadge='<span class="badge bx">'+dueStr+'</span>';
+        var ord=a.billingDay+(a.billingDay===1||a.billingDay===21||a.billingDay===31?'st':a.billingDay===2||a.billingDay===22?'nd':a.billingDay===3||a.billingDay===23?'rd':'th');
+        dueBadge=daysLeft<=0?'<span class="badge br">Due today</span>':daysLeft<=3?'<span class="badge ba">Due in '+daysLeft+'d</span>':daysLeft<=7?'<span class="badge bbl">Due in '+daysLeft+'d</span>':'<span class="badge bx">Due '+ord+'</span>';
       }
-      return'<div class="card bcard is-cc'+(a.archived?' archived':'')+'">'
-        +'<div class="bcard-stripe" style="background:'+col+'"></div>'
-        +'<div class="bcard-head"><div class="bcard-icon" style="background:'+hexA(col,.10)+';color:'+col+'">💳</div>'
-        +(a.archived?'<span class="badge bx">Archived</span>':dueBadge)
-        +'</div>'
+      return'<div class="card bcard is-cc'+(a.archived?' archived':'')+'" style="'+cardBg+';'+cardBorder+'">'
+        +'<div class="bcard-glow" style="'+glowStyle+'"></div>'
+        +'<div class="bcard-stripe" style="'+stripeStyle+'"></div>'
+        +'<div class="bcard-head"><div class="bcard-icon" style="'+logoBg+';color:'+col+'">'+accLogoHtml(a)+'</div>'
+        +(a.archived?'<span class="badge bx">Archived</span>':dueBadge)+'</div>'
         +'<div class="bname">'+a.name+'</div>'
         +'<div class="bnum" style="margin-bottom:10px">•••• '+(a.num||'––––')+'</div>'
         +'<div class="cc-limit-row"><span class="cc-limit-lbl">Credit Limit</span><span class="cc-limit-val">'+fmt(limit)+'</span></div>'
         +'<div class="cc-avail-lbl">Available Credit</div>'
         +'<div class="cc-avail-val" style="color:'+availColor+'">'+fmt(avail)+'</div>'
-        +'<div class="cc-utilbar"><div class="cc-utilfill" style="width:'+utilPct.toFixed(1)+'%;background:'+utilColor+'"></div></div>'
+        +'<div class="cc-utilbar" style="background:'+hexA(col,.10)+'"><div class="cc-utilfill" style="width:'+utilPct.toFixed(1)+'%;background:'+utilColor+'"></div></div>'
         +'<div class="cc-used-row"><span><span>Used</span><strong style="color:'+utilColor+'">'+fmt(used)+'</strong></span><span style="text-align:right"><span>Utilization</span><strong>'+utilPct.toFixed(0)+'%</strong></span></div>'
-        +'<div class="bcard-foot"><button class="bdel" data-id="'+a.id+'">Remove</button><button class="bedit" data-id="'+a.id+'">'+(a.archived?'Unarchive':'Archive')+'</button></div>'
-        +'</div>';
+        +'<div class="bcard-foot">'+footBtns+'</div></div>';
     }
-    // regular account
-    return'<div class="card bcard'+(a.archived?' archived':'')+'"><div class="bcard-stripe" style="background:'+col+'"></div><div class="bcard-head"><div class="bcard-icon" style="background:'+hexA(col,.10)+';color:'+col+'">🏦</div>'+(a.archived?'<span class="badge bx">Archived</span>':'')+'</div><div class="bname">'+a.name+'</div><div class="btype" style="background:'+hexA(col,.08)+';color:'+col+'">'+a.type+'</div><div class="bbal">'+fmt(a.balance)+'</div><div class="bnum">•••• '+(a.num||'––––')+'</div><div class="bcard-foot"><button class="bdel" data-id="'+a.id+'">Remove</button><button class="bedit" data-id="'+a.id+'">'+(a.archived?'Unarchive':'Archive')+'</button></div></div>';
+    return'<div class="card bcard'+(a.archived?' archived':'')+'" style="'+cardBg+';'+cardBorder+'">'
+      +'<div class="bcard-glow" style="'+glowStyle+'"></div>'
+      +'<div class="bcard-stripe" style="'+stripeStyle+'"></div>'
+      +'<div class="bcard-head"><div class="bcard-icon" style="'+logoBg+';color:'+col+'">'+accLogoHtml(a)+'</div>'
+      +(a.archived?'<span class="badge bx">Archived</span>':'')+'</div>'
+      +'<div class="bname">'+a.name+'</div>'
+      +'<div class="btype" style="background:'+hexA(col,.10)+';color:'+col+'">'+a.type+'</div>'
+      +'<div class="bbal">'+fmt(a.balance)+'</div>'
+      +'<div class="bnum">•••• '+(a.num||'––––')+'</div>'
+      +'<div class="bcard-foot">'+footBtns+'</div></div>';
   }).join('');
   g.querySelectorAll('.bdel').forEach(function(btn){btn.addEventListener('click',function(){
     var id=this.dataset.id;
@@ -1301,10 +1419,81 @@ function renderAccounts(){
     S.accounts=S.accounts.filter(function(a){return String(a.id)!==String(id);});
     save();renderAccounts();fillSelects();updateProfileStats();toast('Account removed.');
   });});
+  g.querySelectorAll('.barchive').forEach(function(btn){btn.addEventListener('click',function(){
+    var id=this.dataset.id;var a=findAcc(id);
+    if(a){a.archived=!a.archived;save();renderAccounts();toast(a.archived?'Account archived.':'Account restored.');}
+  });});
   g.querySelectorAll('.bedit').forEach(function(btn){btn.addEventListener('click',function(){
-    var id=this.dataset.id;var a=findAcc(id);if(a){a.archived=!a.archived;save();renderAccounts();toast(a.archived?'Account archived.':'Account restored.');}
+    openEditAccount(this.dataset.id);
   });});
 }
+function openEditAccount(id){
+  var a=findAcc(id);if(!a)return;
+  var isCC=a.isCC;
+  var html=
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px;background:var(--bg);border-radius:12px">'
+    +'<div id="ea-logo-preview" style="width:52px;height:52px;border-radius:11px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0;'+(a.logo?'background:#fff;padding:3px':'background:var(--bg)')+';">'
+    +(a.logo?'<img src="'+a.logo+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">':'<span>'+(isCC?'💳':'🏦')+'</span>')
+    +'</div>'
+    +'<div><button type="button" class="btn-ghost" onclick="ge(\'ea-logo-input\').click()" style="font-size:11.5px">Upload logo</button>'
+    +(a.logo?'<button type="button" class="btn-ghost" onclick="removeAccLogo()" style="font-size:11.5px;margin-left:6px;color:var(--red)">Remove logo</button>':'')
+    +'<div style="font-size:10px;color:var(--t3);margin-top:4px">PNG/JPG, max 500KB</div>'
+    +'</div>'
+    +'<input type="file" id="ea-logo-input" accept="image/*" style="display:none">'
+    +'</div>'
+    +'<div class="fr3">'
+    +'<div class="fg"><label>Bank name</label><input type="text" id="ea-name" value="'+a.name+'"></div>'
+    +'<div class="fg"><label>Last 4 digits</label><input type="text" id="ea-num" maxlength="4" value="'+(a.num||'')+'"></div>'
+    +'<div class="fg"><label>Account type</label><input type="text" id="ea-type" value="'+a.type+'" readonly style="background:var(--bg);cursor:default"></div>'
+    +'</div>'
+    +(isCC
+      ?'<div class="fr3">'
+        +'<div class="fg"><label>Credit limit</label><input type="number" id="ea-limit" value="'+(a.creditLimit||'')+'"></div>'
+        +'<div class="fg"><label>Billing due day</label><input type="number" id="ea-bilday" min="1" max="31" value="'+(a.billingDay||'')+'"></div>'
+        +'<div class="fg"><label>Used credit (owed)</label><input type="number" id="ea-used" value="'+(a.usedCredit||0)+'"></div>'
+        +'</div>'
+      :'<div class="fr"><div class="fg"><label>Current balance</label><input type="number" id="ea-bal" value="'+a.balance+'"></div></div>'
+    )
+    +'<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+  openModal('Edit — '+a.name,html,function(){
+    var newName=gv('ea-name').trim()||a.name;
+    a.name=newName;a.num=gv('ea-num');
+    var inp=ge('ea-logo-input');
+    if(inp&&inp._logoData){
+      a.logo=inp._logoData;
+      if(inp._accentColor){a.accentColor=inp._accentColor;a.color=inp._accentColor;}
+    }
+    if(inp&&inp._removeLogo){a.logo=null;a.accentColor=null;a.color='#3B6BFF';}
+    if(isCC){
+      var nl=parseFloat(gv('ea-limit'));if(!isNaN(nl)&&nl>0)a.creditLimit=nl;
+      var nb=parseInt(gv('ea-bilday'));a.billingDay=isNaN(nb)?0:nb;
+      var nu=parseFloat(gv('ea-used'));if(!isNaN(nu)&&nu>=0)a.usedCredit=nu;
+    } else {
+      var nbv=parseFloat(gv('ea-bal'));if(!isNaN(nbv))a.balance=nbv;
+    }
+    save();renderAccounts();fillSelects();closeModal();toast('Account updated ✓','success');
+  });
+  setTimeout(function(){
+    var inp=ge('ea-logo-input');
+    if(inp)inp.addEventListener('change',function(){
+      var file=this.files[0];if(!file)return;
+      if(file.size>500*1024){toast('Logo must be under 500KB.','error');this.value='';return;}
+      var reader=new FileReader();
+      reader.onload=function(ev){
+        inp._logoData=ev.target.result;inp._removeLogo=false;
+        var prev=ge('ea-logo-preview');
+        if(prev)prev.innerHTML='<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">';
+        extractDominantColor(ev.target.result,function(hex){inp._accentColor=hex;});
+      };
+      reader.readAsDataURL(file);
+    });
+  },50);
+}
+function removeAccLogo(){
+  var inp=ge('ea-logo-input');if(inp){inp._logoData=null;inp._removeLogo=true;}
+  var prev=ge('ea-logo-preview');if(prev)prev.innerHTML='<span>🏦</span>';
+}
+
 
 // ── CC SUMMARY (shown at top of credit panel) ──────────────────────────────────────────────
 function renderCCSummary(){
@@ -1371,11 +1560,43 @@ ge('btn-open-sub').addEventListener('click',function(){
 });
 function renderSubs(){
   var tbody=ge('tb-sub');if(!tbody)return;
-  tbody.innerHTML=S.subscriptions.length?S.subscriptions.map(function(s){
+  var mob=ge('mob-sub');
+  if(!S.subscriptions.length){
+    tbody.innerHTML='<tr><td colspan="8"><div class="empty">No subscriptions yet.</div></td></tr>';
+    if(mob)mob.innerHTML='<div class="empty">No subscriptions yet.</div>';
+    return;
+  }
+  tbody.innerHTML=S.subscriptions.map(function(s){
     var days=s.nextDate?Math.ceil((new Date(s.nextDate)-new Date())/(864e5)):null;
     var status=days===null?'':days<0?'<span class="badge br">Overdue</span>':days===0?'<span class="badge ba">Today</span>':days<=3?'<span class="badge ba">Soon</span>':'<span class="badge bg">Active</span>';
     return'<tr><td><strong>'+s.name+'</strong></td><td class="hide-sm"><span class="badge bbl">'+s.category+'</span></td><td>'+s.cycle+'</td><td class="hide-sm">'+accName(s.account)+'</td><td>'+( s.nextDate||'—')+'</td><td class="hide-sm">'+status+'</td><td class="neg mono" style="text-align:right">'+fmt(s.amt)+'</td><td><button class="btn-icon danger" data-id="'+s.id+'"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></td></tr>';
-  }).join(''):'<tr><td colspan="8"><div class="empty">No subscriptions yet.</div></td></tr>';
+  }).join('');
+  if(mob){
+    mob.innerHTML=S.subscriptions.map(function(s){
+      var days=s.nextDate?Math.ceil((new Date(s.nextDate)-new Date())/(864e5)):null;
+      var statusTxt=days===null?'':days<0?'Overdue':days===0?'Due today':days<=3?'Due soon':'Active';
+      var statusColor=days!==null&&days<0?'var(--red)':days!==null&&days<=3?'var(--amber)':'var(--green)';
+      var statusHtml=statusTxt?'<span style="color:'+statusColor+'">'+statusTxt+'</span>':'';
+      var icon=catIcon(s.category)||'📱';
+      var bg=catColor(s.category)||'rgba(217,119,6,0.12)';
+      return'<div class="mob-card">'
+        +'<div class="mob-dot" style="background:'+bg+'">'+icon+'</div>'
+        +'<div class="mob-body">'
+          +'<div class="mob-title">'+s.name+'</div>'
+          +'<div class="mob-sub">'+s.cycle+' · '+(s.nextDate||'—')+(statusHtml?' · '+statusHtml:'')+'</div>'
+        +'</div>'
+        +'<div class="mob-right">'
+          +'<div class="mob-amt neg">'+fmt(s.amt)+'</div>'
+          +'<div class="mob-actions"><button class="mob-del-sub" data-id="'+s.id+'">Remove</button></div>'
+        +'</div>'
+        +'</div>';
+    }).join('');
+    mob.querySelectorAll('.mob-del-sub').forEach(function(btn){btn.addEventListener('click',function(){
+      var id=this.dataset.id;
+      S.subscriptions=S.subscriptions.filter(function(s){return String(s.id)!==String(id);});
+      save();renderSubs();toast('Removed.');
+    });});
+  }
   tbody.querySelectorAll('.btn-icon.danger').forEach(function(btn){btn.addEventListener('click',function(){
     var id=this.dataset.id;S.subscriptions=S.subscriptions.filter(function(s){return String(s.id)!==String(id);});save();renderSubs();toast('Removed.');
   });});
@@ -1435,14 +1656,14 @@ function renderCharts(){
     var ccAccsChart=S.accounts.filter(function(a){return a.isCC&&!a.archived;});
     var allNamesAcc=regAccsChart.map(function(a){return a.name;}).concat(ccAccsChart.map(function(a){return a.name+' (CC)';}));
     var allValsAcc=regAccsChart.map(function(a){return a.balance;}).concat(ccAccsChart.map(function(a){return-(a.usedCredit||0);}));
-    var allColsAcc=regAccsChart.map(function(a){return a.color;}).concat(ccAccsChart.map(function(a){return a.color||'#E8354A';}));
+    var allColsAcc=regAccsChart.map(function(a){return a.accentColor||a.color||'#3B6BFF';}).concat(ccAccsChart.map(function(a){return a.accentColor||a.color||'#E8354A';}));
     if(allNamesAcc.length){
       var acCv=ge('c-accounts');if(acCv)acCv.style.height=Math.max(120,allNamesAcc.length*54)+'px';
       drawHBar('c-accounts',allNamesAcc,allValsAcc,allColsAcc);
     } else{var ac=ge('c-accounts');if(ac)emptyCanvas(ac,'No accounts yet.');}
   },80);
 }
-function emptyCanvas(cv,msg){var W=canvasW(cv,400),H=canvasH(cv,180);cv.width=W;cv.height=H;var ctx=cv.getContext('2d');ctx.fillStyle=themeText();ctx.font='13px DM Sans,sans-serif';ctx.textAlign='center';ctx.fillText(msg,W/2,H/2);}
+function emptyCanvas(cv,msg){var W=canvasW(cv,400),H=canvasH(cv,180);var ctx=setupCanvas(cv,W,H);ctx.fillStyle=themeText();ctx.font='13px DM Sans,sans-serif';ctx.textAlign='center';ctx.fillText(msg,W/2,H/2);}
 
 // ── PROFILE PHOTO ──────────────────────────────────────────────
 function applyPhoto(){
@@ -1517,8 +1738,8 @@ ge('btn-clear').addEventListener('click',function(){
 
 // ── CANVAS DRAWING ──────────────────────────────────────────────
 function drawBar(id,labels,datasets,opts){
-  var cv=ge(id);if(!cv)return;var ctx=cv.getContext('2d');
-  var W=canvasW(cv,800),H=canvasH(cv,185);cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+  var cv=ge(id);if(!cv)return;
+  var W=canvasW(cv,800),H=canvasH(cv,185);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
   var pad={t:26,r:18,b:42,l:68};var cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
   var allV=[];datasets.forEach(function(d){d.data.forEach(function(v){allV.push(v||0);});});
   var maxV=Math.max.apply(null,allV.concat([1]));
@@ -1539,8 +1760,8 @@ function drawBar(id,labels,datasets,opts){
   if(datasets.length>1){var lx=pad.l+4,ly=9;datasets.forEach(function(d,j){ctx.fillStyle=d.color||CC[j];ctx.fillRect(lx,ly,8,8);ctx.fillStyle=themeText();ctx.font='10.5px DM Sans,sans-serif';ctx.textAlign='left';ctx.fillText(d.label||'',lx+12,ly+7);lx+=ctx.measureText(d.label||'').width+30;});}
 }
 function drawHBar(id,labels,values,colors){
-  var cv=ge(id);if(!cv)return;var ctx=cv.getContext('2d');
-  var W=canvasW(cv,500),H=canvasH(cv,200);cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+  var cv=ge(id);if(!cv)return;
+  var W=canvasW(cv,500),H=canvasH(cv,200);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
   var n=labels.length;if(!n)return;
 
   // measure label widths
@@ -1610,8 +1831,8 @@ function drawHBar(id,labels,values,colors){
   });
 }
 function drawLine(id,labels,values,color){
-  var cv=ge(id);if(!cv)return;var ctx=cv.getContext('2d');
-  var W=canvasW(cv,800),H=canvasH(cv,145);cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+  var cv=ge(id);if(!cv)return;
+  var W=canvasW(cv,800),H=canvasH(cv,145);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
   if(!values.length)return;
   var dl=labels.slice(),dv=values.slice();
   if(dv.length===1){dl.unshift('Start');dv.unshift(0);}
@@ -1636,8 +1857,8 @@ function drawLine(id,labels,values,color){
   var step=Math.ceil(nn/8);for(var x=0;x<nn;x++){if(x%step===0)ctx.fillText(dl[x],px(x),H-pad.b+13);}
 }
 function drawDonut(id,labels,values,colors){
-  var cv=ge(id);if(!cv)return;var ctx=cv.getContext('2d');
-  var W=canvasW(cv,500),H=canvasH(cv,200);cv.width=W;cv.height=H;ctx.clearRect(0,0,W,H);
+  var cv=ge(id);if(!cv)return;
+  var W=canvasW(cv,500),H=canvasH(cv,200);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
   var total=values.reduce(function(s,v){return s+v;},0);if(!total)return;
   var dZW=Math.min(W*.42,H*1.1),cx=dZW/2,cy=H/2,r=Math.min(cx,cy)*.82,ri=r*.54,start=-Math.PI/2;
   values.forEach(function(v,i){
