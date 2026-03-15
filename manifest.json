@@ -1,8 +1,9 @@
 {
+  "id": "/Finance-Tracker/",
   "name": "Felix Finance OS",
   "short_name": "Felix",
   "description": "Personal finance tracker for managing income, expenses, accounts, and budgets.",
-  "start_url": "/Finance-Tracker/",
+  "start_url": "/Finance-Tracker/index.html",
   "scope": "/Finance-Tracker/",
   "display": "standalone",
   "orientation": "portrait",
