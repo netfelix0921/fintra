@@ -387,15 +387,26 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 
 /* Search */
 .search-wrap { position: relative; width: 180px; }
-.search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; stroke: var(--t3); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
 .search-input {
-  width: 100%; padding: 5px 9px 5px 28px;
-  background: var(--bg); border: 1.5px solid var(--border2);
+  width: 100%; padding: 5px 12px;
+  background: var(--bg); border: 1px solid var(--border);
   border-radius: 999px; font-size: 12px;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  color: var(--t1); outline: none; box-shadow: none; transition: all var(--dur-med) var(--ease-out);
+  color: var(--t1);
+  outline: 0 !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  transition: border-color var(--dur-med);
 }
-.search-input:focus { background: var(--surface); border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.09); }
+.search-input:focus,
+.search-input:focus-visible {
+  outline: 0 !important;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.09);
+  background: var(--surface);
+}
 .search-input::placeholder { color: var(--t3); font-size: 11.5px; }
 .search-results {
   position: absolute; top: calc(100% + 6px); left: 0; right: 0;
@@ -407,9 +418,8 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .search-mob-btn { display: none; width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--dur-fast); }
 .search-mob-btn svg { width: 15px; height: 15px; stroke: var(--t2); fill: none; stroke-width: 1.75; stroke-linecap: round; }
 .search-mob-btn:hover { background: var(--surface); }
-.search-mob-bar { display: none; padding: 8px 14px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; z-index: 101; }
-.search-mob-bar .search-input { background: var(--bg); font-size: 13px; padding: 8px 12px 8px 32px; }
-.search-mob-bar svg { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--t3); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
+.search-mob-bar { display: none !important; padding: 8px 14px; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); position: relative; z-index: 101; }
+.search-mob-bar .search-input { background: var(--bg); font-size: 13px; padding: 8px 12px; border-radius: var(--r-sm) !important; flex: 1; }
 .search-mob-bar .search-results { left: 14px; right: 14px; }
 .sr-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background var(--dur-fast); border-bottom: 1px solid var(--border); }
 .sr-item:last-child { border-bottom: none; }
@@ -1234,8 +1244,9 @@ select option { background: var(--surface); }
   .ham-btn { display: flex; }
   .search-wrap { display: none; }
   .search-mob-btn { display: flex; }
-  .search-mob-bar.show { display: block; }
-  .search-mob-bar.open { display: block; }
+  .search-mob-bar.show { display: flex !important; align-items: center; }
+  .search-mob-bar.open { display: flex !important; align-items: center; }
+  .search-mob-bar.show { display: flex !important; align-items: center; }
   .krow { grid-template-columns: 1fr 1fr; }
   .content { padding: 18px 16px; }
 }
@@ -2132,7 +2143,6 @@ input[type="date"], input[type="number"] {
     </div>
     <div class="topbar-right">
       <div class="search-wrap">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <input class="search-input" id="search-input" type="text" placeholder="Search transactions…">
         <div class="search-results" id="search-results"></div>
       </div>
@@ -2148,7 +2158,6 @@ input[type="date"], input[type="number"] {
     </div>
   </div>
   <div class="search-mob-bar" id="search-mob-bar">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     <input class="search-input" id="search-input-mob" type="text" placeholder="Search transactions…" autocomplete="off">
     <div class="search-results" id="search-results-mob"></div>
   </div>
@@ -2604,8 +2613,8 @@ input[type="date"], input[type="number"] {
       <div class="log-filter card" id="lf-charts">
         <div class="lf-presets">
           <span class="lf-title">Period:</span>
-          <button class="df-btn cr-btn" data-range="3">3M</button>
-          <button class="df-btn cr-btn active" data-range="12">1Y</button>
+          <button class="df-btn cr-btn active" data-range="3">3M</button>
+          <button class="df-btn cr-btn" data-range="12">1Y</button>
           <span id="cr-range-label"></span>
         </div>
         <div class="lf-daterow" id="chart-range-btns">
@@ -2635,7 +2644,7 @@ input[type="date"], input[type="number"] {
         <div class="wtitle">
           <span>Income vs Expenses</span>
         </div>
-        <canvas id="c-monthly" class="chart-canvas" style="height:180px"></canvas>
+        <canvas id="c-monthly" class="chart-canvas" style="height:210px"></canvas>
       </div>
 
       <!-- Two column row — same dash-row c2 as dashboard -->
@@ -2981,7 +2990,7 @@ function setGreeting(){
     var dueDate=thisMonth<=now2?new Date(now2.getFullYear(),now2.getMonth()+1,a.billingDay):thisMonth;
     return Math.ceil((dueDate-now2)/(864e5))<=5;
   });
-  if(ccDueSoon.length>0)pills.push('<span class="g-pill amber">💳 '+ccDueSoon[0].name+' due soon</span>');
+  if(ccDueSoon.length>0)pills.push('<span class="g-pill amber">CC: '+ccDueSoon[0].name+' due soon</span>');
   var ins=ge('g-insights');if(ins)ins.innerHTML=pills.join('');
 }
 
@@ -3353,7 +3362,7 @@ function refreshCrCard(){
 function fillSelects(){
   // regular accounts (non-CC) for income/expense/transfer/savings
   var regOpts='<option value="">— select account —</option>'+S.accounts.filter(function(a){return!a.isCC;}).map(function(a){return'<option value="'+a.id+'">'+a.name+(a.archived?' (archived)':'')+'</option>';}).join('');
-  ['in-acc','ex-acc','tr-from','tr-to','sv-acc','sub-acc'].forEach(function(id){var el=ge(id);if(el)el.innerHTML=regOpts;});
+  ['in-acc','ex-acc','tr-from','tr-to','sub-acc'].forEach(function(id){var el=ge(id);if(el)el.innerHTML=regOpts;});
   // credit card dropdown — shows available credit so user knows what's left
   var ccAccounts=S.accounts.filter(function(a){return a.isCC&&!a.archived;});
   var cardOpts=ccAccounts.length
@@ -3545,7 +3554,7 @@ function earmarkBadge(accountId,balance){
   return'<div style="display:flex;justify-content:space-between;align-items:center;'
     +'margin-top:5px;padding:5px 8px;background:rgba(59,107,255,0.07);border-radius:7px;'
     +'border:1px solid rgba(59,107,255,0.14)">'
-    +'<span style="font-size:10px;color:var(--blue);font-weight:500">🎯 Earmarked for goals</span>'
+    +'<span style="font-size:10px;color:var(--blue);font-weight:500">Earmarked for goals</span>'
     +'<span style="font-family:DM Mono,monospace;font-size:11px;font-weight:500;color:var(--blue)">'+fmt(earmark)+'</span>'
     +'</div>'
     +(free>=0
@@ -4060,7 +4069,7 @@ function renderBudget(){
   var mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var now=new Date();var ri=ge('budget-reset-info');
   var daysLeft=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate();
-  if(ri)ri.innerHTML='<div style="font-size:11.5px;color:var(--t3);margin-bottom:4px">📅 Tracking <strong style="color:var(--t2)">'+mn[now.getMonth()]+' '+now.getFullYear()+'</strong> · '+daysLeft+' days remaining · Resets on the 1st</div>';
+  if(ri)ri.innerHTML='<div style="font-size:11.5px;color:var(--t3);margin-bottom:4px">Tracking <strong style="color:var(--t2)">'+mn[now.getMonth()]+' '+now.getFullYear()+'</strong> · '+daysLeft+' days remaining · Resets on the 1st</div>';
   var grid=ge('ggrid');if(!grid)return;
   grid.innerHTML=S.goals.length?S.goals.map(function(g){
     var spent=S.expense.filter(function(e){return e.date.startsWith(curYM())&&e.category===g.category;}).reduce(function(s,e){return s+e.amt;},0);
@@ -4078,7 +4087,7 @@ function renderBudget(){
 
 // ── CHARTS ──────────────────────────────────────────────
 // ── CHART RANGE STATE ──────────────────────────────────────────────
-var _chartRange=12; // default 12 months (1Y)
+var _chartRange=3; // default 3 months
 var _chartFromDate=''; // full date e.g. 2025-01-01
 var _chartToDate='';   // full date e.g. 2025-12-31
 
@@ -4232,11 +4241,11 @@ function wireChartControls(){
   });
   var crClear=ge('cr-clear');
   if(crClear)crClear.addEventListener('click',function(){
-    _chartFromDate='';_chartToDate='';_chartRange=12;
+    _chartFromDate='';_chartToDate='';_chartRange=3;
     var cf=ge('cr-from-date');var ct=ge('cr-to-date');
     if(cf)cf.value='';if(ct)ct.value='';
     document.querySelectorAll('#lf-charts .cr-btn').forEach(function(b){b.classList.remove('active');});
-    var def=document.querySelector('#lf-charts .cr-btn[data-range="12"]');
+    var def=document.querySelector('#lf-charts .cr-btn[data-range="3"]');
     if(def)def.classList.add('active');
     renderCharts();
   });
@@ -4337,7 +4346,7 @@ ge('btn-clear').addEventListener('click',function(){
 // ── CANVAS DRAWING ──────────────────────────────────────────────
 function drawBar(id,labels,datasets,opts){
   var cv=ge(id);if(!cv)return;
-  var W=canvasW(cv,800),H=canvasH(cv,185);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
+  var W=canvasW(cv,800),H=canvasH(cv,210);var ctx=setupCanvas(cv,W,H);ctx.clearRect(0,0,W,H);
   var allV=[];datasets.forEach(function(d){d.data.forEach(function(v){allV.push(v||0);});});
   var hasData=allV.some(function(v){return v>0;});
   if(!hasData){
@@ -4352,15 +4361,21 @@ function drawBar(id,labels,datasets,opts){
   ctx.strokeStyle=themeGrid();ctx.lineWidth=1;
   ctx.fillStyle=themeText();ctx.font='11px Plus Jakarta Sans,sans-serif';ctx.textAlign='right';
   for(var i=0;i<=4;i++){var y=pad.t+cH-(i/4)*cH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();ctx.fillText((opts&&opts.yCur||'')+Math.round(maxV*i/4).toLocaleString(),pad.l-6,y+4);}
-  var n=labels.length,ds=datasets.length,grpW=cW/n,barW=Math.min(grpW*.38/ds,28);
+  var n=labels.length,ds=datasets.length,grpW=cW/n;
+  var barGap=5; // gap between bars in same group
+  var barW=Math.min(Math.floor((grpW*0.65-barGap*(ds-1))/ds),40);
+  barW=Math.max(barW,4);
+  var totalGroupW=barW*ds+barGap*(ds-1);
   labels.forEach(function(lbl,i){
     datasets.forEach(function(d,j){
-      var v=d.data[i]||0,x=pad.l+i*grpW+(grpW-barW*ds)/2+j*barW,bH=Math.max((v/maxV)*cH,v>0?2:0),y=pad.t+cH-bH;
+      var v=d.data[i]||0;
+      var x=pad.l+i*grpW+(grpW-totalGroupW)/2+j*(barW+barGap);
+      var bH=Math.max((v/maxV)*cH,v>0?2:0),y=pad.t+cH-bH;
       ctx.fillStyle=d.color||CC[j];
-      if(bH>5){var r=Math.min(4,barW/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+barW-r,y);ctx.arcTo(x+barW,y,x+barW,y+r,r);ctx.lineTo(x+barW,y+bH);ctx.lineTo(x,y+bH);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();ctx.fill();}
+      if(bH>5){var r=Math.min(5,barW/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+barW-r,y);ctx.arcTo(x+barW,y,x+barW,y+r,r);ctx.lineTo(x+barW,y+bH);ctx.lineTo(x,y+bH);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();ctx.fill();}
       else if(bH>0)ctx.fillRect(x,y,barW,bH);
     });
-    ctx.fillStyle=themeText();ctx.textAlign='center';ctx.font='10.5px Plus Jakarta Sans,sans-serif';
+    ctx.fillStyle=themeText();ctx.textAlign='center';ctx.font='11px Plus Jakarta Sans,sans-serif';
     ctx.fillText(lbl,pad.l+i*grpW+grpW/2,H-pad.b+14);
   });
   /* legend removed — redundant with card title */
@@ -4521,7 +4536,7 @@ function renderDash(){
   var all=[];
   S.income.forEach(function(e){all.push({date:e.date,desc:e.source,type:'Income',amt:e.amt,cls:'pos',sign:'+',dot:catColor(e.category),icon:catIcon(e.category)});});
   S.expense.forEach(function(e){all.push({date:e.date,desc:e.desc,type:'Expense',amt:e.amt,cls:'neg',sign:'-',dot:catColor(e.category),icon:catIcon(e.category)});});
-  S.transfer.forEach(function(e){all.push({date:e.date,desc:'Transfer',type:'Transfer',amt:e.amt,cls:'neu',sign:'',dot:'rgba(8,145,178,0.12)',icon:'↔️'});});
+  S.transfer.forEach(function(e){all.push({date:e.date,desc:'Transfer '+(e.note?'— '+e.note:''),type:'Transfer',amt:e.amt,cls:'neu',sign:'',dot:'rgba(8,145,178,0.12)',icon:'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M3 5l3-3M3 5l3 3"/><path d="M13 11H3m10 0l-3-3m3 3l-3 3"/></svg>'});});
   S.credit.forEach(function(e){all.push({date:e.date,desc:e.desc,type:'Credit',amt:e.amt,cls:e.type==='Charge'?'neg':'pos',sign:e.type==='Charge'?'-':'+',dot:catColor(e.category),icon:catIcon(e.category)});});
   all.sort(function(a,b){return b.date.localeCompare(a.date);});
   ge('recent-list').innerHTML=all.slice(0,7).map(function(e){return'<div class="ri"><div class="rl"><div class="rdot" style="background:'+e.dot+'">'+e.icon+'</div><div><div class="rdesc">'+e.desc+'</div><div class="rdate">'+e.date+' · '+e.type+'</div></div></div><div class="ramt '+e.cls+'">'+e.sign+fmt(e.amt)+'</div></div>';}).join('')||'<div style="color:var(--t3);font-size:12.5px;padding:.8rem 0">No activity yet.</div>';
@@ -4635,14 +4650,14 @@ var LOG_CFG={
     amt:function(e){return{sign:'-',cls:'neg',val:fmt(e.amt)};}
   },
   transfer:{
-    icon:function(){return'↔️';},
+    icon:function(){return'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M3 5l3-3M3 5l3 3"/><path d="M13 11H3m10 0l-3-3m3 3l-3 3"/></svg>';},
     dotBg:function(){return'rgba(8,145,178,0.12)';},
     title:function(e){return accName(e.from)+' → '+accName(e.to);},
     sub:function(e){return e.date+(e.note?' · '+e.note:'');},
     amt:function(e){return{sign:'',cls:'neu',val:fmt(e.amt)};}
   },
   credit:{
-    icon:function(e){return e.isPaid?'✅':catIcon(e.category);},
+    icon:function(e){return e.isPaid?'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5,8 6,12 13.5,4"/></svg>':catIcon(e.category);},
     dotBg:function(e){return e.isPaid?'rgba(14,168,96,0.12)':catColor(e.category);},
     title:function(e){return e.desc;},
     sub:function(e){return e.date+' · '+e.card+(e.isPaid?' · <span style="color:var(--green);font-weight:500">Paid</span>':(e.due&&e.type==='Charge'?' · Due '+e.due:''));},
@@ -5033,7 +5048,7 @@ function openAddInstallment(){
   }).join('');
   var html=
     '<div style="background:var(--blue-s);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;color:var(--blue)">'+
-    '💳 Each month\'s installment will be <strong>auto-charged to your CC</strong> and logged as a credit charge.</div>'+
+    'Each month\'s installment will be <strong>auto-charged to your CC</strong> and logged as a credit charge.</div>'+
     '<div class="fr3">'+
       '<div class="fg"><label>Item / description</label><input type="text" id="ip-name" placeholder="e.g. iPhone 15 Pro"></div>'+
       '<div class="fg"><label>Credit card</label><select id="ip-card">'+ccOpts+'</select></div>'+
@@ -5297,7 +5312,11 @@ function renderSavingsGoals(){
           +(hasTarget
             ?'<span class="sg-pct" style="color:'+col.text+'">'+pct+'%'+(isDone?' ✓':'')+'</span>'
             :'<span class="sg-pct" style="color:var(--t3)">No target set</span>')
-          +'<span class="sg-meta">'+(g.account?'Linked: '+(findAcc(g.account)?findAcc(g.account).name:''):'Unlinked')+'</span>'
+          +(function(){
+        var acc=g.account?findAcc(g.account):null;
+        if(!acc) return '<span class="sg-meta" style="color:var(--t3)">No linked account</span>';
+        return '<span class="sg-meta">'+acc.name+' · <span style="color:var(--t2);font-family:DM Mono,monospace">'+fmt(acc.balance)+'</span></span>';
+      }())
         +'</div>'
         +deadlineHtml
         +monthlyHint
@@ -5352,7 +5371,7 @@ function openSavingsGoalModal(editId){
     +'<div class="fr3">'
       +'<div class="fg"><label>Goal name</label><input type="text" id="sg-name" placeholder="e.g. Health Fund" value="'+(g?g.name:'')+'"></div>'
       +'<div class="fg"><label>Target amount <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><input type="number" id="sg-target" min="0" placeholder="100,000" value="'+(g&&g.target?g.target:'')+'"></div>'
-      +'<div class="fg"><label>Linked account <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><select id="sg-acc"><option value="">— none —</option></select></div>'
+      +'<div class="fg"><label>Linked account <span style="font-weight:400;font-size:10px;color:var(--t3)">(reference only)</span></label><select id="sg-acc"><option value="">— none —</option></select></div>'
     +'</div>'
     +'<div class="fr3">'
       +'<div class="fg"><label>Deadline <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><input type="date" id="sg-deadline" value="'+(g&&g.deadline?g.deadline:'')+'"></div>'
@@ -5381,12 +5400,14 @@ function openSavingsGoalModal(editId){
   });
 
   setTimeout(function(){
-    fillSelects();
+    // Build sg-acc cleanly — not via fillSelects to avoid duplicate blank
     var sa=ge('sg-acc');
     if(sa){
-      var opt=document.createElement('option');opt.value='';opt.textContent='— none —';
-      sa.insertBefore(opt,sa.firstChild);
-      if(g&&g.account)sa.value=g.account;
+      var accOpts='<option value="">— none —</option>';
+      S.accounts.filter(function(a){return!a.archived;}).forEach(function(a){
+        accOpts+='<option value="'+a.id+'"'+(g&&String(g.account)===String(a.id)?' selected':'')+'>'+a.name+(a.isCC?' (CC)':'')+'</option>';
+      });
+      sa.innerHTML=accOpts;
     }
     // Wire month picker to auto-fill deadline
     var mon=ge('sg-months');var dl=ge('sg-deadline');
@@ -5410,7 +5431,7 @@ function updateSgHint(){
   var target=parseFloat(gv('sg-target'))||0;
   var dl=gv('sg-deadline');
   if(!target||!dl){hint.style.display='none';return;}
-  var months=Math.max(1,Math.round((new Date(dl+' T00:00:00')-new Date())/(864e5*30.44)));
+  var months=Math.max(1,Math.round((new Date(dl+'T00:00:00')-new Date())/(864e5*30.44)));
   var monthly=Math.ceil(target/months);
   hint.style.display='block';
   hint.innerHTML='To reach <strong>'+fmt(target)+'</strong> by <strong>'+new Date(dl+'T00:00:00').toLocaleDateString('en-PH',{month:'short',year:'numeric'})+'</strong> — save <strong style="color:var(--blue)">'+fmt(monthly)+'/month</strong> for '+months+' months.';
@@ -5434,7 +5455,7 @@ function logSavingsToGoal(presetGoal){
     +'</div>'
     +'<div class="fr">'
       +'<div class="fg"><label>Amount</label><input type="number" id="sv-amt" min="0" placeholder="0.00"></div>'
-      +'<div class="fg"><label>Linked account <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><select id="sv-acc"><option value="">— none —</select></div>'
+      +'<div class="fg"><label>Linked account <span style="font-weight:400;font-size:10px;color:var(--t3)">(reference only)</span></label><select id="sv-acc"><option value="">— none —</option></select></div>'
     +'</div>'
     +'<div id="sv-goal-status" style="font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:10px;display:none;color:var(--t2)"></div>'
     +'<div class="fg"><label>Note <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><input type="text" id="sv-note" placeholder="Optional"></div>'
@@ -5444,7 +5465,13 @@ function logSavingsToGoal(presetGoal){
   setTimeout(function(){
     fillSelects();
     var sa=ge('sv-acc');
-    if(sa){var opt=document.createElement('option');opt.value='';opt.textContent='— none —';sa.insertBefore(opt,sa.firstChild);}
+    if(sa){
+      var accOpts2='<option value="">— none —</option>';
+      S.accounts.filter(function(a){return!a.archived;}).forEach(function(a){
+        accOpts2+='<option value="'+a.id+'">'+a.name+(a.isCC?' (CC)':'')+'</option>';
+      });
+      sa.innerHTML=accOpts2;
+    }
     // Show goal progress in hint
     function showGoalStatus(){
       var hint=ge('sv-goal-status');if(!hint)return;
@@ -5466,7 +5493,23 @@ function logSavingsToGoal(presetGoal){
       hint.style.display='block';
       hint.innerHTML=parts.join(' · ');
     }
-    var goalEl=ge('sv-goal');if(goalEl){goalEl.addEventListener('change',showGoalStatus);showGoalStatus();}
+    var goalEl=ge('sv-goal');
+    if(goalEl){
+      goalEl.addEventListener('change',function(){
+        if(this.value==='__new__'){
+          // Replace select with text input
+          var inp=document.createElement('input');
+          inp.type='text'; inp.id='sv-goal'; inp.placeholder='Type new goal name…';
+          inp.className=this.className; inp.style.cssText=this.style.cssText;
+          this.parentNode.replaceChild(inp,this);
+          inp.focus();
+          inp.addEventListener('input',showGoalStatus);
+        } else {
+          showGoalStatus();
+        }
+      });
+      showGoalStatus();
+    }
   },40);
 }
 
@@ -5622,7 +5665,7 @@ function saveEntry(type){
     // ── SAVINGS IS A GOAL TRACKER — no account balance changes ──
     // If you want to physically move money between banks, use Transfer.
     S.savings.push(e);
-    save();renderLog('savings');statSavings();updateProfileStats();renderAccounts();renderDash();closeModal();
+    save();renderLog('savings');statSavings();updateProfileStats();renderAccounts();renderDash();renderSavingsGoals();closeModal();
     toast('Savings logged ✓ — '+fmt(amt)+' '+(stype==='Deposit'?'saved toward':'withdrawn from')+' "'+e.goal+'"','success');
   }
 }
@@ -5903,7 +5946,7 @@ function renderInsightCards(){
   }
   if(forecastItemsEl){
     forecastItemsEl.innerHTML=fc.deductions.map(function(d){
-      var ic=d.type==='installment'?'💳':d.type==='bill'?'📄':'🔄';
+      var ic=d.type==='installment'?catIcon('Subscription'):d.type==='bill'?catIcon('Utilities'):catIcon('Transfer');
       return'<div class="fc-item">'
         +'<span class="fc-name">'+ic+' '+d.name+'</span>'
         +'<span class="fc-amt neg">-'+fmt(d.amt)+'</span>'
@@ -5973,20 +6016,20 @@ loadCatMem();
 // ══════════════════════════════════════════════════════════════
 
 var BILL_CATS=[
-  {name:'Electricity',icon:'💡',color:'rgba(217,119,6,0.12)'},
-  {name:'Water',icon:'🌊',color:'rgba(8,145,178,0.12)'},
-  {name:'Internet',icon:'📶',color:'rgba(59,107,255,0.12)'},
+  {name:'Electricity',icon:catIcon('Utilities'),color:'rgba(217,119,6,0.12)'},
+  {name:'Water',icon:catIcon('Transport'),color:'rgba(8,145,178,0.12)'},
+  {name:'Internet',icon:catIcon('Subscription'),color:'rgba(59,107,255,0.12)'},
   {name:'Phone',icon:catIcon('Subscription'),color:'rgba(139,60,247,0.12)'},
   {name:'Rent',icon:catIcon('Rent'),color:'rgba(139,60,247,0.12)'},
-  {name:'Gas',icon:'🔥',color:'rgba(232,53,74,0.12)'},
-  {name:'Insurance',icon:'🛡️',color:'rgba(14,168,96,0.12)'},
+  {name:'Gas',icon:catIcon('Utilities'),color:'rgba(232,53,74,0.12)'},
+  {name:'Insurance',icon:catIcon('Health'),color:'rgba(14,168,96,0.12)'},
   {name:'Loan',icon:catIcon('Savings'),color:'rgba(59,107,255,0.12)'},
-  {name:'TV/Cable',icon:'📺',color:'rgba(217,119,6,0.12)'},
-  {name:'Other',icon:'📄',color:'rgba(142,146,184,0.12)'}
+  {name:'TV/Cable',icon:catIcon('Entertainment'),color:'rgba(217,119,6,0.12)'},
+  {name:'Other',icon:catIcon('Other'),color:'rgba(142,146,184,0.12)'}
 ];
 
 function billCatInfo(cat){
-  return BILL_CATS.find(function(c){return c.name===cat;})||{name:'Other',icon:'📄',color:'rgba(142,146,184,0.12)'};
+  return BILL_CATS.find(function(c){return c.name===cat;})||{name:'Other',icon:catIcon('Other'),color:'rgba(142,146,184,0.12)'};
 }
 
 function billStatus(b){
