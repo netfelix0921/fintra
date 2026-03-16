@@ -1146,8 +1146,30 @@ select option { background: var(--surface); }
 .prof-badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 500; background: var(--blue-s); color: var(--blue); }
 .pn { font-size: 18px; font-weight: 500; color: var(--t1); letter-spacing: -.3px; }
 .pt { font-size: 12px; color: var(--t3); }
-.prof-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.prof-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media(max-width:600px) { .prof-2col { grid-template-columns: 1fr; } }
+
+/* Profile form fields */
+.prof-field {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px;
+}
+.prof-field:last-of-type { border-bottom: none; }
+.prof-label { font-size: 12.5px; color: var(--t2); flex-shrink: 0; min-width: 70px; font-weight: 400; }
+.prof-field input, .prof-field select {
+  text-align: right; flex: 1; max-width: 240px;
+}
+
+/* Profile stat rows */
+.prof-stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid var(--border);
+  font-size: 12.5px; color: var(--t2); gap: 8px;
+}
+.prof-stat-row:last-of-type { border-bottom: none; }
+.prof-stat-row span:last-child {
+  font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; flex-shrink: 0;
+}
 .sset { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); }
 .sset-t { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--t3); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; }
 .srow { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 10px; }
@@ -1357,6 +1379,8 @@ html[data-theme="dark"] .wtitle .wlink { color: #60A5FA; }
 html[data-theme="dark"] .sset { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .sset-t { border-bottom-color: var(--border); }
 html[data-theme="dark"] .srow { border-bottom-color: var(--border); }
+html[data-theme="dark"] .prof-field { border-bottom-color: var(--border); }
+html[data-theme="dark"] .prof-stat-row { border-bottom-color: var(--border); color: var(--t2); }
 html[data-theme="dark"] .dzone { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.18); }
 html[data-theme="dark"] .fcard { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .fcard h3 { border-bottom-color: var(--border); }
@@ -1903,82 +1927,96 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 
     <!-- PROFILE -->
     <div id="panel-profile" class="panel">
-      <div class="ph"><div><div class="ph-t">Profile &amp; Settings</div><div class="ph-s">Manage your app</div></div></div>
+      <div class="ph"><div><div class="ph-t">Profile &amp; Settings</div><div class="ph-s">Manage your account and preferences</div></div></div>
 
-      <!-- Compact hero -->
-      <div class="card" style="padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px">
+      <!-- Avatar hero -->
+      <div class="card" style="padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px">
         <div style="position:relative;flex-shrink:0">
-          <div class="av-lg" id="prof-av-lg" style="width:54px;height:54px;font-size:20px"><span id="prof-initial">F</span></div>
-          <button id="btn-photo" style="position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#3B6BFF,#6B44EE);border:2px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;padding:0">📷</button>
+          <div class="av-lg" id="prof-av-lg" style="width:56px;height:56px;font-size:22px"><span id="prof-initial">Y</span></div>
+          <button id="btn-photo" style="position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:var(--blue);border:2px solid var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;padding:0" title="Change photo">📷</button>
         </div>
         <input type="file" id="photo-input" accept="image/*" style="display:none">
         <div style="flex:1;min-width:0">
-          <div class="pn" id="prof-name-disp" style="font-size:16px">Your Name/div>
-          <div class="pt" id="prof-tag-disp" style="font-size:11px;margin-top:1px">Personal Finance Tracker</div>
-          <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
-            <span class="prof-badge" id="pb-acc" style="font-size:9.5px;padding:2px 7px">0 Accounts</span>
-            <span class="prof-badge" id="pb-inc" style="font-size:9.5px;padding:2px 7px">0 Income</span>
-            <span class="prof-badge" id="pb-exp" style="font-size:9.5px;padding:2px 7px">0 Expenses</span>
+          <div class="pn" id="prof-name-disp" style="font-size:16px;font-weight:600;color:var(--t1)">Your Name</div>
+          <div class="pt" id="prof-tag-disp" style="font-size:12px;margin-top:2px;color:var(--t3)">Personal Finance Tracker</div>
+          <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">
+            <span class="prof-badge" id="pb-acc">0 Accounts</span>
+            <span class="prof-badge" id="pb-inc">0 Income</span>
+            <span class="prof-badge" id="pb-exp">0 Expenses</span>
           </div>
         </div>
       </div>
 
-      <!-- Personal info + Data summary side by side on desktop, stacked on mobile -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px" class="prof-2col">
-        <div class="card sset" style="padding:14px 16px;margin-bottom:0">
-          <div class="sset-t" style="font-size:11px;margin-bottom:10px">Personal info</div>
-          <div class="srow" style="padding:6px 0"><label>Name</label><input type="text" id="pf-name" placeholder="Your name" style="font-size:12px;padding:6px 9px"></div>
-          <div class="srow" style="padding:6px 0"><label>Tagline</label><input type="text" id="pf-tag" placeholder="e.g. Saving for the future" style="font-size:12px;padding:6px 9px"></div>
-          <div class="srow" style="padding:6px 0;border-bottom:none"><label>Currency</label><select id="pf-cur" style="font-size:12px;padding:6px 9px"><option value="₱">₱ PHP</option><option value="$">$ USD</option><option value="€">€ EUR</option><option value="£">£ GBP</option><option value="¥">¥ JPY</option></select></div>
-          <button class="btn-save" id="btn-save-profile" style="margin-top:10px;padding:6px 14px;font-size:12px">Save</button>
+      <!-- Personal Info -->
+      <div class="card sset" style="padding:18px 20px;margin-bottom:12px">
+        <div class="sset-t" style="margin-bottom:14px">Personal info</div>
+        <div class="prof-field">
+          <label class="prof-label">Name</label>
+          <input type="text" id="pf-name" placeholder="Your name">
         </div>
-        <div class="card sset" style="padding:14px 16px;margin-bottom:0">
-          <div class="sset-t" style="font-size:11px;margin-bottom:10px">Data summary</div>
-          <div class="srow" style="padding:5px 0"><label style="font-size:11.5px">Accounts</label><span id="ps-acc" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--blue);font-weight:500">0</span></div>
-          <div class="srow" style="padding:5px 0"><label style="font-size:11.5px">Income entries</label><span id="ps-inc" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--green);font-weight:500">0</span></div>
-          <div class="srow" style="padding:5px 0"><label style="font-size:11.5px">Expense entries</label><span id="ps-exp" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);font-weight:500">0</span></div>
-          <div class="srow" style="padding:5px 0;border-bottom:none"><label style="font-size:11.5px">Budget goals</label><span id="ps-bud" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--purple);font-weight:500">0</span></div>
+        <div class="prof-field">
+          <label class="prof-label">Tagline</label>
+          <input type="text" id="pf-tag" placeholder="e.g. Saving for the future">
+        </div>
+        <div class="prof-field" style="border-bottom:none">
+          <label class="prof-label">Currency</label>
+          <select id="pf-cur" style="max-width:160px">
+            <option value="₱">₱ PHP</option>
+            <option value="$">$ USD</option>
+            <option value="€">€ EUR</option>
+            <option value="£">£ GBP</option>
+            <option value="¥">¥ JPY</option>
+          </select>
+        </div>
+        <button class="btn-add" id="btn-save-profile" style="margin-top:16px;font-size:12.5px;padding:7px 18px">Save changes</button>
+      </div>
+
+      <!-- Data Summary + App Status side by side -->
+      <div class="prof-2col" style="margin-bottom:12px">
+        <div class="card sset" style="padding:18px 20px">
+          <div class="sset-t" style="margin-bottom:12px">Data summary</div>
+          <div class="prof-stat-row"><span>Accounts</span><span style="color:var(--blue)" id="ps-acc">0</span></div>
+          <div class="prof-stat-row"><span>Income entries</span><span style="color:var(--green)" id="ps-inc">0</span></div>
+          <div class="prof-stat-row"><span>Expense entries</span><span style="color:var(--red)" id="ps-exp">0</span></div>
+          <div class="prof-stat-row" style="border-bottom:none"><span>Budget goals</span><span style="color:var(--purple)" id="ps-bud">0</span></div>
+        </div>
+        <div class="card sset" style="padding:18px 20px">
+          <div class="sset-t" style="margin-bottom:12px">App status</div>
+          <div class="prof-stat-row">
+            <span>Auto-save</span>
+            <span style="display:flex;align-items:center;gap:5px;color:var(--green)">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>On
+            </span>
+          </div>
+          <div class="prof-stat-row" style="border-bottom:none;align-items:flex-start">
+            <span>Today</span>
+            <span id="profile-date-display" style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--t2);text-align:right">—</span>
+          </div>
         </div>
       </div>
 
-      <!-- App Status -->
-      <div class="card sset" style="padding:14px 16px;margin-bottom:10px">
-        <div class="sset-t" style="font-size:11px;margin-bottom:10px">App Status</div>
-        <div class="srow" style="padding:6px 0">
-          <label style="font-size:11.5px">Auto-save</label>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--green);font-weight:500">
-            <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
-            On — all changes saved automatically
-          </span>
-        </div>
-        <div class="srow" style="padding:6px 0;border-bottom:none">
-          <label style="font-size:11.5px">Today's date</label>
-          <span id="profile-date-display" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t2)">—</span>
-        </div>
-      </div>
-
-      <!-- Backup + Tools in one row -->
-      <div class="card sset" style="padding:14px 16px;margin-bottom:10px">
-        <div class="sset-t" style="font-size:11px;margin-bottom:10px">Backup &amp; Tools</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          <button class="btn-add" id="btn-export" style="font-size:11px;padding:5px 11px">⬇ JSON</button>
-          <button class="btn-ghost" id="btn-export-csv" style="font-size:11px;padding:5px 11px">📊 CSV</button>
-          <button class="btn-ghost" id="btn-import-trigger" style="font-size:11px;padding:5px 11px">⬆ Import</button>
+      <!-- Backup & Tools -->
+      <div class="card sset" style="padding:18px 20px;margin-bottom:12px">
+        <div class="sset-t" style="margin-bottom:12px">Backup &amp; Tools</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn-add" id="btn-export" style="font-size:12px;padding:6px 14px">⬇ JSON</button>
+          <button class="btn-ghost" id="btn-export-csv" style="font-size:12px;padding:6px 14px">📊 CSV</button>
+          <button class="btn-ghost" id="btn-import-trigger" style="font-size:12px;padding:6px 14px">⬆ Import</button>
           <input type="file" id="import-file" accept=".json" style="display:none">
-          <button class="btn-ghost" id="btn-recalc" style="font-size:11px;padding:5px 11px;color:var(--blue)">⟳ Recalc Balances</button>
-          <button class="btn-ghost" id="btn-export-cal" style="font-size:11px;padding:5px 11px">📅 Calendar</button>
+          <button class="btn-ghost" id="btn-recalc" style="font-size:12px;padding:6px 14px;color:var(--blue)">⟳ Recalc Balances</button>
+          <button class="btn-ghost" id="btn-export-cal" style="font-size:12px;padding:6px 14px">📅 Calendar</button>
         </div>
-        <div style="font-size:10.5px;color:var(--t3)">Recalculate rebuilds all account balances from transaction history.</div>
+        <div style="font-size:11px;color:var(--t3)">Recalculate rebuilds all account balances from your full transaction history.</div>
       </div>
 
-      <!-- Danger zone compact -->
-      <div class="dzone" style="padding:12px 14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <!-- Danger zone -->
+      <div class="dzone" style="padding:16px 20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
           <div>
-            <div style="font-size:12px;font-weight:500;color:var(--red)">⚠ Danger zone</div>
-            <div style="font-size:10.5px;color:var(--t2);margin-top:2px">Permanently delete all data. Cannot be undone.</div>
+            <div style="font-size:13px;font-weight:500;color:var(--red)">⚠ Danger zone</div>
+            <div style="font-size:11.5px;color:var(--t2);margin-top:3px">Permanently delete all data. This cannot be undone.</div>
           </div>
-          <button class="btn-danger" id="btn-clear" style="font-size:11.5px;padding:6px 14px">Clear all data</button>
+          <button class="btn-danger" id="btn-clear" style="font-size:12px;padding:7px 16px;white-space:nowrap">Clear all data</button>
         </div>
       </div>
     </div>
