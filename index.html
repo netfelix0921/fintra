@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Felix">
+<meta name="apple-mobile-web-app-title" content="Finance Tracker">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#0B0F1A" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#F4F6F9" media="(prefers-color-scheme: light)">
@@ -17,11 +17,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<title>Felix — Finance OS</title>
+<title>Finance Tracker</title>
 
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   FELIX FINANCE OS — Premium Design System v3
+   Finance Tracker — Premium Design System v3
    "Quiet Luxury" — A refined, minimal fintech aesthetic
    Inspired by Linear, Stripe, and Apple Wallet
    ═══════════════════════════════════════════════════════════════ */
@@ -122,7 +122,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .ham-btn,.search-mob-btn,.sr-item,.mob-del,.mob-edit,.mob-pay,.mob-sub-pause,
 .mob-sub-skip,.mob-del-sub,.bill-pay-btn,.bill-edit-btn,.bill-del-btn,
 .btn-add,.btn-ghost,.btn-save,.btn-danger,.btn-icon,.btn-pay,.bdel,.bedit,
-.barchive,.bft,.nav-btn,.pchip,.av-topbar,.av-lg,.lf-apply,.lf-clear,
+.barchive,.bview,.bft,.nav-btn,.pchip,.av-topbar,.av-lg,.lf-apply,.lf-clear,
 .wtitle .wlink,[onclick] {
   cursor: pointer;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -376,6 +376,17 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   width: 26px !important; height: 26px !important;
   font-size: 10px !important;
   box-shadow: none !important;
+}
+
+/* Hide date/save chips on small screens so title stays visible */
+@media (max-width: 600px) {
+  .tb-chip-hide { display: none !important; }
+  .topbar { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); gap: 6px; }
+  .topbar-title { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .topbar-right { gap: 2px; }
+  #av-topbar { width: 24px !important; height: 24px !important; }
 }
 
 /* Search */
@@ -800,6 +811,8 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .bedit:hover { background: var(--blue); color: #fff; }
 .barchive { background: var(--bg); color: var(--t2); border-color: var(--border); }
 .barchive:hover { background: var(--t1); color: #fff; }
+.bview { background: var(--bg); color: var(--t2); border-color: var(--border); }
+.bview:hover { background: var(--t1); color: #fff; }
 
 /* CC card */
 .bcard.is-cc .bbal { font-size: 13.5px; color: var(--t2); }
@@ -1184,10 +1197,10 @@ select option { background: var(--surface); }
 }
 
 @media (max-width: 600px) {
-  .krow { grid-template-columns: 1fr 1fr; }
+  .krow { grid-template-columns: 1fr 1fr; gap: 8px; }
   .hide-sm { display: none; }
   .bcard { min-height: 148px; }
-  .topbar { padding-left: max(14px, env(safe-area-inset-left)); padding-right: max(14px, env(safe-area-inset-right)); }
+  .topbar { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
   .fr3 { grid-template-columns: 1fr 1fr; }
   .nw-hero { padding: 22px 22px; }
   .nw-val { font-size: 34px; }
@@ -1198,11 +1211,17 @@ select option { background: var(--surface); }
 }
 
 @media (max-width: 420px) {
-  .krow { grid-template-columns: 1fr; }
+  .krow { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi { padding: 11px 12px 10px; }
+  .kpi-icon { width: 26px; height: 26px; margin-bottom: 8px; }
+  .kval { font-size: 16px; }
+  .klbl { font-size: 9px; }
+  .ktag { font-size: 9.5px; }
   .bgrid, .bank-grid { grid-template-columns: 1fr; }
   .fr3 { grid-template-columns: 1fr; }
   .modal { border-radius: var(--r-lg); max-height: 95vh; }
-  .nw-val { font-size: 28px; }
+  .nw-val { font-size: 26px; }
+  .content { padding: 12px 12px; }
 }
 
 @media (min-width: 1440px) {
@@ -1295,6 +1314,7 @@ html[data-theme="dark"] .bdel:hover { background: var(--red); color: #fff; }
 html[data-theme="dark"] .bedit { background: rgba(37,99,235,0.12); color: #60A5FA; border-color: rgba(37,99,235,0.22); }
 html[data-theme="dark"] .bedit:hover { background: var(--blue); color: #fff; }
 html[data-theme="dark"] .barchive { background: var(--bg); color: var(--t2); border-color: var(--border); }
+html[data-theme="dark"] .bview { background: var(--bg); color: var(--t2); border-color: var(--border); }
 html[data-theme="dark"] .btn-pay { background: rgba(5,150,105,0.14); color: #34D399; border-color: rgba(5,150,105,0.24); }
 html[data-theme="dark"] .btn-pay:hover { background: var(--green); color: #fff; }
 html[data-theme="dark"] .mob-card { border-bottom-color: var(--border); }
@@ -1387,8 +1407,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
       </svg>
     </div>
     <div>
-      <div class="logo-text">FELIX</div>
-      <div class="logo-sub">Finance OS</div>
+      <div class="logo-text">Finance Tracker</div>
     </div>
   </div>
   <div class="sidebar-divider"></div>
@@ -1411,8 +1430,8 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   </nav>
   <div class="sidebar-foot">
     <div class="pchip" id="profile-chip">
-      <div class="av" id="av-chip"><span id="av-initial">F</span></div>
-      <div><div class="pname" id="chip-name">Felix</div><div class="prole">Profile &amp; Settings</div></div>
+      <div class="av" id="av-chip"><span id="av-initial">Y/span></div>
+      <div><div class="pname" id="chip-name">You/div><div class="prole">Profile &amp; Settings</div></div>
     </div>
   </div>
 </aside>
@@ -1435,13 +1454,13 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
       <button class="search-mob-btn" id="search-mob-btn" title="Search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
-      <div class="tb-chip" id="date-badge"></div>
-      <div class="tb-chip" id="spill">auto-save on</div>
+      <div class="tb-chip tb-chip-hide" id="date-badge"></div>
+      <div class="tb-chip tb-chip-hide" id="spill">auto-save on</div>
       <button class="tb-btn" id="theme-btn" title="Toggle dark mode">
         <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
       <!-- Mobile profile avatar -->
-      <div class="av" id="av-topbar" title="Profile & Settings" style="cursor:pointer;flex-shrink:0"><span id="av-topbar-initial">F</span></div>
+      <div class="av" id="av-topbar" title="Profile & Settings" style="cursor:pointer;flex-shrink:0"><span id="av-topbar-initial">Y/span></div>
     </div>
   </div>
   <!-- Mobile search bar (shown when search icon tapped) -->
@@ -1457,10 +1476,10 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
     <div id="panel-dashboard" class="panel active">
       <div class="greeting">
         <div style="display:flex;align-items:center;gap:14px">
-          <div class="av-lg" id="dash-av" onclick="goPanel('profile')" title="Profile & Settings" style="cursor:pointer;width:52px;height:52px;font-size:18px;border:2px solid rgba(59,107,255,0.15);box-shadow:0 2px 10px rgba(59,107,255,0.20);flex-shrink:0"><span id="dash-av-initial">F</span></div>
+          <div class="av-lg" id="dash-av" onclick="goPanel('profile')" title="Profile & Settings" style="cursor:pointer;width:52px;height:52px;font-size:18px;border:2px solid rgba(59,107,255,0.15);box-shadow:0 2px 10px rgba(59,107,255,0.20);flex-shrink:0"><span id="dash-av-initial">Y/span></div>
           <div class="greeting-left">
             <div class="g-time" id="gtime">Good morning</div>
-            <div class="g-name">Hey, <span id="gname-span">Felix.</span></div>
+            <div class="g-name">Hey, <span id="gname-span">there.</span></div>
             <div class="g-insights" id="g-insights"></div>
           </div>
         </div>
@@ -1894,8 +1913,8 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
         </div>
         <input type="file" id="photo-input" accept="image/*" style="display:none">
         <div style="flex:1;min-width:0">
-          <div class="pn" id="prof-name-disp" style="font-size:16px">Felix</div>
-          <div class="pt" id="prof-tag-disp" style="font-size:11px;margin-top:1px">Personal Finance OS</div>
+          <div class="pn" id="prof-name-disp" style="font-size:16px">Your Name/div>
+          <div class="pt" id="prof-tag-disp" style="font-size:11px;margin-top:1px">Personal Finance Tracker</div>
           <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap">
             <span class="prof-badge" id="pb-acc" style="font-size:9.5px;padding:2px 7px">0 Accounts</span>
             <span class="prof-badge" id="pb-inc" style="font-size:9.5px;padding:2px 7px">0 Income</span>
@@ -1919,6 +1938,22 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
           <div class="srow" style="padding:5px 0"><label style="font-size:11.5px">Income entries</label><span id="ps-inc" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--green);font-weight:500">0</span></div>
           <div class="srow" style="padding:5px 0"><label style="font-size:11.5px">Expense entries</label><span id="ps-exp" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--red);font-weight:500">0</span></div>
           <div class="srow" style="padding:5px 0;border-bottom:none"><label style="font-size:11.5px">Budget goals</label><span id="ps-bud" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--purple);font-weight:500">0</span></div>
+        </div>
+      </div>
+
+      <!-- App Status -->
+      <div class="card sset" style="padding:14px 16px;margin-bottom:10px">
+        <div class="sset-t" style="font-size:11px;margin-bottom:10px">App Status</div>
+        <div class="srow" style="padding:6px 0">
+          <label style="font-size:11.5px">Auto-save</label>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--green);font-weight:500">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0"></span>
+            On — all changes saved automatically
+          </span>
+        </div>
+        <div class="srow" style="padding:6px 0;border-bottom:none">
+          <label style="font-size:11.5px">Today's date</label>
+          <span id="profile-date-display" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--t2)">—</span>
         </div>
       </div>
 
@@ -1968,7 +2003,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   FELIX — Finance OS  |  Single-file app
+   Finance Tracker  |  Single-file app
    ────────────────────────────────────────────────────────────
    TABLE OF CONTENTS (search for "── <name> ──" to jump)
    ─────────────────────────────────────────────────────────
@@ -2005,7 +2040,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
    BOOT             processSubscriptions → renderDash → …
    ════════════════════════════════════════════════════════ */
 var SK='felix_v6';var S;
-function defaultState(){return{accounts:[],income:[],expense:[],transfer:[],credit:[],savings:[],subscriptions:[],goals:[],installments:[],bills:[],profile:{name:'Felix',tagline:'',currency:'₱',photo:''},nextId:1};}
+function defaultState(){return{accounts:[],income:[],expense:[],transfer:[],credit:[],savings:[],subscriptions:[],goals:[],installments:[],bills:[],profile:{name:'',tagline:'',currency:'₱',photo:''},nextId:1};}
 function loadState(){
   try{
     var r=localStorage.getItem(SK);
@@ -2072,6 +2107,10 @@ function updateDateBadge(){var d=new Date();var days=['Sun','Mon','Tue','Wed','T
 function setGreeting(){
   var h=new Date().getHours();
   st('gtime',h<12?'Good morning':h<17?'Good afternoon':'Good evening');
+  // Show name or just "there" if no name set
+  var displayName=(S.profile&&S.profile.name)?S.profile.name:'there';
+  st('gname-span',displayName+'.');
+  st('chip-name',displayName==='there'?'You':S.profile.name);
   var ym=curYM();
   var mi=S.income.filter(function(e){return e.date.startsWith(ym);}).reduce(function(s,e){return s+e.amt;},0);
   var me=S.expense.filter(function(e){return e.date.startsWith(ym);}).reduce(function(s,e){return s+e.amt;},0);
@@ -2607,7 +2646,8 @@ function renderAccounts(){
       ?'background:radial-gradient(circle,'+hexA(a.accentColor,.22)+',transparent 70%);opacity:1'
       :'opacity:0';
     var stripeStyle=a.accentColor?'background:'+col+';opacity:0.7':'opacity:0';
-    var footBtns='<button class="bedit" data-id="'+a.id+'">Edit</button>'
+    var footBtns='<button class="bview" data-id="'+a.id+'">Transactions</button>'
+      +'<button class="bedit" data-id="'+a.id+'">Edit</button>'
       +'<button class="barchive" data-id="'+a.id+'">'+(a.archived?'Unarchive':'Archive')+'</button>'
       +'<button class="bdel" data-id="'+a.id+'">Remove</button>';
 
@@ -2651,6 +2691,7 @@ function renderAccounts(){
       +'<div class="bnum">•••• '+(a.num||'––––')+'</div>'
       +'<div class="bcard-foot">'+footBtns+'</div></div>';
   }).join('');
+  g.querySelectorAll('.bview').forEach(function(btn){btn.addEventListener('click',function(){viewAccountTransactions(this.dataset.id);});});
   g.querySelectorAll('.bdel').forEach(function(btn){btn.addEventListener('click',function(){
     var id=this.dataset.id;
     confirmModal('Remove this account? Existing transactions will remain.',function(){
@@ -2666,6 +2707,54 @@ function renderAccounts(){
     openEditAccount(this.dataset.id);
   });});
 }
+
+// ── VIEW ACCOUNT TRANSACTIONS ──────────────────────────────────
+function viewAccountTransactions(id){
+  var a=findAcc(id);if(!a)return;
+  var rows=[];
+  S.income.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
+    rows.push({date:e.date,desc:e.source,type:'Income',amt:e.amt,sign:'+',cls:'pos'});
+  });
+  S.expense.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
+    rows.push({date:e.date,desc:e.desc,type:'Expense',amt:e.amt,sign:'-',cls:'neg'});
+  });
+  S.transfer.filter(function(e){return String(e.from)===String(id)||String(e.to)===String(id);}).forEach(function(e){
+    var isFrom=String(e.from)===String(id);
+    rows.push({date:e.date,desc:'Transfer '+(isFrom?'→ '+accName(e.to):'← '+accName(e.from)),type:'Transfer',amt:e.amt,sign:isFrom?'-':'+',cls:isFrom?'neg':'pos'});
+  });
+  S.savings.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
+    rows.push({date:e.date,desc:e.goal+' ('+e.type+')',type:'Savings',amt:e.amt,sign:e.type==='Deposit'?'+':'-',cls:e.type==='Deposit'?'pos':'neg'});
+  });
+  rows.sort(function(a,b){return b.date.localeCompare(a.date);});
+
+  var html=
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--r);margin-bottom:14px">'
+    +'<div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:2px">'+(a.isCC?'Outstanding':'Balance')+'</div>'
+    +'<div style="font-family:DM Mono,monospace;font-size:22px;color:var(--t1);letter-spacing:-1px;font-weight:400">'+fmt(a.isCC?a.usedCredit||0:a.balance)+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">'+a.type+'</div>'
+    +'<div style="font-size:11px;color:var(--t3);font-family:DM Mono,monospace">•••• '+(a.num||'––––')+'</div></div>'
+    +'</div>';
+
+  if(!rows.length){
+    html+='<div style="text-align:center;padding:2.5rem 1rem;color:var(--t3);font-size:13px">No transactions found for this account.</div>';
+  } else {
+    html+='<div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'+rows.length+' transaction'+(rows.length!==1?'s':'')+'</div>';
+    html+='<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;max-height:360px;overflow-y:auto">';
+    html+=rows.map(function(r,i){
+      return'<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:'+(i<rows.length-1?'1px solid var(--border)':'none')+'">'
+        +'<div style="min-width:0">'
+          +'<div style="font-size:12.5px;color:var(--t1);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">'+r.desc+'</div>'
+          +'<div style="font-size:10.5px;color:var(--t3);margin-top:1px">'+r.date+' · '+r.type+'</div>'
+        +'</div>'
+        +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:400;color:'+(r.cls==='pos'?'var(--green)':'var(--red)')+';flex-shrink:0;margin-left:12px">'+r.sign+fmt(r.amt)+'</div>'
+        +'</div>';
+    }).join('');
+    html+='</div>';
+  }
+  html+='<div style="margin-top:16px;display:flex;justify-content:flex-end"><button class="btn-ghost" onclick="closeModal()">Close</button></div>';
+  openModal(a.name+' — All Transactions', html, null);
+}
+
 function openEditAccount(id){
   var a=findAcc(id);if(!a)return;
   var isCC=a.isCC;
@@ -3161,7 +3250,7 @@ function emptyCanvas(cv,msg){var W=canvasW(cv,400),H=canvasH(cv,180);var ctx=set
 
 // ── PROFILE PHOTO ──────────────────────────────────────────────
 function applyPhoto(){
-  var p=S.profile.photo,ini=(S.profile.name||'F').charAt(0).toUpperCase(),s='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';
+  var p=S.profile.photo,ini=(S.profile.name||'Y').charAt(0).toUpperCase(),s='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block';
   var lg=ge('prof-av-lg');var ch=ge('av-chip');var tb=ge('av-topbar');var da=ge('dash-av');
   if(lg)lg.innerHTML=p?'<img src="'+p+'" style="'+s+'">':(ini);
   if(ch)ch.innerHTML=p?'<img src="'+p+'" style="'+s+'">':(ini);
@@ -3187,24 +3276,33 @@ function updateProfileStats(){
 }
 function renderProfile(){
   var p=S.profile;
-  sv('pf-name',p.name||'Felix');sv('pf-tag',p.tagline||'');sv('pf-cur',p.currency||'₱');
-  st('prof-name-disp',p.name||'Felix');st('prof-tag-disp',p.tagline||'Personal Finance OS');
-  st('prof-initial',(p.name||'F').charAt(0).toUpperCase());
+  sv('pf-name',p.name||'');sv('pf-tag',p.tagline||'');sv('pf-cur',p.currency||'₱');
+  st('prof-name-disp',p.name||'Your Name');st('prof-tag-disp',p.tagline||'Personal Finance Tracker');
+  st('prof-initial',(p.name||'Y').charAt(0).toUpperCase());
+  // Populate app status date
+  var d=new Date();
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var mons=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var dateStr=days[d.getDay()]+', '+mons[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+  var el=ge('profile-date-display');if(el)el.textContent=dateStr;
   updateProfileStats();applyPhoto();
 }
 ge('btn-save-profile').addEventListener('click',function(){
-  var name=gv('pf-name').trim()||'Felix';
+  var name=gv('pf-name').trim();
   S.profile.name=name;S.profile.tagline=gv('pf-tag').trim();S.profile.currency=gv('pf-cur');
-  st('prof-name-disp',name);st('prof-tag-disp',S.profile.tagline||'Personal Finance OS');
-  st('chip-name',name);st('gname-span',name+'.');
-  st('prof-initial',name.charAt(0).toUpperCase());
+  var displayName=name||'there';
+  st('prof-name-disp',name||'Your Name');
+  st('prof-tag-disp',S.profile.tagline||'Personal Finance Tracker');
+  st('chip-name',name||'You');
+  st('gname-span',displayName+'.');
+  st('prof-initial',(name||'Y').charAt(0).toUpperCase());
   updateProfileStats();applyPhoto();save();toast('Profile saved ✓','success');
 });
 
 // ── BACKUP ──────────────────────────────────────────────
 ge('btn-export').addEventListener('click',function(){
   var blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
-  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='felix-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url);toast('Exported ✓','success');
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='finance-tracker-backup-'+today()+'.json';a.click();URL.revokeObjectURL(url);toast('Exported ✓','success');
 });
 ge('btn-export-csv').addEventListener('click',function(){
   var rows=['Type,Date,Description,Category,Amount,Account,Note'];
@@ -3214,7 +3312,7 @@ ge('btn-export-csv').addEventListener('click',function(){
   S.credit.forEach(function(e){rows.push('Credit,'+e.date+','+e.desc+','+e.category+','+(e.type==='Charge'?'-':'')+e.amt+','+e.card+','+(e.note||''));});
   S.savings.forEach(function(e){rows.push('Savings,'+e.date+','+e.goal+','+e.type+','+(e.type==='Deposit'?'':'-')+e.amt+','+accName(e.account)+(e.toAccount?' → '+accName(e.toAccount):'')+','+(e.note||''));});
   var blob=new Blob([rows.join('\n')],{type:'text/csv'});
-  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='felix-export-'+today()+'.csv';a.click();URL.revokeObjectURL(url);toast('CSV exported ✓','success');
+  var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='finance-tracker-export-'+today()+'.csv';a.click();URL.revokeObjectURL(url);toast('CSV exported ✓','success');
 });
 ge('btn-import-trigger').addEventListener('click',function(){ge('import-file').click();});
 ge('import-file').addEventListener('change',function(){
@@ -3806,12 +3904,12 @@ function exportCalendar(){
       var dtend=dtEndD.getFullYear()+pad2(dtEndD.getMonth()+1)+pad2(dtEndD.getDate());
       var used=a.usedCredit||0;
       events.push({
-        uid:'felix-cc-'+a.id+'-'+dtstart+'@felix.finance',
+        uid:'ft-cc-'+a.id+'-'+dtstart+'@finance.tracker',
         dtstamp:dstamp,
         dtstart:dtstart,
         dtend:dtend,
         summary:'💳 '+a.name+' Payment Due',
-        description:'Credit card billing due date for '+a.name+'.\nOutstanding balance: '+cur2+used.toLocaleString('en-PH',{minimumFractionDigits:2})+'\nCredit limit: '+cur2+(a.creditLimit||0).toLocaleString('en-PH',{minimumFractionDigits:2})+'\n\nManage in Felix Finance.',
+        description:'Credit card billing due date for '+a.name+'.\nOutstanding balance: '+cur2+used.toLocaleString('en-PH',{minimumFractionDigits:2})+'\nCredit limit: '+cur2+(a.creditLimit||0).toLocaleString('en-PH',{minimumFractionDigits:2})+'\n\nManage in Finance Tracker.',
         alarms:[1440, 4320] // 1 day before and 3 days before
       });
     }
@@ -3824,12 +3922,12 @@ function exportCalendar(){
     var dEnd=new Date(e.due);dEnd.setDate(dEnd.getDate()+1);
     var dtend=dEnd.getFullYear()+pad2(dEnd.getMonth()+1)+pad2(dEnd.getDate());
     events.push({
-      uid:'felix-charge-'+e.id+'@felix.finance',
+      uid:'ft-charge-'+e.id+'@finance.tracker',
       dtstamp:dstamp,
       dtstart:dtstart,
       dtend:dtend,
       summary:'⚠️ Credit Due: '+e.desc+' ('+e.card+')',
-      description:'Unpaid credit charge due on '+e.due+'.\nAmount: '+cur2+e.amt.toLocaleString('en-PH',{minimumFractionDigits:2})+'\nCard: '+e.card+'\nCategory: '+e.category+(e.note?'\nNote: '+e.note:'')+'\n\nPay via Felix Finance.',
+      description:'Unpaid credit charge due on '+e.due+'.\nAmount: '+cur2+e.amt.toLocaleString('en-PH',{minimumFractionDigits:2})+'\nCard: '+e.card+'\nCategory: '+e.category+(e.note?'\nNote: '+e.note:'')+'\n\nPay via Finance Tracker.',
       alarms:[480, 1440, 4320] // 8 hours, 1 day, 3 days before
     });
   });
@@ -3844,7 +3942,7 @@ function exportCalendar(){
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;
-  a.download='felix-credit-dues.ics';
+  a.download='finance-tracker-dues.ics';
   a.click();
   URL.revokeObjectURL(url);
   toast('Calendar exported! Open the .ics file to import into Google/Apple/Outlook Calendar.','success');
@@ -3857,7 +3955,7 @@ function exportCalendar(){
       +'<div style="background:var(--green-s);border:1px solid rgba(14,168,96,0.20);border-radius:10px;padding:12px 14px;display:flex;gap:10px">'
       +'<div style="font-size:20px">✅</div>'
       +'<div><div style="font-weight:500;color:var(--green);font-size:13px">Exported '+evCount+' event'+(evCount!==1?'s':'')+'</div>'
-      +'<div style="font-size:11.5px;color:var(--t2);margin-top:2px">The file <strong>felix-credit-dues.ics</strong> was downloaded.</div></div>'
+      +'<div style="font-size:11.5px;color:var(--t2);margin-top:2px">The file <strong>finance-tracker-dues.ics</strong> was downloaded.</div></div>'
       +'</div>'
       +'<div style="font-size:12.5px;font-weight:500;color:var(--t1);margin-bottom:-6px">How to import:</div>'
       +'<div class="cal-steps">'
