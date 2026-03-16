@@ -2778,50 +2778,112 @@ function renderAccounts(){
 }
 
 // ── VIEW ACCOUNT TRANSACTIONS ──────────────────────────────────
-function viewAccountTransactions(id){
-  var a=findAcc(id);if(!a)return;
-  var rows=[];
-  S.income.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
-    rows.push({date:e.date,desc:e.source,type:'Income',amt:e.amt,sign:'+',cls:'pos'});
-  });
-  S.expense.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
-    rows.push({date:e.date,desc:e.desc,type:'Expense',amt:e.amt,sign:'-',cls:'neg'});
-  });
-  S.transfer.filter(function(e){return String(e.from)===String(id)||String(e.to)===String(id);}).forEach(function(e){
-    var isFrom=String(e.from)===String(id);
-    rows.push({date:e.date,desc:'Transfer '+(isFrom?'→ '+accName(e.to):'← '+accName(e.from)),type:'Transfer',amt:e.amt,sign:isFrom?'-':'+',cls:isFrom?'neg':'pos'});
-  });
-  S.savings.filter(function(e){return String(e.account)===String(id);}).forEach(function(e){
-    rows.push({date:e.date,desc:e.goal+' ('+e.type+')',type:'Savings',amt:e.amt,sign:e.type==='Deposit'?'+':'-',cls:e.type==='Deposit'?'pos':'neg'});
-  });
-  rows.sort(function(a,b){return b.date.localeCompare(a.date);});
+function viewAccountTransactions(accId){
+  var a=findAcc(accId);if(!a)return;
 
-  var html=
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--r);margin-bottom:14px">'
-    +'<div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:2px">'+(a.isCC?'Outstanding':'Balance')+'</div>'
-    +'<div style="font-family:DM Mono,monospace;font-size:22px;color:var(--t1);letter-spacing:-1px;font-weight:400">'+fmt(a.isCC?a.usedCredit||0:a.balance)+'</div></div>'
-    +'<div style="text-align:right"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">'+a.type+'</div>'
-    +'<div style="font-size:11px;color:var(--t3);font-family:DM Mono,monospace">•••• '+(a.num||'––––')+'</div></div>'
-    +'</div>';
-
-  if(!rows.length){
-    html+='<div style="text-align:center;padding:2.5rem 1rem;color:var(--t3);font-size:13px">No transactions found for this account.</div>';
-  } else {
-    html+='<div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'+rows.length+' transaction'+(rows.length!==1?'s':'')+'</div>';
-    html+='<div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;max-height:360px;overflow-y:auto">';
-    html+=rows.map(function(r,i){
-      return'<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:'+(i<rows.length-1?'1px solid var(--border)':'none')+'">'
-        +'<div style="min-width:0">'
-          +'<div style="font-size:12.5px;color:var(--t1);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px">'+r.desc+'</div>'
-          +'<div style="font-size:10.5px;color:var(--t3);margin-top:1px">'+r.date+' · '+r.type+'</div>'
-        +'</div>'
-        +'<div style="font-family:DM Mono,monospace;font-size:13px;font-weight:400;color:'+(r.cls==='pos'?'var(--green)':'var(--red)')+';flex-shrink:0;margin-left:12px">'+r.sign+fmt(r.amt)+'</div>'
-        +'</div>';
-    }).join('');
-    html+='</div>';
+  function buildRows(){
+    var rows=[];
+    S.income.filter(function(e){return String(e.account)===String(accId);}).forEach(function(e){
+      rows.push({id:e.id,etype:'income',date:e.date,desc:e.source,label:'Income',amt:e.amt,sign:'+',cls:'pos'});
+    });
+    S.expense.filter(function(e){return String(e.account)===String(accId);}).forEach(function(e){
+      rows.push({id:e.id,etype:'expense',date:e.date,desc:e.desc,label:'Expense',amt:e.amt,sign:'-',cls:'neg'});
+    });
+    S.transfer.filter(function(e){return String(e.from)===String(accId)||String(e.to)===String(accId);}).forEach(function(e){
+      var isFrom=String(e.from)===String(accId);
+      rows.push({id:e.id,etype:'transfer',date:e.date,desc:'Transfer '+(isFrom?'to '+accName(e.to):'from '+accName(e.from)),label:'Transfer',amt:e.amt,sign:isFrom?'-':'+',cls:isFrom?'neg':'pos'});
+    });
+    S.savings.filter(function(e){return String(e.account)===String(accId);}).forEach(function(e){
+      rows.push({id:e.id,etype:'savings',date:e.date,desc:e.goal+' ('+e.type+')',label:'Savings',amt:e.amt,sign:e.type==='Deposit'?'+':'-',cls:e.type==='Deposit'?'pos':'neg'});
+    });
+    rows.sort(function(a,b){return b.date.localeCompare(a.date);});
+    return rows;
   }
-  html+='<div style="margin-top:16px;display:flex;justify-content:flex-end"><button class="btn-ghost" onclick="closeModal()">Close</button></div>';
-  openModal(a.name+' — All Transactions', html, null);
+
+  function refreshModal(){
+    var acc=findAcc(accId);if(!acc)return;
+    var rows=buildRows();
+    var html='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--r);margin-bottom:14px">'
+      +'<div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:2px">'+(acc.isCC?'Outstanding':'Balance')+'</div>'
+      +'<div style="font-family:DM Mono,monospace;font-size:22px;color:var(--t1);letter-spacing:-1px;font-weight:400">'+fmt(acc.isCC?acc.usedCredit||0:acc.balance)+'</div></div>'
+      +'<div style="text-align:right"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">'+acc.type+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);font-family:DM Mono,monospace">.... '+(acc.num||'----')+'</div></div>'
+      +'</div>';
+    if(!rows.length){
+      html+='<div style="text-align:center;padding:2.5rem 1rem;color:var(--t3);font-size:13px">No transactions found for this account.</div>';
+    } else {
+      html+='<div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'+rows.length+' transaction'+(rows.length!==1?'s':'')+'</div>';
+      html+='<div id="vat-list" style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;max-height:400px;overflow-y:auto">';
+      rows.forEach(function(r,i){
+        html+='<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:'+(i<rows.length-1?'1px solid var(--border)':'none')+';background:var(--surface)">'
+          +'<div style="flex:1;min-width:0">'
+            +'<div style="font-size:12.5px;color:var(--t1);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px">'+r.desc+'</div>'
+            +'<div style="font-size:10px;color:var(--t3);margin-top:1px">'+r.date+' - '+r.label+'</div>'
+          +'</div>'
+          +'<div style="font-family:DM Mono,monospace;font-size:12px;color:'+(r.cls==='pos'?'var(--green)':'var(--red)')+';flex-shrink:0">'+r.sign+fmt(r.amt)+'</div>'
+          +'<div class="vat-actions" data-etype="'+r.etype+'" data-id="'+r.id+'" style="display:flex;gap:3px;flex-shrink:0">'
+            +'<button class="vat-edit-btn" style="font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(37,99,235,0.09);color:var(--blue);border:1px solid rgba(37,99,235,0.18);cursor:pointer;font-family:inherit;font-weight:500">Edit</button>'
+            +'<button class="vat-del-btn" style="font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(220,38,38,0.08);color:var(--red);border:1px solid rgba(220,38,38,0.18);cursor:pointer;font-family:inherit;font-weight:500">Delete</button>'
+          +'</div>'
+        +'</div>';
+      });
+      html+='</div>';
+    }
+    html+='<div style="margin-top:14px;display:flex;justify-content:flex-end"><button class="btn-ghost vat-close">Close</button></div>';
+    var body=ge('modal-body');
+    if(body){
+      body.innerHTML=html;
+      // Wire close
+      var closeBtn=body.querySelector('.vat-close');
+      if(closeBtn)closeBtn.addEventListener('click',closeModal);
+      // Wire Edit and Delete via event delegation
+      body.querySelectorAll('.vat-actions').forEach(function(wrap){
+        var etype=wrap.dataset.etype;
+        var eid=wrap.dataset.id;
+        var editBtn=wrap.querySelector('.vat-edit-btn');
+        var delBtn=wrap.querySelector('.vat-del-btn');
+        if(editBtn){editBtn.addEventListener('click',function(){
+          editEntry(etype,eid);
+          // After edit modal closes, re-open account transactions
+          setTimeout(function(){
+            var m=ge('modal-overlay');
+            if(!m||!m.classList.contains('show')){viewAccountTransactions(accId);}
+          },300);
+        });}
+        if(delBtn){delBtn.addEventListener('click',function(){
+          confirmModal('Remove this transaction?',function(){
+            var e=S[etype]&&S[etype].find(function(x){return String(x.id)===String(eid);});
+            if(e){
+              if(etype==='income'){var ac=findAcc(e.account);if(ac)ac.balance=+(ac.balance-e.amt).toFixed(2);}
+              if(etype==='expense'){var ac=findAcc(e.account);if(ac)ac.balance=+(ac.balance+e.amt).toFixed(2);}
+              if(etype==='transfer'){
+                var fa=findAcc(e.from);if(fa)fa.balance=+(fa.balance+e.amt).toFixed(2);
+                var ta=findAcc(e.to);if(ta)ta.balance=+(ta.balance-e.amt).toFixed(2);
+              }
+              if(etype==='credit'&&e.cardId){
+                var cc=findAcc(e.cardId);
+                if(cc){
+                  if(e.type==='Charge'&&!e.isPaid)cc.usedCredit=+Math.max(0,(cc.usedCredit||0)-e.amt).toFixed(2);
+                  if(e.type==='Payment')cc.usedCredit=+((cc.usedCredit||0)+e.amt).toFixed(2);
+                }
+              }
+            }
+            if(S[etype])S[etype]=S[etype].filter(function(x){return String(x.id)!==String(eid);});
+            save();
+            renderLog(etype);renderStat(etype);updateProfileStats();
+            if(ge('krow'))renderDash();
+            renderAlerts();
+            if(etype==='credit')renderCCSummary();
+            toast('Transaction removed.','success');
+            refreshModal();
+          },true);
+        });}
+      });
+    }
+  }
+
+  openModal(a.name+' - All Transactions','<div style="padding:2rem;text-align:center;color:var(--t3)">Loading...</div>',null);
+  refreshModal();
 }
 
 function openEditAccount(id){
