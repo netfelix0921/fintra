@@ -322,7 +322,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
    ═══════════════════════════════════════════════════════════════ */
 .main {
   flex: 1; display: flex; flex-direction: column;
-  overflow: hidden; min-width: 0;
+  overflow: clip; min-width: 0;
   background: var(--bg);
 }
 
@@ -332,7 +332,8 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .topbar {
   height: calc(46px + env(safe-area-inset-top));
   flex-shrink: 0;
-  background: rgba(255,255,255,0.88);
+  position: sticky; top: 0;
+  background: rgba(255,255,255,0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
@@ -583,16 +584,17 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   line-height: 1.2; letter-spacing: -0.1px; white-space: nowrap;
 }
 .g-name span { color: var(--blue); font-weight: 600; }
-/* Pills inline below name — single row */
+/* Pills inline below name — wrapping allowed */
 .g-insights {
-  display: flex; gap: 4px; flex-wrap: nowrap;
-  align-items: center; margin-top: 5px; overflow: hidden;
+  display: flex; gap: 4px; flex-wrap: wrap;
+  align-items: center; margin-top: 5px;
 }
 .g-pill {
   display: inline-flex; align-items: center; gap: 3px;
   padding: 2px 7px; border-radius: 999px;
   font-size: 10px; font-weight: 400; border: 1px solid transparent;
   white-space: nowrap; flex-shrink: 0;
+  max-width: 160px; overflow: hidden; text-overflow: ellipsis;
 }
 .g-pill.green { background: var(--green-s); color: var(--green); border-color: rgba(5,150,105,0.18); }
 .g-pill.red { background: var(--red-s); color: var(--red); border-color: rgba(220,38,38,0.18); }
@@ -777,9 +779,18 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 /* ═══════════════════════════════════════════════════════════════
    BANK / ACCOUNT CARDS
    ═══════════════════════════════════════════════════════════════ */
-.bgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.bank-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-@media (max-width: 600px) { .bgrid, .bank-grid { grid-template-columns: 1fr; } }
+.bgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.bank-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+/* Keep 2 columns even on small phones — tighten card at small sizes */
+@media (max-width: 420px) {
+  .bgrid, .bank-grid { gap: 8px; }
+  .bcard { padding: 12px 12px 10px; }
+  .bbal { font-size: 16px; }
+  .bname { font-size: 11.5px; }
+  .bnum { font-size: 9.5px; }
+  .af-btn, .bdel, .bedit, .barchive { font-size: 9.5px; padding: 4px 0; }
+  .bview { font-size: 10px; }
+}
 
 .bcard {
   border-radius: var(--r-lg);
@@ -916,7 +927,7 @@ input, select, textarea {
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   background: var(--bg);
-  font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px; font-family: 'Plus Jakarta Sans', sans-serif;
   color: var(--t1); outline: none; width: 100%;
   transition: all var(--dur-fast);
   -webkit-appearance: none; appearance: none;
@@ -927,8 +938,8 @@ input:focus, select:focus, textarea:focus {
   background: var(--surface);
 }
 input::placeholder, textarea::placeholder { color: var(--t3); }
-input[type="date"] { font-family: 'DM Mono', monospace; font-size: 12px; }
-input[type="number"] { font-family: 'DM Mono', monospace; }
+input[type="date"] { font-family: 'DM Mono', monospace; font-size: 16px; }
+input[type="number"] { font-family: 'DM Mono', monospace; font-size: 16px; }
 select {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238E97B0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -1255,7 +1266,6 @@ select option { background: var(--surface); }
   .kval { font-size: 16px; }
   .klbl { font-size: 9px; }
   .ktag { font-size: 9.5px; }
-  .bgrid, .bank-grid { grid-template-columns: 1fr; }
   .fr3 { grid-template-columns: 1fr; }
   .modal { border-radius: var(--r-lg); max-height: 95vh; }
   .nw-val { font-size: 26px; }
@@ -1297,7 +1307,7 @@ html[data-theme="dark"] {
 html[data-theme="dark"] body { background: var(--bg); color: var(--t1); }
 html[data-theme="dark"] .sidebar { background: var(--surface); border-right-color: var(--border); }
 html[data-theme="dark"] .sidebar::before { background: none; }
-html[data-theme="dark"] .topbar { background: rgba(19,23,32,0.90); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: var(--border); }
+html[data-theme="dark"] .topbar { background: rgba(19,23,32,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: var(--border); }
 html[data-theme="dark"] .card { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .card-flat { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .modal { background: var(--surface); border-color: var(--border); }
@@ -1765,11 +1775,13 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
       <!-- How it works explanation -->
       <div class="card" style="padding:14px 16px;margin-bottom:14px;border-left:3px solid var(--blue)">
         <div style="font-size:12px;font-weight:500;color:var(--t1);margin-bottom:6px">💡 How Savings Works</div>
-        <div style="font-size:11.5px;color:var(--t2);line-height:1.6">
-          Savings tracks <strong>how much of your account balance is earmarked</strong> toward each goal — the money physically stays in your bank account.<br>
-          <span style="color:var(--green)">● Deposit</span> = tag some of your account balance as saved for a goal &nbsp;·&nbsp;
-          <span style="color:var(--red)">● Withdrawal</span> = un-tag money (used from goal)<br>
-          To physically move money between banks → use <strong>Transfer</strong>.
+        <div style="font-size:11.5px;color:var(--t2);line-height:1.7">
+          Savings tracks <strong>how much of your account balance is earmarked</strong> toward each goal — the money physically stays in your bank account.
+        </div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:11.5px;color:var(--t2);line-height:1.5"><span style="color:var(--green);font-weight:500">● Deposit</span> — tag some of your balance as saved toward a goal</div>
+          <div style="font-size:11.5px;color:var(--t2);line-height:1.5"><span style="color:var(--red);font-weight:500">● Withdrawal</span> — un-tag money (used from goal)</div>
+          <div style="font-size:11.5px;color:var(--t2);line-height:1.5;margin-top:2px">To physically move money between banks → use <strong>Transfer</strong>.</div>
         </div>
       </div>
 
@@ -5002,7 +5014,32 @@ function editBill(id){
     if(!due){toast('Select a due date.','error');return;}
     b.name=name;b.category=ge('bl-cat').value;b.amt=amt;b.dueDate=due;
     b.recurrence=ge('bl-rec').value;b.account=ge('bl-acc').value||null;b.note=ge('bl-note').value;
-    save();renderBills();renderAlerts();renderDashBills();closeModal();toast('Bill updated ✓','success');
+    // If bill was already paid, update the matching expense entry amount and account balance
+    if(b.isPaid&&b.paidAmt!==undefined){
+      var oldAmt=b.paidAmt;
+      var diff=amt-oldAmt;
+      // Find the logged expense for this bill (match by desc + paidDate)
+      var expEntry=S.expense.find(function(e){
+        return e.desc===('Bill: '+name)||e.desc===('Bill: '+b.name);
+      });
+      // More precise match: same amount and paid date
+      if(!expEntry){
+        expEntry=S.expense.find(function(e){
+          return String(e.amt)===String(oldAmt)&&e.date===b.paidDate;
+        });
+      }
+      if(expEntry){
+        // Adjust account balance for the diff
+        if(expEntry.account){
+          var acc=findAcc(expEntry.account);
+          if(acc)acc.balance=+(acc.balance-diff).toFixed(2);
+        }
+        expEntry.amt=amt;
+        expEntry.desc='Bill: '+name;
+      }
+      b.paidAmt=amt;
+    }
+    save();renderBills();renderAlerts();renderDashBills();renderAccounts();renderDash();closeModal();toast('Bill updated ✓','success');
   });
 }
 
