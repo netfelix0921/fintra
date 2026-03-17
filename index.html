@@ -1714,10 +1714,18 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 .bn-lbl {
   font-size: 9px; font-weight: 500; color: var(--t3);
   font-family: 'Plus Jakarta Sans', sans-serif;
-  transition: color var(--dur-fast); white-space: nowrap;
+  transition: color var(--dur-fast), opacity var(--dur-fast), max-height var(--dur-fast);
+  white-space: nowrap;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
 }
 .bn-item.active .bn-ico svg { stroke: var(--blue); }
-.bn-item.active .bn-lbl { color: var(--blue); font-weight: 600; }
+.bn-item.active .bn-lbl {
+  color: var(--blue); font-weight: 600;
+  opacity: 1;
+  max-height: 14px;
+}
 .bn-item.active .bn-active-dot { display: block; }
 .bn-active-dot {
   display: none; width: 4px; height: 4px;
