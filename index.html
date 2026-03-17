@@ -9,6 +9,11 @@
 <meta name="apple-mobile-web-app-title" content="Felix">
 <meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#0E1520">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <title>Felix — Finance Tracker</title>
@@ -162,6 +167,11 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   align-items: center;
   gap: 10px;
   user-select: none;
+}
+@media (max-width: 900px) {
+  .sidebar-logo {
+    padding: 10px 14px 10px;
+  }
 }
 
 .logo-icon {
@@ -1348,7 +1358,7 @@ select option { background: var(--surface); }
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .sidebar { position: fixed; top: calc(46px + env(safe-area-inset-top)); left: -260px; height: calc(100% - 46px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); }
+  .sidebar { position: fixed; top: calc(46px + env(safe-area-inset-top)); left: -260px; height: calc(100% - 46px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; }
   .sidebar.open { left: 0; }
   .ham-btn { display: flex; }
   .search-wrap { display: none; }
