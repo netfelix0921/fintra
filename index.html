@@ -1702,14 +1702,14 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
    BOTTOM NAV BAR
    ═══════════════════════════════════════════════════════════════ */
 .bottom-nav {
-  display: none; /* keep for desktop */
+  display: none;
 
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
 
-  height: 52px;
+  height: 52px; /* 🔥 tighter */
 
   display: flex;
   justify-content: space-around;
@@ -1722,7 +1722,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   border-top: 0.5px solid rgba(0,0,0,0.08);
   z-index: 150;
 
-  padding-top: 4px;
+  padding-top: 2px;
   padding-bottom: env(safe-area-inset-bottom);
 }
 .bn-bar {
