@@ -2765,13 +2765,22 @@ input[type="date"], input[type="number"] {
       <!-- Backup & Tools -->
       <div class="card sset">
         <div class="sset-t">Appearance</div>
-        <div class="srow">
-          <label style="font-size:12.5px;color:var(--t2)">Theme</label>
-          <select id="theme-pref-select" style="max-width:160px;text-align:right">
-            <option value="system">System (auto)</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
+        <div class="srow" style="align-items:center">
+          <label style="font-size:12.5px;color:var(--t2);flex-shrink:0">Theme</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <button class="theme-chip" data-pref="light" onclick="setThemePref('light')"
+              style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
+              Light
+            </button>
+            <button class="theme-chip" data-pref="dark" onclick="setThemePref('dark')"
+              style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
+              Dark
+            </button>
+            <button class="theme-chip" data-pref="system" onclick="setThemePref('system')"
+              style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
+              System
+            </button>
+          </div>
         </div>
       </div>
 
@@ -3231,9 +3240,13 @@ function applyTheme(){
   document.documentElement.setAttribute('data-theme',_darkMode?'dark':'');
   var icon=ge('theme-icon');
   if(icon)icon.innerHTML=_darkMode?'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>':'<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
-  // Sync profile theme selector
-  var sel=ge('theme-pref-select');
-  if(sel)sel.value=_themePref;
+  // Sync theme chips
+  document.querySelectorAll('.theme-chip').forEach(function(btn){
+    var active=btn.dataset.pref===_themePref;
+    btn.style.background=active?'var(--blue)':'transparent';
+    btn.style.color=active?'#fff':'var(--t2)';
+    btn.style.borderColor=active?'var(--blue)':'var(--border2)';
+  });
   var iconBg=ge('icon-bg');
   if(iconBg)iconBg.setAttribute('fill',_darkMode?'#0d0e1a':'#ffffff');
 }
@@ -3245,14 +3258,11 @@ function toggleTheme(){
   applyTheme();
 }
 ge('theme-btn').addEventListener('click',toggleTheme);
-// Wire profile theme selector
-document.addEventListener('change',function(e){
-  if(e.target&&e.target.id==='theme-pref-select'){
-    _themePref=e.target.value;
-    localStorage.setItem('felix_theme_pref',_themePref);
-    applyTheme();
-  }
-});
+function setThemePref(pref){
+  _themePref=pref;
+  localStorage.setItem('felix_theme_pref',_themePref);
+  applyTheme();
+}
 applyTheme();
 
 // ── MODAL ──────────────────────────────────────────────
