@@ -1834,7 +1834,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 @media (max-width: 900px) {
   .bottom-nav { display: flex; flex-direction: column; }
   /* Extra bottom padding so content clears the fixed bottom nav */
-  .content { padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
+  .content { padding-bottom: max(8px, env(safe-area-inset-bottom)) !important; }
 }
 /* Transparent bottom nav on scroll — only plus stays ──────── */
 .bottom-nav {
