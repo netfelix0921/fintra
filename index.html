@@ -192,7 +192,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   padding: 0 !important;
   overflow: hidden !important;
 }
-#logo-icon-wrap #icon-bg { fill: var(--t1) !important; }
+#logo-icon-wrap #icon-bg { fill: url(#sb-bg) !important; }
 
 .logo-text {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1552,8 +1552,8 @@ html[data-theme="dark"] .sub-card-icon { background: var(--bg-2); }
 html[data-theme="dark"] .sub-card-name { color: var(--t1); }
 html[data-theme="dark"] .sub-card-amt { color: #F87171; }
 html[data-theme="dark"] .logo-text { -webkit-text-fill-color: var(--t1) !important; }
-html[data-theme="dark"] #logo-icon-wrap { background: #1E2535 !important; }
-html[data-theme="dark"] #icon-bg { fill: #1E2535 !important; }
+/* logo bg preserved in dark mode */
+/* logo fill preserved in dark mode */
 html[data-theme="dark"] .toast { background: #1E2535; border: 1px solid var(--border); }
 html[data-theme="dark"] .toast.success { background: var(--green); border-color: transparent; }
 html[data-theme="dark"] .toast.error { background: var(--red); border-color: transparent; }
@@ -2227,17 +2227,26 @@ input[type="date"], input[type="number"] {
   .search-mob-bar { left: 232px; }
 }
 
-.onboard-overlay{position:fixed;inset:0;background:rgba(10,14,26,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px}
-.onboard-card{background:var(--surface);border-radius:24px;width:100%;max-width:420px;padding:28px;box-shadow:var(--sh-xl);animation:modalSlideIn .35s cubic-bezier(.16,1,.3,1) both}
-.onboard-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
-.onboard-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);transition:all .2s}
-.onboard-dot.on{background:var(--blue);width:20px;border-radius:4px}
-.onboard-ico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.onboard-ico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
-.onboard-title{font-size:18px;font-weight:600;color:var(--t1);text-align:center;letter-spacing:-.3px;margin-bottom:6px}
-.onboard-desc{font-size:13px;color:var(--t3);text-align:center;line-height:1.6;margin-bottom:20px}
-.onboard-foot{display:flex;gap:8px;margin-top:18px}
-.ob-skip{font-size:12px;color:var(--t3);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px;flex-shrink:0}
+/* ── ONBOARDING FULLSCREEN ─────────────────────────────── */
+.ob-overlay{position:fixed;inset:0;z-index:2000;background:#0A0618;display:flex;flex-direction:column;overflow:hidden}
+.ob-slides{flex:1;display:flex;overflow:hidden;position:relative}
+.ob-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 0 0;transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .45s;will-change:transform,opacity}
+.ob-slide.prev{transform:translateX(-100%);opacity:0}
+.ob-slide.active{transform:translateX(0);opacity:1}
+.ob-slide.next{transform:translateX(100%);opacity:0}
+.ob-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.ob-bottom{position:relative;z-index:2;width:100%;padding:32px 28px 48px;background:linear-gradient(to top,rgba(10,6,24,1) 70%,rgba(10,6,24,0))}
+.ob-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:14px}
+.ob-h{font-size:26px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1.2;margin-bottom:10px}
+.ob-p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:0}
+.ob-nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px 40px;gap:16px;position:relative;z-index:2}
+.ob-dots2{display:flex;gap:6px;align-items:center}
+.ob-dot2{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.25);transition:all .25s}
+.ob-dot2.on{width:20px;background:#fff}
+.ob-next{padding:13px 28px;background:linear-gradient(135deg,#818CF8,#2DD4BF);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:-.2px;transition:opacity .15s;flex-shrink:0}
+.ob-next:active{opacity:.85}
+.ob-skip2{font-size:13px;color:rgba(255,255,255,.35);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0}
+.ob-skip2:active{color:rgba(255,255,255,.6)}
 
 .amt-calc-hint{font-size:11px;color:var(--blue);padding:3px 0;display:none;cursor:pointer}
 
@@ -3421,8 +3430,7 @@ function applyTheme(){
     btn.style.color=active?'#fff':'var(--t2)';
     btn.style.borderColor=active?'var(--blue)':'var(--border2)';
   });
-  var iconBg=ge('icon-bg');
-  if(iconBg)iconBg.setAttribute('fill',_darkMode?'#0d0e1a':'#ffffff');
+  // logo icon bg is intentionally preserved across themes
 }
 function toggleTheme(){
   var order=['light','dark','system'];
@@ -5021,7 +5029,7 @@ function renderDash(){
   S.transfer.forEach(function(e){all.push({date:e.date,desc:accName(e.from)+' → '+accName(e.to),type:'Transfer',amt:e.amt,cls:'neu',sign:'',dot:'rgba(8,145,178,0.12)',icon:'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M3 5l3-3M3 5l3 3"/><path d="M13 11H3m10 0l-3-3m3 3l-3 3"/></svg>'});});
   S.credit.forEach(function(e){all.push({date:e.date,desc:e.desc,type:'Credit',amt:e.amt,cls:e.type==='Charge'?'neg':'pos',sign:e.type==='Charge'?'-':'+',dot:catColor(e.category),icon:catIcon(e.category)});});
   all.sort(function(a,b){return b.date.localeCompare(a.date);});
-  ge('recent-list').innerHTML=all.slice(0,7).map(function(e){return'<div class="ri"><div class="rl"><div class="rdot" style="background:'+e.dot+'">'+e.icon+'</div><div><div class="rdesc">'+e.desc+'</div><div class="rdate">'+e.date+' · '+e.type+'</div></div></div><div class="ramt '+e.cls+'">'+e.sign+fmt(e.amt)+'</div></div>';}).join('')||'<div style="color:var(--t3);font-size:12.5px;padding:.8rem 0">No activity yet.</div>';
+  ge('recent-list').innerHTML=all.slice(0,7).map(function(e){return'<div class="ri"><div class="rl"><div class="rdot" style="background:'+e.dot+'">'+e.icon+'</div><div><div class="rdesc">'+e.desc+'</div><div class="rdate">'+e.date+' · '+e.type+'</div></div></div><div class="ramt '+e.cls+'">'+e.sign+fmt(e.amt)+'</div></div>';}).join('')||'<div style="color:var(--t3);font-size:12.5px;padding:2rem 0;text-align:center;width:100%">No activity yet.</div>';
   // Top expenses
   var ym=curYM();var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   st('top-exp-month',mn[parseInt(ym.split('-')[1])-1]+' '+ym.slice(0,4));
@@ -7149,132 +7157,231 @@ function wireDashButtons(){
 }
 
 
-var _obStep=0;
-// Detect iOS Safari running in browser (not already installed as PWA)
-var _isIosSafari=(function(){
-  var ua=navigator.userAgent;
-  var isIos=/iphone|ipad|ipod/i.test(ua);
-  var isStandalone=('standalone' in navigator)&&navigator.standalone;
-  var isSafari=/^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
-  return isIos&&isSafari&&!isStandalone;
-})();
-var _isAndroid=/android/i.test(navigator.userAgent)&&!navigator.standalone;
-
-function _buildInstallFields(){
-  if(navigator.standalone){
-    // Already running as installed PWA
-    return '<div style="margin:4px 0 8px;padding:14px 16px;background:var(--green-s);border:1px solid rgba(5,150,105,0.20);border-radius:12px;display:flex;align-items:center;gap:12px">'
-      +'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-      +'<div><div style="font-size:13px;font-weight:600;color:var(--green)">Already installed!</div><div style="font-size:12px;color:var(--t3);margin-top:2px">Fintra is running as a home screen app.</div></div>'
-      +'</div>';
+// ── ONBOARDING — Feature slides ──────────────────────────────
+var OB_SLIDES=[
+  {
+    badge:'Welcome',badgeBg:'rgba(129,140,248,.15)',badgeCol:'#818CF8',
+    title:'Your Financial\nControl Center',
+    desc:'Track every transaction, manage all your accounts, and grow your savings — all in one place.',
+    art:function(){return'<svg width="260" height="280" viewBox="0 0 260 280" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<rect x="30" y="40" width="200" height="130" rx="18" fill="#1A1040" stroke="rgba(129,140,248,.3)" stroke-width="1"/>'
+      +'<rect x="48" y="62" width="80" height="8" rx="4" fill="rgba(129,140,248,.4)"/>'
+      +'<rect x="48" y="78" width="140" height="28" rx="6" fill="rgba(129,140,248,.15)"/>'
+      +'<text x="56" y="97" font-family="system-ui" font-size="16" font-weight="700" fill="#fff">4,820.00</text>'
+      +'<rect x="48" y="116" width="45" height="36" rx="8" fill="rgba(45,212,191,.1)" stroke="rgba(45,212,191,.2)" stroke-width="1"/>'
+      +'<rect x="48" y="125" width="28" height="5" rx="2.5" fill="rgba(45,212,191,.5)"/>'
+      +'<rect x="48" y="134" width="35" height="8" rx="3" fill="#2DD4BF"/>'
+      +'<rect x="102" y="116" width="45" height="36" rx="8" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.2)" stroke-width="1"/>'
+      +'<rect x="102" y="125" width="28" height="5" rx="2.5" fill="rgba(239,68,68,.4)"/>'
+      +'<rect x="102" y="134" width="35" height="8" rx="3" fill="#EF4444"/>'
+      +'<rect x="156" y="116" width="45" height="36" rx="8" fill="rgba(129,140,248,.1)" stroke="rgba(129,140,248,.2)" stroke-width="1"/>'
+      +'<rect x="156" y="125" width="28" height="5" rx="2.5" fill="rgba(129,140,248,.4)"/>'
+      +'<rect x="156" y="134" width="35" height="8" rx="3" fill="#818CF8"/>'
+      +'<rect x="30" y="186" width="90" height="60" rx="14" fill="#1A1040" stroke="rgba(45,212,191,.2)" stroke-width="1"/>'
+      +'<rect x="44" y="200" width="50" height="5" rx="2.5" fill="rgba(255,255,255,.2)"/>'
+      +'<rect x="44" y="213" width="62" height="10" rx="4" fill="#2DD4BF" opacity=".8"/>'
+      +'<rect x="30" y="254" width="56" height="4" rx="2" fill="rgba(255,255,255,.06)"/>'
+      +'<rect x="140" y="186" width="90" height="60" rx="14" fill="#1A1040" stroke="rgba(129,140,248,.2)" stroke-width="1"/>'
+      +'<rect x="154" y="200" width="50" height="5" rx="2.5" fill="rgba(255,255,255,.2)"/>'
+      +'<rect x="154" y="213" width="62" height="10" rx="4" fill="#818CF8" opacity=".8"/>'
+      +'</svg>';}
+  },
+  {
+    badge:'Accounts',badgeBg:'rgba(45,212,191,.12)',badgeCol:'#2DD4BF',
+    title:'All Your Accounts\nin One View',
+    desc:'Banks, e-wallets, credit cards, cash — connect any account and see all your balances in one place.',
+    art:function(){return'<svg width="260" height="280" viewBox="0 0 260 280" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<rect x="20" y="20" width="220" height="70" rx="16" fill="#1A1040" stroke="rgba(45,212,191,.25)" stroke-width="1"/>'
+      +'<rect x="36" y="36" width="32" height="32" rx="10" fill="rgba(45,212,191,.15)"/>'
+      +'<rect x="43" y="43" width="18" height="18" rx="4" fill="#2DD4BF" opacity=".7"/>'
+      +'<rect x="78" y="40" width="70" height="7" rx="3.5" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="78" y="54" width="45" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/>'
+      +'<rect x="180" y="42" width="44" height="12" rx="5" fill="rgba(45,212,191,.2)"/>'
+      +'<text x="202" y="52" font-family="system-ui" font-size="9" font-weight="700" fill="#2DD4BF" text-anchor="middle">+1,200</text>'
+      +'<rect x="20" y="100" width="220" height="70" rx="16" fill="#1A1040" stroke="rgba(129,140,248,.25)" stroke-width="1"/>'
+      +'<rect x="36" y="116" width="32" height="32" rx="10" fill="rgba(129,140,248,.15)"/>'
+      +'<rect x="43" y="123" width="18" height="18" rx="4" fill="#818CF8" opacity=".7"/>'
+      +'<rect x="78" y="120" width="55" height="7" rx="3.5" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="78" y="134" width="80" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/>'
+      +'<rect x="168" y="120" width="56" height="7" rx="3.5" fill="rgba(255,255,255,.5)" text-anchor="end"/>'
+      +'<rect x="20" y="180" width="220" height="70" rx="16" fill="#1A1040" stroke="rgba(239,68,68,.2)" stroke-width="1"/>'
+      +'<rect x="36" y="196" width="32" height="32" rx="10" fill="rgba(239,68,68,.1)"/>'
+      +'<rect x="41" y="201" width="22" height="22" rx="4" fill="#EF4444" opacity=".5"/>'
+      +'<rect x="78" y="200" width="60" height="7" rx="3.5" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="78" y="214" width="100" height="5" rx="2.5" fill="rgba(255,255,255,.25)"/>'
+      +'<rect x="160" y="198" width="64" height="20" rx="8" fill="rgba(239,68,68,.15)"/>'
+      +'<rect x="168" y="204" width="48" height="7" rx="3.5" fill="#EF4444" opacity=".8"/>'
+      +'</svg>';}
+  },
+  {
+    badge:'Budgets',badgeBg:'rgba(251,191,36,.12)',badgeCol:'#FBB724',
+    title:'Set Budgets,\nStay on Track',
+    desc:'Create monthly budget goals per category. Get alerts before you overspend — not after.',
+    art:function(){return'<svg width="260" height="280" viewBox="0 0 260 280" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<rect x="30" y="20" width="200" height="240" rx="20" fill="#1A1040" stroke="rgba(251,191,36,.15)" stroke-width="1"/>'
+      +'<rect x="48" y="40" width="80" height="7" rx="3.5" fill="rgba(255,255,255,.5)"/>'
+      +'<rect x="48" y="54" width="120" height="14" rx="5" fill="rgba(251,191,36,.2)"/>'
+      +'<text x="56" y="65" font-family="system-ui" font-size="11" font-weight="700" fill="#FBB724">12,400 / 20,000</text>'
+      +'<rect x="48" y="78" width="164" height="6" rx="3" fill="rgba(255,255,255,.08)"/>'
+      +'<rect x="48" y="78" width="100" height="6" rx="3" fill="#FBB724" opacity=".8"/>'
+      +'<rect x="48" y="106" width="55" height="5" rx="2.5" fill="rgba(255,255,255,.3)"/>'
+      +'<rect x="48" y="118" width="164" height="5" rx="2.5" fill="rgba(255,255,255,.06)"/>'
+      +'<rect x="48" y="118" width="60" height="5" rx="2.5" fill="#2DD4BF" opacity=".8"/>'
+      +'<rect x="48" y="134" width="70" height="5" rx="2.5" fill="rgba(255,255,255,.3)"/>'
+      +'<rect x="48" y="146" width="164" height="5" rx="2.5" fill="rgba(255,255,255,.06)"/>'
+      +'<rect x="48" y="146" width="130" height="5" rx="2.5" fill="#EF4444" opacity=".7"/>'
+      +'<rect x="48" y="162" width="80" height="5" rx="2.5" fill="rgba(255,255,255,.3)"/>'
+      +'<rect x="48" y="174" width="164" height="5" rx="2.5" fill="rgba(255,255,255,.06)"/>'
+      +'<rect x="48" y="174" width="44" height="5" rx="2.5" fill="#818CF8" opacity=".8"/>'
+      +'<rect x="48" y="200" width="164" height="40" rx="12" fill="rgba(251,191,36,.1)" stroke="rgba(251,191,36,.25)" stroke-width="1"/>'
+      +'<rect x="60" y="212" width="100" height="5" rx="2.5" fill="rgba(255,255,255,.3)"/>'
+      +'<rect x="60" y="223" width="72" height="7" rx="3.5" fill="#FBB724" opacity=".7"/>'
+      +'</svg>';}
+  },
+  {
+    badge:'Bills & Subs',badgeBg:'rgba(129,140,248,.12)',badgeCol:'#818CF8',
+    title:'Never Miss\na Payment',
+    desc:'Track bills, subscriptions, and due dates. Get reminders so nothing slips through the cracks.',
+    art:function(){return'<svg width="260" height="280" viewBox="0 0 260 280" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<rect x="30" y="16" width="200" height="248" rx="20" fill="#1A1040" stroke="rgba(129,140,248,.15)" stroke-width="1"/>'
+      +'<rect x="48" y="34" width="90" height="8" rx="4" fill="rgba(255,255,255,.5)"/>'
+      +'<rect x="48" y="56" width="164" height="38" rx="10" fill="rgba(45,212,191,.08)" stroke="rgba(45,212,191,.2)" stroke-width="1"/>'
+      +'<rect x="48" y="56" width="4" height="38" rx="2" fill="#2DD4BF"/>'
+      +'<rect x="62" y="64" width="60" height="6" rx="3" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="62" y="76" width="40" height="5" rx="2.5" fill="rgba(45,212,191,.5)"/>'
+      +'<rect x="170" y="66" width="34" height="10" rx="4" fill="rgba(45,212,191,.2)"/>'
+      +'<rect x="175" y="69" width="24" height="5" rx="2.5" fill="#2DD4BF" opacity=".9"/>'
+      +'<rect x="48" y="104" width="164" height="38" rx="10" fill="rgba(251,191,36,.08)" stroke="rgba(251,191,36,.2)" stroke-width="1"/>'
+      +'<rect x="48" y="104" width="4" height="38" rx="2" fill="#FBB724"/>'
+      +'<rect x="62" y="112" width="72" height="6" rx="3" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="62" y="124" width="50" height="5" rx="2.5" fill="rgba(251,191,36,.5)"/>'
+      +'<rect x="170" y="114" width="34" height="10" rx="4" fill="rgba(251,191,36,.2)"/>'
+      +'<rect x="175" y="117" width="24" height="5" rx="2.5" fill="#FBB724" opacity=".9"/>'
+      +'<rect x="48" y="152" width="164" height="38" rx="10" fill="rgba(239,68,68,.08)" stroke="rgba(239,68,68,.2)" stroke-width="1"/>'
+      +'<rect x="48" y="152" width="4" height="38" rx="2" fill="#EF4444"/>'
+      +'<rect x="62" y="160" width="54" height="6" rx="3" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="62" y="172" width="36" height="5" rx="2.5" fill="rgba(239,68,68,.5)"/>'
+      +'<rect x="166" y="158" width="38" height="10" rx="4" fill="rgba(239,68,68,.2)"/>'
+      +'<rect x="170" y="161" width="30" height="5" rx="2.5" fill="#EF4444" opacity=".9"/>'
+      +'<rect x="48" y="206" width="164" height="38" rx="10" fill="rgba(129,140,248,.08)" stroke="rgba(129,140,248,.2)" stroke-width="1"/>'
+      +'<rect x="48" y="206" width="4" height="38" rx="2" fill="#818CF8"/>'
+      +'<rect x="62" y="214" width="80" height="6" rx="3" fill="rgba(255,255,255,.7)"/>'
+      +'<rect x="62" y="226" width="55" height="5" rx="2.5" fill="rgba(129,140,248,.5)"/>'
+      +'<rect x="170" y="212" width="34" height="10" rx="4" fill="rgba(129,140,248,.2)"/>'
+      +'<rect x="175" y="215" width="24" height="5" rx="2.5" fill="#818CF8" opacity=".9"/>'
+      +'</svg>';}
+  },
+  {
+    badge:'Ready',badgeBg:'rgba(45,212,191,.12)',badgeCol:'#2DD4BF',
+    title:'Your Money,\nFully in Control',
+    desc:'Fintra is ready. Add your first account, set a budget, and start taking control of your money.',
+    art:function(){return'<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      +'<rect x="10" y="10" width="200" height="200" rx="46" fill="#120D30"/>'
+      +'<defs>'
+      +'<linearGradient id="ob-sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>'
+      +'<linearGradient id="ob-ssl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>'
+      +'<clipPath id="ob-sclip"><rect x="10" y="10" width="200" height="200" rx="46"/></clipPath>'
+      +'</defs>'
+      +'<rect x="10" y="10" width="200" height="200" rx="46" fill="url(#ob-sbg)"/>'
+      +'<g transform="translate(55 55) rotate(-8 55 55)">'
+      +'<rect x="24" y="18" width="13" height="72" rx="5" fill="rgba(255,255,255,.9)"/>'
+      +'<rect x="24" y="18" width="52" height="13" rx="5" fill="rgba(255,255,255,.9)"/>'
+      +'<rect x="24" y="46" width="36" height="12" rx="5" fill="rgba(255,255,255,.9)"/>'
+      +'</g>'
+      +'<rect x="116" y="47" width="14" height="130" rx="7" fill="url(#ob-ssl)" transform="rotate(30 165 110)" clip-path="url(#ob-sclip)" opacity=".95"/>'
+      +'<circle cx="110" cy="172" r="22" fill="rgba(45,212,191,.15)" stroke="rgba(45,212,191,.4)" stroke-width="1.5"/>'
+      +'<polyline points="100,172 108,180 122,164" fill="none" stroke="#2DD4BF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+      +'</svg>';}
   }
-  if(_isIosSafari){
-    return '<div style="margin:4px 0 8px">'
-      // Step 1
-      +'<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px">'
-      +'<div style="width:28px;height:28px;border-radius:8px;background:var(--blue-s);display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      +'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'
-      +'</div>'
-      +'<div><div style="font-size:12.5px;font-weight:600;color:var(--t1)">Tap the Share button</div>'
-      +'<div style="font-size:11.5px;color:var(--t3);margin-top:2px">The <strong style="color:var(--t2)">\u2191</strong> icon at the bottom of Safari</div></div>'
-      +'</div>'
-      // Step 2
-      +'<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px">'
-      +'<div style="width:28px;height:28px;border-radius:8px;background:var(--blue-s);display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      +'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>'
-      +'</div>'
-      +'<div><div style="font-size:12.5px;font-weight:600;color:var(--t1)">Tap \u201cAdd to Home Screen\u201d</div>'
-      +'<div style="font-size:11.5px;color:var(--t3);margin-top:2px">Scroll down in the share menu to find it</div></div>'
-      +'</div>'
-      // Step 3
-      +'<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--bg);border-radius:10px">'
-      +'<div style="width:28px;height:28px;border-radius:8px;background:var(--green-s);display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      +'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-      +'</div>'
-      +'<div><div style="font-size:12.5px;font-weight:600;color:var(--t1)">Tap \u201cAdd\u201d and open Fintra</div>'
-      +'<div style="font-size:11.5px;color:var(--t3);margin-top:2px">Fintra will appear on your home screen like a native app</div></div>'
-      +'</div>'
-      +'</div>';
-  }
-  if(_isAndroid){
-    return '<div style="margin:4px 0 8px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12.5px;color:var(--t2);line-height:1.6">'
-      +'Tap the <strong style="color:var(--t1)">\u22EE menu</strong> in Chrome, then tap <strong style="color:var(--t1)">\u201cAdd to Home screen\u201d</strong> or <strong style="color:var(--t1)">\u201cInstall app\u201d</strong>.'
-      +'</div>';
-  }
-  // Desktop or other browser
-  return '<div style="margin:4px 0 8px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12.5px;color:var(--t2);line-height:1.6">'
-    +'On iPhone, open Fintra in <strong style="color:var(--t1)">Safari</strong>, tap the <strong style="color:var(--t1)">Share \u2191</strong> button, then <strong style="color:var(--t1)">\u201cAdd to Home Screen\u201d</strong>.'
-    +'</div>';
-}
-
-var OB_STEPS=[
-  {ico:'<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',bg:'var(--blue-s)',col:'var(--blue)',
-   title:'Welcome to Fintra',desc:"Your financial control center. Let\u2019s set you up in a few quick steps.",
-   fields:'<div class="fr"><div class="fg"><label>Your name</label><input type="text" id="ob-name" placeholder="e.g. Juan dela Cruz" style="font-size:16px"></div></div>',btn:'Continue',
-   next:function(){var n=(document.getElementById('ob-name')||{}).value||'';if(!n.trim()){toast('Please enter your name.','error');return false;}S.profile.name=n.trim();document.querySelectorAll('#gname-span,#chip-name,#prof-name-disp').forEach(function(el){if(el.id==='gname-span')el.textContent=n.trim()+'.';else el.textContent=n.trim();});save();return true;}},
-  {ico:'<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',bg:'var(--green-s)',col:'var(--green)',
-   title:'Add your first account',desc:'Connect your main bank or e-wallet so Fintra can track your balance.',
-   fields:'<div class="fr3"><div class="fg"><label>Account name</label><input type="text" id="ob-aname" placeholder="e.g. BDO Savings" style="font-size:16px"></div><div class="fg"><label>Balance</label><input type="number" id="ob-abal" placeholder="0.00" style="font-size:16px"></div><div class="fg"><label>Type</label><select id="ob-atype" style="font-size:16px"><option>Savings</option><option>Checking</option><option>Cash</option><option>E-Wallet</option></select></div></div>',btn:'Add account',
-   next:function(){var n=(document.getElementById('ob-aname')||{}).value||'';if(!n.trim()){toast('Enter an account name.','error');return false;}var b=parseFloat((document.getElementById('ob-abal')||{}).value)||0;var t=(document.getElementById('ob-atype')||{}).value||'Savings';S.accounts.push({id:nxtId(),name:n.trim(),type:t,num:'',balance:b,_openingBalance:b,color:'#3B6BFF',accentColor:'#3B6BFF',archived:false,isCC:false,logo:null});save();renderAccounts();fillSelects();return true;}},
-  {ico:'<svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
-   bg:'var(--blue-s)',col:'var(--blue)',
-   title:'Install Fintra on your phone',
-   desc:'Get the full app experience \u2014 works offline, opens instantly, no browser bar.',
-   fields:'',
-   _fieldsLazy:true,
-   btn:'Got it \u2014 I\u2019ll install it',
-   next:function(){return true;}},
-  {ico:'<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',bg:'rgba(124,58,237,0.10)',col:'#7C3AED',
-   title:"You\u2019re all set!",desc:'Start logging income, tracking expenses, or setting a savings goal. Fintra handles the rest.',
-   fields:'',btn:'Start using Fintra',
-   next:function(){return true;}}
 ];
-function _obRender(){
-  var dots=document.getElementById('ob-dots');
-  if(dots){dots.innerHTML=OB_STEPS.map(function(_,i){return'<div class="onboard-dot'+(i<=_obStep?' on':'')+'">'+'</div>';}).join('');}
-  var s=OB_STEPS[_obStep];
-  var body=document.getElementById('ob-body');if(!body)return;
-  var fields=s.fields||'';
-  var bg=s.bg,col=s.col,title=s.title,desc=s.desc,btn=s.btn;
-  if(s._fieldsLazy){
-    var already=!!(navigator.standalone);
-    fields=_buildInstallFields();
-    if(already){bg='var(--green-s)';col='var(--green)';title='Running as app \u2713';desc='Fintra is already installed on your home screen. You\u2019re all set!';btn='Finish setup';}
-  }
-  body.innerHTML='<div class="onboard-ico" style="background:'+bg+';color:'+col+'">'+s.ico+'</div>'
-    +'<div class="onboard-title">'+title+'</div><div class="onboard-desc">'+desc+'</div>'+fields
-    +'<div class="onboard-foot">'+(_obStep<OB_STEPS.length-1?'<button class="ob-skip" id="ob-skip">Skip setup</button>':'')
-    +'<button class="btn-add" id="ob-btn" style="flex:1">'+btn+'</button></div>';
-  setTimeout(function(){
-    var obBtn=document.getElementById('ob-btn');
-    if(obBtn)obBtn.addEventListener('click',function(){
-      if(!OB_STEPS[_obStep].next())return;
-      if(_obStep>=OB_STEPS.length-1){_obClose();}else{_obStep++;_obRender();}
-    });
-    var sk=document.getElementById('ob-skip');if(sk)sk.addEventListener('click',_obClose);
-    var fi=body.querySelector('input[type="text"],input[type="number"]');
-    if(fi)setTimeout(function(){fi.focus();},50);
-  },20);
+
+var _obCur=0;
+
+function _obBuildSlides(){
+  var container=document.getElementById('ob-slides');
+  if(!container)return;
+  container.innerHTML=OB_SLIDES.map(function(s,i){
+    var cls=i===0?'ob-slide active':i===1?'ob-slide next':'ob-slide next';
+    return'<div class="'+cls+'" id="ob-slide-'+i+'">'
+      +'<div class="ob-art">'+s.art()+'</div>'
+      +'<div class="ob-bottom">'
+      +'<div class="ob-badge" style="background:'+s.badgeBg+';color:'+s.badgeCol+'">'+s.badge+'</div>'
+      +'<div class="ob-h">'+s.title.replace('\n','<br>')+'</div>'
+      +'<div class="ob-p">'+s.desc+'</div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
+
+function _obUpdateDots(){
+  var dc=document.getElementById('ob-dots2');
+  if(!dc)return;
+  dc.innerHTML=OB_SLIDES.map(function(_,i){
+    return'<div class="ob-dot2'+(i===_obCur?' on':'')+'"></div>';
+  }).join('');
+}
+
+function _obUpdateNav(){
+  var btn=document.getElementById('ob-next');
+  var sk=document.getElementById('ob-skip2');
+  if(!btn)return;
+  var isLast=_obCur>=OB_SLIDES.length-1;
+  btn.textContent=isLast?'Get Started':'Next';
+  if(sk)sk.style.opacity=isLast?'0':'1';
+  if(sk)sk.style.pointerEvents=isLast?'none':'auto';
+}
+
+function _obGoTo(idx){
+  var prev=_obCur;
+  _obCur=Math.max(0,Math.min(OB_SLIDES.length-1,idx));
+  document.querySelectorAll('.ob-slide').forEach(function(el,i){
+    el.className='ob-slide'+(i===_obCur?' active':i<_obCur?' prev':' next');
+  });
+  _obUpdateDots();
+  _obUpdateNav();
+}
+
 function _obClose(){
   var ov=document.getElementById('onboard-ov');if(ov)ov.style.display='none';
   S.profile._onboarded=true;save();renderDash();renderAccounts();
 }
+
+function _obInit(){
+  _obCur=0;
+  _obBuildSlides();
+  _obUpdateDots();
+  _obUpdateNav();
+  var next=document.getElementById('ob-next');
+  var sk=document.getElementById('ob-skip2');
+  if(next)next.onclick=function(){
+    if(_obCur>=OB_SLIDES.length-1){_obClose();}else{_obGoTo(_obCur+1);}
+  };
+  if(sk)sk.onclick=_obClose;
+  // Swipe support
+  var slides=document.getElementById('ob-slides');
+  var startX=0;
+  if(slides){
+    slides.addEventListener('touchstart',function(e){startX=e.touches[0].clientX;},{passive:true});
+    slides.addEventListener('touchend',function(e){
+      var dx=e.changedTouches[0].clientX-startX;
+      if(Math.abs(dx)>50){dx<0?_obGoTo(_obCur+1):_obGoTo(_obCur-1);}
+    },{passive:true});
+  }
+}
+
 function maybeShowOnboard(){
   var noData=!S.accounts.length&&!S.income.length;
   if(!S.profile._onboarded||noData){
     S.profile._onboarded=false;
-    _obStep=0;
     var ov=document.getElementById('onboard-ov');if(ov)ov.style.display='flex';
-    _obRender();
+    _obInit();
   }
 }
 function resetOnboarding(){
   S.profile._onboarded=false;
   save();
-  _obStep=0;
   var ov=document.getElementById('onboard-ov');if(ov)ov.style.display='flex';
-  _obRender();
+  _obInit();
 }
 
 
@@ -7577,6 +7684,13 @@ if ('serviceWorker' in navigator) {
 }
 
 </script>
-<div id="onboard-ov" class="onboard-overlay" style="display:none"><div class="onboard-card"><div class="onboard-dots" id="ob-dots"></div><div id="ob-body"></div></div></div>
+<div id="onboard-ov" class="ob-overlay" style="display:none">
+  <div class="ob-slides" id="ob-slides"></div>
+  <div class="ob-nav">
+    <button class="ob-skip2" id="ob-skip2">Skip</button>
+    <div class="ob-dots2" id="ob-dots2"></div>
+    <button class="ob-next" id="ob-next">Next</button>
+  </div>
+</div>
 </body>
 </html>
