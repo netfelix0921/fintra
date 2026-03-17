@@ -139,13 +139,15 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
    SIDEBAR
    ═══════════════════════════════════════════════════════════════ */
 .sidebar {
-  width: 232px;
+  width: 260px;
   flex-shrink: 0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255,255,255,0.6);
   display: flex;
   flex-direction: column;
-  transition: left var(--dur-slow) var(--ease);
+  transition: right var(--dur-slow) var(--ease);
   overflow: hidden;
   padding-top: env(safe-area-inset-top);
   position: relative;
@@ -216,7 +218,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 
 .sidebar-divider { height: 1px; background: var(--border); }
 
-.nav { flex: 1; padding: 8px 10px; overflow-y: auto; }
+.nav { flex: 1; padding: 12px 10px 8px; overflow-y: auto; }
 .nav-section {
   font-size: 9.5px;
   letter-spacing: 0.10em;
@@ -330,12 +332,61 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   overflow: hidden; min-width: 0;
   background: var(--bg);
 }
+/* Desktop — sidebar always visible, content offset ────────── */
+@media (min-width: 901px) {
+  .app { flex-direction: row; }
+  .sidebar {
+    position: relative !important;
+    top: auto !important; right: auto !important;
+    height: 100vh !important;
+    width: 240px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    border-left: none !important;
+    border-right: 1px solid var(--border) !important;
+    background: var(--surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 10 !important;
+    box-shadow: none !important;
+  }
+  .sidebar::before {
+    content: "";
+    display: block;
+    height: calc(env(safe-area-inset-top) + 8px);
+    flex-shrink: 0;
+  }
+  .sidebar-overlay { display: none !important; }
+  .topbar {
+    left: 240px !important;
+    background: rgba(255,255,255,0.96) !important;
+  }
+  .topbar-logo { display: none !important; }
+  .bottom-nav { display: none !important; }
+  .content {
+    padding-top: calc(50px + env(safe-area-inset-top) + 16px) !important;
+  }
+  .content.no-topbar {
+    padding-top: calc(50px + env(safe-area-inset-top) + 16px) !important;
+  }
+  .topbar.tb-hidden { transform: none !important; }
+  html[data-theme="dark"] .sidebar {
+    background: var(--surface) !important;
+    border-right-color: var(--border) !important;
+    backdrop-filter: none !important;
+  }
+  .search-mob-bar { left: 240px !important; }
+  .ham-btn { display: none !important; }
+  /* Always show search bar on desktop */
+  .search-mob-btn { display: none !important; }
+  .topbar-right .search-wrap { display: flex !important; }
+}
 
 /* ═══════════════════════════════════════════════════════════════
    TOPBAR
    ═══════════════════════════════════════════════════════════════ */
 .topbar {
-  height: calc(46px + env(safe-area-inset-top));
+  height: calc(50px + env(safe-area-inset-top));
   flex-shrink: 0;
   position: fixed; top: 0; left: 0; right: 0;
   background: rgba(255,255,255,0.94);
@@ -347,13 +398,43 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
   gap: 8px; z-index: 400;
+  transition: transform 0.3s var(--ease);
 }
-.topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.topbar-title {
-  font-size: 13.5px; font-weight: 500; color: var(--t1); letter-spacing: -0.1px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.topbar.hide { transform: translateY(-100%); }
+.topbar.tb-hidden { transform: translateY(-100%); pointer-events: none; }
+.topbar-left { display: flex; align-items: center; gap: 0; min-width: 0; }
+.topbar-logo {
+  display: flex; align-items: center; gap: 9px;
+  cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+.topbar-brand {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 17px; font-weight: 700; letter-spacing: -0.5px;
+  color: var(--t1); line-height: 1;
+}
+.topbar-title { display: none; }
+@media(min-width:901px){
+  .topbar-title { display: block; font-size:14px; font-weight:600; color:var(--t1); letter-spacing:-0.2px; }
+  .topbar-logo { display: none; }
 }
 .topbar-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+/* Panel hero header — replaces .ph on accounts/bills/profile ──────── */
+.panel-hero {
+  padding: calc(50px + env(safe-area-inset-top) + 20px) 20px 20px;
+  margin: calc(-46px - env(safe-area-inset-top) - 16px) -20px 20px;
+  background: var(--surface);
+}
+.panel-hero-title {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.6px; color: var(--t1);
+  line-height: 1.15; margin-bottom: 4px;
+}
+.panel-hero-sub {
+  font-size: 13px; color: var(--t3); font-weight: 400;
+}
+.panel-hero-actions {
+  display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap;
+}
 
 /* Chips — date and save status */
 .tb-chip {
@@ -428,7 +509,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .search-mob-btn { display: none; width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--dur-fast); }
 .search-mob-btn svg { width: 15px; height: 15px; stroke: var(--t2); fill: none; stroke-width: 1.75; stroke-linecap: round; }
 .search-mob-btn:hover { background: var(--surface); }
-.search-mob-bar { display: none !important; padding: 8px 14px; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); position: fixed; top: calc(46px + env(safe-area-inset-top)); left: 0; right: 0; z-index: 399; }
+.search-mob-bar { display: none !important; padding: 8px 14px; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); position: fixed; top: calc(50px + env(safe-area-inset-top)); left: 0; right: 0; z-index: 399; }
 .search-mob-bar .search-input { background: var(--bg); font-size: 13px; padding: 8px 12px; border-radius: var(--r-sm) !important; flex: 1; }
 .search-mob-bar .search-results { left: 14px; right: 14px; }
 .sr-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background var(--dur-fast); border-bottom: 1px solid var(--border); }
@@ -467,9 +548,13 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .content {
   flex: 1; overflow-y: auto;
   padding: 18px 20px;
-  padding-top: calc(46px + env(safe-area-inset-top) + 16px);
+  padding-top: calc(50px + env(safe-area-inset-top) + 16px);
   padding-bottom: calc(18px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling: touch;
+  transition: padding-top 0.3s var(--ease);
+}
+.content.no-topbar {
+  padding-top: calc(env(safe-area-inset-top) + 16px);
 }
 .panel { display: none; }
 .panel.active {
@@ -1351,15 +1436,15 @@ select option { background: var(--surface); }
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR OVERLAY
    ═══════════════════════════════════════════════════════════════ */
-.sidebar-overlay { display: none; position: fixed; top: calc(46px + env(safe-area-inset-top)); left: 0; right: 0; bottom: 0; background: rgba(12,18,32,0.48); backdrop-filter: blur(2px); z-index: 99; }
+.sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(12,18,32,0.48); backdrop-filter: blur(2px); z-index: 99; }
 .sidebar-overlay.show { display: block; }
 
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .sidebar { position: fixed; top: calc(46px + env(safe-area-inset-top)); left: -260px; height: calc(100% - 46px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; }
-  .sidebar.open { left: 0; }
+  .sidebar { position: fixed; top: calc(50px + env(safe-area-inset-top)); right: -260px; left: auto; height: calc(100% - 50px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; }
+  .sidebar.open { right: 0; }
   .ham-btn { display: flex; }
   .search-wrap { display: none; }
   .search-mob-btn { display: flex; }
@@ -1430,7 +1515,7 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="dark"] body { background: var(--bg); color: var(--t1); }
-html[data-theme="dark"] .sidebar { background: var(--surface); border-right-color: var(--border); }
+html[data-theme="dark"] .sidebar { background: rgba(13,15,28,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-left-color: rgba(255,255,255,0.07); }
 html[data-theme="dark"] .sidebar::before { background: none; }
 html[data-theme="dark"] .topbar { background: rgba(19,23,32,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom-color: var(--border); }
 html[data-theme="dark"] .card { background: var(--surface); border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
@@ -1514,6 +1599,8 @@ html[data-theme="dark"] .bft.active { background: var(--blue); color: #fff; bord
 html[data-theme="dark"] .bft:hover { color: #60A5FA; border-color: rgba(37,99,235,0.22); background: var(--bg-2); }
 html[data-theme="dark"] .ham-btn { background: var(--bg); border-color: var(--border); }
 html[data-theme="dark"] .ham-btn span { background: var(--t2); }
+html[data-theme="dark"] .topbar { background: rgba(13,15,28,0.95); }
+html[data-theme="dark"] .topbar-brand { color: var(--t1); }
 html[data-theme="dark"] .sidebar-overlay { background: rgba(0,0,0,0.65); }
 html[data-theme="dark"] .log-filter { background: var(--surface); border-color: var(--border); }
 html[data-theme="dark"] .df-btn:hover { background: var(--bg-2); color: var(--t1); border-color: var(--border); }
@@ -1620,16 +1707,20 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 }
 /* Add button — center pill */
 .bn-add {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--blue); border: none; cursor: pointer;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99,102,241,1), rgba(14,165,233,1));
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  box-shadow: 0 4px 20px rgba(99,102,241,0.55), 0 2px 6px rgba(0,0,0,0.18);
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: transform var(--dur-fast), box-shadow var(--dur-fast);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), opacity 0.2s;
   flex-shrink: 0;
+  margin-bottom: 4px;
 }
-.bn-add:active { transform: scale(0.94); box-shadow: 0 2px 8px rgba(37,99,235,0.25); }
-.bn-add svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.bn-add:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(129,140,248,0.3); }
+.bn-add svg { width: 20px; height: 20px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; }
 /* Badge on bills icon */
 .bn-badge {
   position: absolute; top: -3px; right: -5px;
@@ -1688,6 +1779,32 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   .bottom-nav { display: flex; flex-direction: column; }
   /* Extra bottom padding so content clears the fixed bottom nav */
   .content { padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
+}
+/* Transparent bottom nav on scroll — only plus stays ──────── */
+.bottom-nav {
+  transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+}
+.bottom-nav.scrolled {
+  background: transparent !important;
+  border-top-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.bottom-nav.scrolled .bn-item {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.bottom-nav.scrolled .bn-add {
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(37,99,235,0.5);
+}
+.bn-item {
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), background var(--dur-fast);
+}
+.bn-add {
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background var(--dur-fast);
 }
 
 /* Dark mode */
@@ -2215,11 +2332,7 @@ input[type="date"], input[type="number"] {
 
 
 /* ── BULK SELECT ── */
-.bulk-bar { display:none; align-items:center; gap:10px; padding:8px 14px; background:var(--blue-s); border-radius:var(--r-sm); margin-bottom:10px; flex-wrap:wrap; }
-.bulk-bar.show { display:flex; }
-.bulk-bar-count { font-size:12.5px; font-weight:500; color:var(--blue); flex:1; }
-.tbl .bulk-chk { width:16px; height:16px; cursor:pointer; accent-color:var(--blue); }
-.mob-card .bulk-chk { width:18px; height:18px; cursor:pointer; accent-color:var(--blue); flex-shrink:0; }
+
 
 
 @media (min-width: 901px) {
@@ -2250,10 +2363,10 @@ input[type="date"], input[type="number"] {
 
 .amt-calc-hint{font-size:11px;color:var(--blue);padding:3px 0;display:none;cursor:pointer}
 
-.mob-card{position:relative;overflow:hidden;touch-action:pan-y;user-select:none;border-bottom:1px solid var(--border)}
-.swipe-bg{position:absolute;right:0;top:0;bottom:0;width:72px;background:var(--red);display:flex;align-items:center;justify-content:center;transform:translateX(72px);transition:transform .16s ease}
+.mob-card{display:flex;align-items:center;gap:12px;padding:10px 14px;position:relative;overflow:hidden;touch-action:manipulation;user-select:none;border-bottom:1px solid var(--border)}
+.swipe-bg{display:none}
 .swipe-bg svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round}
-.mob-inner{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);position:relative;z-index:1;width:100%;box-sizing:border-box;transition:transform .16s ease}
+.mob-inner{display:contents}
 
 .stmt-toggle{display:flex;gap:6px;margin-bottom:12px}
 .stmt-toggle button{font-size:11.5px;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;transition:all .15s}
@@ -2261,6 +2374,10 @@ input[type="date"], input[type="number"] {
 .stmt-card{background:var(--blue-s);border:1px solid rgba(37,99,235,.12);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px}
 .stmt-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:4px 0;border-bottom:1px solid var(--border);color:var(--t2)}
 .stmt-row:last-child{border-bottom:none;font-weight:500;color:var(--t1)}
+/* Desktop sidebar logo ─────────────────────────────────── */
+.sb-logo-desktop{display:none;align-items:center;gap:10px;padding:18px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-brand{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.5px;color:var(--t1);line-height:1}
+@media(min-width:901px){.sb-logo-desktop{display:flex}}
 .stmt-row .neg{color:var(--red)}
 
 .acc-sparkline{width:80px;height:28px;flex-shrink:0;opacity:.7}
@@ -2273,29 +2390,23 @@ input[type="date"], input[type="number"] {
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon" id="logo-icon-wrap">
-      <svg width="34" height="34" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="sb-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
-          <linearGradient id="sb-sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>
-          <clipPath id="sb-clip"><rect width="110" height="110" rx="26"/></clipPath>
-        </defs>
-        <rect id="icon-bg" width="110" height="110" rx="26" fill="url(#sb-bg)"/>
-        <g transform="rotate(-8 55 55)">
-          <rect x="24" y="18" width="13" height="72" rx="5" fill="rgba(255,255,255,0.9)"/>
-          <rect x="24" y="18" width="52" height="13" rx="5" fill="rgba(255,255,255,0.9)"/>
-          <rect x="24" y="46" width="36" height="12" rx="5" fill="rgba(255,255,255,0.9)"/>
-        </g>
-        <rect x="52" y="-8" width="14" height="130" rx="7" fill="url(#sb-sl)" transform="rotate(30 55 55)" clip-path="url(#sb-clip)" opacity="0.95"/>
-      </svg>
-    </div>
-    <div>
-      <div class="logo-text">Fintra</div>
-      <div class="logo-sub">Track. Manage. Grow.</div>
-    </div>
+  <div class="sb-logo-desktop">
+    <svg width="28" height="28" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sbd-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
+        <linearGradient id="sbd-sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>
+        <clipPath id="sbd-clip"><rect width="110" height="110" rx="26"/></clipPath>
+      </defs>
+      <rect width="110" height="110" rx="26" fill="url(#sbd-bg)"/>
+      <g transform="rotate(-8 55 55)">
+        <rect x="24" y="18" width="13" height="72" rx="5" fill="rgba(255,255,255,0.9)"/>
+        <rect x="24" y="18" width="52" height="13" rx="5" fill="rgba(255,255,255,0.9)"/>
+        <rect x="24" y="46" width="36" height="12" rx="5" fill="rgba(255,255,255,0.9)"/>
+      </g>
+      <rect x="52" y="-8" width="14" height="130" rx="7" fill="url(#sbd-sl)" transform="rotate(30 55 55)" clip-path="url(#sbd-clip)" opacity="0.95"/>
+    </svg>
+    <span class="sb-brand">Fintra</span>
   </div>
-  <div class="sidebar-divider"></div>
   <nav class="nav">
     <div class="nav-section">Overview</div>
     <button class="nav-btn active" data-panel="dashboard"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</button>
@@ -2317,6 +2428,9 @@ input[type="date"], input[type="number"] {
     <div class="pchip" id="profile-chip">
       <div class="av" id="av-chip"><span id="av-initial">Y</span></div>
       <div><div class="pname" id="chip-name">You</div><div class="prole">Profile &amp; Settings</div></div>
+      <button class="tb-btn" id="theme-btn" title="Toggle dark mode" style="margin-left:auto;flex-shrink:0">
+        <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
     </div>
   </div>
 </aside>
@@ -2325,23 +2439,38 @@ input[type="date"], input[type="number"] {
 <div class="main">
   <div class="topbar">
     <div class="topbar-left">
-      <button class="ham-btn" id="ham-btn"><span></span><span></span><span></span></button>
-      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div class="topbar-logo" onclick="goPanel('dashboard')">
+        <svg width="28" height="28" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="tb-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
+            <linearGradient id="tb-sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>
+            <clipPath id="tb-clip"><rect width="110" height="110" rx="26"/></clipPath>
+          </defs>
+          <rect width="110" height="110" rx="26" fill="url(#tb-bg)"/>
+          <g transform="rotate(-8 55 55)">
+            <rect x="24" y="18" width="13" height="72" rx="5" fill="rgba(255,255,255,0.9)"/>
+            <rect x="24" y="18" width="52" height="13" rx="5" fill="rgba(255,255,255,0.9)"/>
+            <rect x="24" y="46" width="36" height="12" rx="5" fill="rgba(255,255,255,0.9)"/>
+          </g>
+          <rect x="52" y="-8" width="14" height="130" rx="7" fill="url(#tb-sl)" transform="rotate(30 55 55)" clip-path="url(#tb-clip)" opacity="0.95"/>
+        </svg>
+        <span class="topbar-brand">Fintra</span>
+      </div>
     </div>
     <div class="topbar-right">
-      <div class="search-wrap">
-        <input class="search-input" id="search-input" type="text" placeholder="Search transactions…">
-        <div class="search-results" id="search-results"></div>
-      </div>
-      <button class="search-mob-btn tb-btn" id="search-mob-btn" title="Search">
+      <button class="tb-btn search-mob-btn" id="search-mob-btn" title="Search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
       <div class="tb-chip tb-chip-hide" id="date-badge"></div>
-      <div class="tb-chip tb-chip-hide" id="spill">auto-save on</div>
-      <button class="tb-btn" id="theme-btn" title="Toggle dark mode">
-        <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <div id="spill" style="display:none"></div>
+      <button class="tb-btn" id="ham-btn" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
       <div id="av-topbar" style="display:none!important;width:0!important;overflow:hidden!important"><span id="av-topbar-initial">Y</span></div>
+      <div class="search-wrap" style="display:none">
+        <input class="search-input" id="search-input" type="text" placeholder="Search transactions…">
+        <div class="search-results" id="search-results"></div>
+      </div>
     </div>
   </div>
   <div class="search-mob-bar" id="search-mob-bar">
@@ -2496,14 +2625,21 @@ input[type="date"], input[type="number"] {
 
     <!-- ACCOUNTS -->
     <div id="panel-accounts" class="panel">
-      <div class="ph"><div><div class="ph-t">Accounts</div><div class="ph-s">Your bank accounts &amp; wallets</div></div><div style="display:flex;gap:8px;align-items:center"><button id="btn-reorder-acc">⇅ Reorder</button><button class="btn-add" id="btn-open-acc">+ Add account</button></div></div>
+      <div class="panel-hero">
+        <div class="panel-hero-title">Accounts</div>
+        <div class="panel-hero-sub">Your banks, wallets &amp; cards</div>
+        <div class="panel-hero-actions">
+          <button id="btn-reorder-acc" class="btn-ghost" style="font-size:12px">⇅ Reorder</button>
+          <button class="btn-add" id="btn-open-acc">+ Add account</button>
+        </div>
+      </div>
       <div class="bank-grid" id="bank-grid"></div>
     </div>
 
     <!-- INCOME -->
     <div id="panel-income" class="panel">
-      <div class="ph"><div><div class="ph-t">Income</div><div class="ph-s">All earnings logged</div></div><div style="display:flex;gap:6px"><button class="btn-ghost" id="btn-select-income" style="font-size:12px">Select</button><button class="btn-add" id="btn-open-income">+ Log income</button></div></div>
-      <div class="bulk-bar" id="bulk-bar-income"><span class="bulk-bar-count" id="bulk-count-income">0 selected</span><button class="btn-danger" id="bulk-del-income" style="font-size:12px;padding:6px 14px">Delete selected</button><button class="btn-ghost" id="bulk-cancel-income" style="font-size:12px">Cancel</button></div>
+      <div class="ph"><div><div class="ph-t">Income</div><div class="ph-s">All earnings logged</div></div><button class="btn-add" id="btn-open-income">+ Log income</button></div>
+      
       <div class="srow2">
         <div class="card sc"><div class="sc-l">Total</div><div class="sc-v green" id="si-tot">₱0.00</div></div>
         <div class="card sc"><div class="sc-l">This month</div><div class="sc-v green" id="si-mon">₱0.00</div></div>
@@ -2543,8 +2679,8 @@ input[type="date"], input[type="number"] {
 
     <!-- EXPENSE -->
     <div id="panel-expense" class="panel">
-      <div class="ph"><div><div class="ph-t">Expenses</div><div class="ph-s">Track where money goes</div></div><div style="display:flex;gap:6px"><button class="btn-ghost" id="btn-select-expense" style="font-size:12px">Select</button><button class="btn-add" id="btn-open-expense">+ Log expense</button></div></div>
-      <div class="bulk-bar" id="bulk-bar-expense"><span class="bulk-bar-count" id="bulk-count-expense">0 selected</span><button class="btn-danger" id="bulk-del-expense" style="font-size:12px;padding:6px 14px">Delete selected</button><button class="btn-ghost" id="bulk-cancel-expense" style="font-size:12px">Cancel</button></div>
+      <div class="ph"><div><div class="ph-t">Expenses</div><div class="ph-s">Track where money goes</div></div><button class="btn-add" id="btn-open-expense">+ Log expense</button></div>
+      
       <div class="srow2">
         <div class="card sc"><div class="sc-l">Total</div><div class="sc-v red" id="se-tot">₱0.00</div></div>
         <div class="card sc"><div class="sc-l">This month</div><div class="sc-v red" id="se-mon">₱0.00</div></div>
@@ -2752,9 +2888,12 @@ input[type="date"], input[type="number"] {
 
     <!-- BILLS -->
     <div id="panel-bills" class="panel">
-      <div class="ph">
-        <div><div class="ph-t">Bills</div><div class="ph-s">Track upcoming &amp; recurring bills — electricity, rent, internet &amp; more</div></div>
-        <button class="btn-add" id="btn-open-bill">+ Add bill</button>
+      <div class="panel-hero">
+        <div class="panel-hero-title">Bills</div>
+        <div class="panel-hero-sub">Track upcoming &amp; recurring payments</div>
+        <div class="panel-hero-actions">
+          <button class="btn-add" id="btn-open-bill">+ Add bill</button>
+        </div>
       </div>
       <div class="srow2" style="margin-bottom:14px">
         <div class="card sc"><div class="sc-l">Unpaid this month</div><div class="sc-v red" id="bill-unpaid">₱0.00</div></div>
@@ -2867,7 +3006,10 @@ input[type="date"], input[type="number"] {
 
     <!-- PROFILE -->
     <div id="panel-profile" class="panel">
-      <div class="ph"><div><div class="ph-t">Profile &amp; Settings</div><div class="ph-s">Manage your account and preferences</div></div></div>
+      <div class="panel-hero">
+        <div class="panel-hero-title">Profile &amp; Settings</div>
+        <div class="panel-hero-sub">Manage your account and preferences</div>
+      </div>
 
       <!-- Avatar hero -->
       <div class="card" style="padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
@@ -3295,6 +3437,14 @@ function goPanel(name){
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
   var btn=document.querySelector('.nav-btn[data-panel="'+name+'"]');if(btn)btn.classList.add('active');
   st('topbar-title',TITLES[name]||name);
+  // Hide topbar on all panels except dashboard
+  var tb=document.querySelector('.topbar');
+  if(tb){tb.classList.toggle('tb-hidden',name!=='dashboard');}
+  var cont2=document.querySelector('.content');
+  if(cont2){cont2.classList.toggle('no-topbar',name!=='dashboard');}
+  // Reset scroll state when switching panels
+  var bn=ge('bottom-nav');if(bn)bn.classList.remove('scrolled');
+  var cont=document.querySelector('.content');if(cont)cont.scrollTop=0;
   closeSidebar();
   if(name==='dashboard'){renderDash();renderAlerts();renderDashSpending();renderDashGoals();renderDashBudget();updateDashHero();}
   if(name==='networth'){renderNetWorth();setTimeout(function(){
@@ -3402,6 +3552,24 @@ var _sideOpen=false;
 function openSidebar(){_sideOpen=true;ge('sidebar').classList.add('open');ge('ham-btn').classList.add('open');ge('sidebar-overlay').classList.add('show');}
 function closeSidebar(){_sideOpen=false;ge('sidebar').classList.remove('open');ge('ham-btn').classList.remove('open');ge('sidebar-overlay').classList.remove('show');}
 ge('ham-btn').addEventListener('click',function(){_sideOpen?closeSidebar():openSidebar();});
+
+// ── SCROLL-HIDE BOTTOM NAV ──────────────────────────────
+(function(){
+  var bn=ge('bottom-nav');
+  var content=document.querySelector('.content');
+  if(!bn||!content)return;
+  var lastY=0,ticking=false;
+  function onScroll(){
+    var y=content.scrollTop;
+    var going=y>lastY&&y>40;
+    bn.classList.toggle('scrolled',going);
+    lastY=y;
+    ticking=false;
+  }
+  content.addEventListener('scroll',function(){
+    if(!ticking){requestAnimationFrame(onScroll);ticking=true;}
+  },{passive:true});
+})();
 ge('sidebar-overlay').addEventListener('click',closeSidebar);
 
 // ── DARK MODE ──────────────────────────────────────────────
@@ -5322,12 +5490,12 @@ function renderLog(type){
       var extraAction=(type==='credit'&&e.type==='Charge'&&!e.isPaid)
         ?'<button class="mob-pay" data-id="'+e.id+'">Pay</button>'
         :'';
-      return'<div class="mob-card'+(type==='credit'&&e.isPaid?' mob-paid':'')+'"><div class="mob-dot" style="background:'+cfg.dotBg(e)+'">'+cfg.icon(e)+'</div><div class="mob-body"><div class="mob-title">'+cfg.title(e)+'</div><div class="mob-sub">'+cfg.sub(e)+'</div></div><div class="mob-right"><div class="mob-amt '+a.cls+'">'+a.sign+a.val+'</div><div class="mob-actions">'+extraAction+'<button class="mob-edit" data-type="'+type+'" data-id="'+e.id+'">Edit</button><button class="mob-del" data-type="'+type+'" data-id="'+e.id+'">Remove</button></div></div></div>';
+      return'<div class="mob-card'+(type==='credit'&&e.isPaid?' mob-paid':'')+'" data-id="'+e.id+'"><div class="mob-dot" style="background:'+cfg.dotBg(e)+'">'+cfg.icon(e)+'</div><div class="mob-body"><div class="mob-title">'+cfg.title(e)+'</div><div class="mob-sub">'+cfg.sub(e)+'</div></div><div class="mob-right"><div class="mob-amt '+a.cls+'">'+a.sign+a.val+'</div><div class="mob-actions">'+extraAction+'<button class="mob-edit" data-type="'+type+'" data-id="'+e.id+'">Edit</button><button class="mob-del" data-type="'+type+'" data-id="'+e.id+'">Remove</button></div></div></div>';
     }).join('');
     mob.querySelectorAll('.mob-del').forEach(function(btn){btn.addEventListener('click',function(){deleteEntry(this.dataset.type,this.dataset.id);});});
     mob.querySelectorAll('.mob-edit').forEach(function(btn){btn.addEventListener('click',function(){editEntry(this.dataset.type,this.dataset.id);});});
     mob.querySelectorAll('.mob-pay').forEach(function(btn){btn.addEventListener('click',function(){payCharge(this.dataset.id);});});
-    setTimeout(function(){wireSwipeToDelete(mob,type);},30);
+    // swipe-to-delete removed — use Edit/Remove buttons instead
   }
   if(tbody){
     tbody.querySelectorAll('.btn-icon.danger').forEach(function(btn){btn.addEventListener('click',function(){deleteEntry(this.dataset.type,this.dataset.id);});});
@@ -7593,71 +7761,8 @@ maybeShowOnboard();
 maybeShowOnboard();
 
 // ── BULK SELECT ──────────────────────────────────────────────
-function wireBulkSelect(type){
-  var selectBtn=ge('btn-select-'+type);
-  var bulkBar=ge('bulk-bar-'+type);
-  var countEl=ge('bulk-count-'+type);
-  var delBtn=ge('bulk-del-'+type);
-  var cancelBtn=ge('bulk-cancel-'+type);
-  var _active=false;
-
-  function getChecked(){
-    return Array.from(document.querySelectorAll('#panel-'+type+' .bulk-chk:checked')).map(function(cb){return cb.dataset.id;});
-  }
-  function updateCount(){
-    var n=getChecked().length;
-    if(countEl)countEl.textContent=n+' selected';
-  }
-  function enter(){
-    _active=true;
-    if(selectBtn)selectBtn.textContent='Done';
-    if(bulkBar)bulkBar.classList.add('show');
-    // Add checkboxes to visible rows
-    document.querySelectorAll('#panel-'+type+' .mob-card').forEach(function(row){
-      if(row.querySelector('.bulk-chk'))return;
-      var cb=document.createElement('input');
-      cb.type='checkbox';cb.className='bulk-chk';cb.dataset.id=row.dataset.id||'';
-      cb.addEventListener('change',updateCount);
-      row.insertBefore(cb,row.firstChild);
-    });
-    document.querySelectorAll('#panel-'+type+' tbody tr[data-id]').forEach(function(row){
-      if(row.querySelector('.bulk-chk'))return;
-      var td=document.createElement('td');
-      var cb=document.createElement('input');
-      cb.type='checkbox';cb.className='bulk-chk';cb.dataset.id=row.dataset.id||'';
-      cb.addEventListener('change',updateCount);
-      td.appendChild(cb);
-      row.insertBefore(td,row.firstChild);
-    });
-  }
-  function exit(){
-    _active=false;
-    if(selectBtn)selectBtn.textContent='Select';
-    if(bulkBar)bulkBar.classList.remove('show');
-    document.querySelectorAll('#panel-'+type+' .bulk-chk').forEach(function(cb){cb.closest('tr,div').querySelector('.bulk-chk')&&cb.remove();});
-    renderLog(type);
-  }
-  if(selectBtn)selectBtn.addEventListener('click',function(){_active?exit():enter();});
-  if(cancelBtn)cancelBtn.addEventListener('click',exit);
-  if(delBtn)delBtn.addEventListener('click',function(){
-    var ids=getChecked();
-    if(!ids.length){toast('Select at least one entry.','error');return;}
-    confirmModal('Delete <strong>'+ids.length+'</strong> entr'+(ids.length===1?'y':'ies')+'? This cannot be undone.',function(){
-      ids.forEach(function(id){
-        var e=S[type]&&S[type].find(function(x){return String(x.id)===String(id);});
-        if(e){
-          if(type==='income'){var a=findAcc(e.account);if(a)a.balance=+(a.balance-e.amt).toFixed(2);}
-          if(type==='expense'){var a=findAcc(e.account);if(a)a.balance=+(a.balance+e.amt).toFixed(2);}
-        }
-        if(S[type])S[type]=S[type].filter(function(x){return String(x.id)!==String(id);});
-      });
-      save();renderLog(type);renderStat(type);renderDash();renderAlerts();updateProfileStats();
-      closeModal();exit();toast(ids.length+' entr'+(ids.length===1?'y':'ies')+' deleted.');
-    },true);
-  });
-}
 // Wire bulk select for income and expense panels
-setTimeout(function(){wireBulkSelect('income');wireBulkSelect('expense');},100);
+
 
 // Global keyboard shortcut: press N to open quick-add, Escape to close modal/sheet
 document.addEventListener('keydown',function(e){
@@ -7674,6 +7779,34 @@ document.addEventListener('keydown',function(e){
     openSheet();
   }
 });
+
+// ── HAPTIC FEEDBACK ──────────────────────────────────────────
+(function(){
+  function hapticLight(){if(navigator.vibrate){navigator.vibrate(8);}}
+  window.hapticLight=hapticLight;
+  function haptic(el){
+    if(!el)return;
+    el.addEventListener('touchstart',function(){
+      if(navigator.vibrate){navigator.vibrate(8);}
+      else if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.haptic){
+        try{window.webkit.messageHandlers.haptic.postMessage('light');}catch(e){}
+      }
+    },{passive:true});
+  }
+  // Wire to all interactive elements now and after DOM changes
+  function wireAll(){
+    document.querySelectorAll('button,a,.nav-btn,.bn-item,.bn-add,.mob-card,.bcard,.pchip,.ob-next,.ob-skip2').forEach(function(el){
+      if(el._hapticWired)return;
+      el._hapticWired=true;
+      haptic(el);
+    });
+  }
+  wireAll();
+  // Re-wire after dynamic renders
+  var _mo=new MutationObserver(function(){wireAll();});
+  _mo.observe(document.body,{childList:true,subtree:true});
+})();
+
 // ── SERVICE WORKER ──────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
