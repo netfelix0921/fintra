@@ -163,7 +163,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 }
 
 .sidebar-logo {
-  padding: 16px 16px 12px;
+  padding: 18px 16px 14px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -171,7 +171,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 }
 @media (max-width: 900px) {
   .sidebar-logo {
-    padding: 10px 14px 10px;
+    padding: 14px 16px 12px;
   }
 }
 
@@ -217,7 +217,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 
 .sidebar-divider { height: 1px; background: var(--border); }
 
-.nav { flex: 1; padding: 8px 10px; overflow-y: auto; }
+.nav { flex: 1; padding: 12px 10px 8px; overflow-y: auto; }
 .nav-section {
   font-size: 9.5px;
   letter-spacing: 0.10em;
@@ -354,14 +354,16 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .topbar.tb-hidden { transform: translateY(-100%); pointer-events: none; }
 .topbar-left { display: flex; align-items: center; gap: 0; min-width: 0; }
 .topbar-logo {
-  display: flex; align-items: center; gap: 9px;
+  display: flex; align-items: center; gap: 8px;
   cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
 }
 .topbar-brand {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 17px; font-weight: 700; letter-spacing: -0.5px;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.4px;
   color: var(--t1); line-height: 1;
+  transition: color var(--dur-fast);
 }
+/* FIX: topbar title always visible since topbar is always shown */
 .topbar-title { display: none; }
 .topbar-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
@@ -1391,14 +1393,16 @@ select option { background: var(--surface); }
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
-  .sidebar { position: fixed; top: calc(50px + env(safe-area-inset-top)); right: -260px; left: auto; height: calc(100% - 50px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; }
+  /* Sidebar slides in from right only when .open — hidden by default */
+  .sidebar { position: fixed; top: calc(50px + env(safe-area-inset-top)); right: -280px; left: auto; height: calc(100% - 50px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; transition: right var(--dur-slow) var(--ease); }
   .sidebar.open { right: 0; }
+  /* FIX: sidebar nav section hidden — not visible behind the sidebar on mobile */
+  .nav { display: flex; flex-direction: column; }
   .ham-btn { display: flex; }
   .search-wrap { display: none; }
   .search-mob-btn { display: flex; }
   .search-mob-bar.show { display: flex !important; align-items: center; }
   .search-mob-bar.open { display: flex !important; align-items: center; }
-  .search-mob-bar.show { display: flex !important; align-items: center; }
   .krow { grid-template-columns: 1fr 1fr; }
   .content { padding: 16px 18px; }
 }
@@ -1445,9 +1449,10 @@ html[data-theme="dark"] {
   --border:     rgba(255,255,255,0.07);
   --border2:    rgba(255,255,255,0.11);
   --t1:  #EEF2FF;
-  --t2:  #8B95B0;
-  --t3:  #4B5268;
-  --t4:  #2D3148;
+  /* FIX: t2 and t3 made brighter so secondary/tertiary text is legible in dark mode */
+  --t2:  #A8B3CE;
+  --t3:  #6B7696;
+  --t4:  #3A4060;
   --sh-xs:  0 1px 2px rgba(0,0,0,0.30);
   --sh-sm:  0 2px 4px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.28);
   --sh-md:  0 4px 12px rgba(0,0,0,0.50), 0 2px 4px rgba(0,0,0,0.30);
@@ -1620,39 +1625,60 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   z-index: 150;
-  padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+  padding: 4px 0 calc(4px + env(safe-area-inset-bottom));
   flex-shrink: 0;
+  transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
 }
-.bn-bar { display: flex; align-items: center; justify-content: space-around; }
+/* Hide bottom nav while sidebar drawer is open */
+.bottom-nav.bn-hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+/* 4. FIX: equal-width flex items so nav is perfectly centered */
+.bn-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+/* Each slot (item or add) gets equal share */
+.bn-item, .bn-add-slot {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .bn-item {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  cursor: pointer; padding: 3px 6px; border-radius: 10px;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer; padding: 6px 0; border-radius: 12px;
   border: none; background: transparent;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation; transition: background var(--dur-fast);
-  min-width: 44px;
 }
 .bn-item:active { background: var(--bg); }
 .bn-ico { position: relative; display: flex; align-items: center; justify-content: center; }
 .bn-ico svg {
-  width: 20px; height: 20px;
+  width: 22px; height: 22px;
   stroke: var(--t3); fill: none;
   stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round;
   transition: stroke var(--dur-fast);
 }
+/* Label hidden by default, only shown when active */
 .bn-lbl {
-  font-size: 9px; font-weight: 500; color: var(--t3);
+  font-size: 9.5px; font-weight: 600; color: var(--blue);
   font-family: 'Plus Jakarta Sans', sans-serif;
-  transition: color var(--dur-fast); white-space: nowrap;
+  transition: max-height var(--dur-med), opacity var(--dur-med);
+  white-space: nowrap;
+  max-height: 0; overflow: hidden; opacity: 0;
 }
+.bn-item.active .bn-lbl { max-height: 20px; opacity: 1; }
 .bn-item.active .bn-ico svg { stroke: var(--blue); }
-.bn-item.active .bn-lbl { color: var(--blue); font-weight: 600; }
-.bn-item.active .bn-active-dot { display: block; }
-.bn-active-dot {
-  display: none; width: 4px; height: 4px;
-  border-radius: 50%; background: var(--blue);
-  margin-top: -1px;
-}
+.bn-item.active .bn-active-dot { display: none; }
+.bn-active-dot { display: none; }
 /* Add button — center pill */
 .bn-add {
   width: 40px; height: 40px; border-radius: 50%;
@@ -1724,10 +1750,21 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   /* Extra bottom padding so content clears the fixed bottom nav */
   .content { padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important; }
 }
-/* Transparent bottom nav on scroll — only plus stays ──────── */
+/* On scroll: fade out nav items, keep only the plus button */
 .bottom-nav {
-  transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+  transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
 }
+.bn-item {
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), background var(--dur-fast);
+}
+.bn-add-slot {
+  transition: transform 0.22s var(--ease);
+}
+.bn-add {
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+/* Scrolled state — only plus floats, everything else hides */
 .bottom-nav.scrolled {
   background: transparent !important;
   border-top-color: transparent !important;
@@ -1736,19 +1773,12 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 }
 .bottom-nav.scrolled .bn-item {
   opacity: 0;
+  transform: translateY(6px);
   pointer-events: none;
-  transform: translateY(8px);
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
 }
 .bottom-nav.scrolled .bn-add {
-  transform: scale(1.1);
-  box-shadow: 0 8px 24px rgba(37,99,235,0.5);
-}
-.bn-item {
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), background var(--dur-fast);
-}
-.bn-add {
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background var(--dur-fast);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.45);
+  transform: scale(1.08);
 }
 
 /* Dark mode */
@@ -2240,38 +2270,39 @@ input[type="date"], input[type="number"] {
 
 
 /* ═══════════════════════════════════════════════════════
-   SAVINGS GOALS
+   SAVINGS GOALS — compact row layout
    ═══════════════════════════════════════════════════════ */
-.sg-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
-.sg-card { padding:18px 20px; border-radius:var(--r-lg); background:var(--surface); box-shadow:var(--sh-sm); position:relative; overflow:hidden; }
-.sg-card-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; }
-.sg-card-ico { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-right:10px; }
-.sg-card-ico svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
-.sg-card-info { flex:1; min-width:0; }
-.sg-card-name { font-size:14px; font-weight:600; color:var(--t1); letter-spacing:-.2px; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.sg-card-sub  { font-size:11px; color:var(--t3); }
-.sg-card-actions { display:flex; gap:4px; flex-shrink:0; margin-left:8px; }
-.sg-card-btn { width:26px; height:26px; border-radius:var(--r-sm); border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t3); transition:all var(--dur-fast); }
+/* FIX: switched from tall grid cards to compact single-column rows */
+.sg-grid { display:flex; flex-direction:column; gap:6px; }
+.sg-card { padding:10px 14px; border-radius:var(--r); background:var(--surface); box-shadow:var(--sh-xs); border:1px solid var(--border); position:relative; overflow:hidden; }
+.sg-card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.sg-card-ico { width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-right:8px; }
+.sg-card-ico svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.sg-card-info { flex:1; min-width:0; display:flex; align-items:center; gap:8px; }
+.sg-card-name { font-size:13px; font-weight:600; color:var(--t1); letter-spacing:-.1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sg-card-sub  { font-size:10.5px; color:var(--t3); flex-shrink:0; }
+.sg-card-actions { display:flex; gap:2px; flex-shrink:0; margin-left:6px; }
+.sg-card-btn { width:24px; height:24px; border-radius:6px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t3); transition:all var(--dur-fast); }
 .sg-card-btn:hover { background:var(--bg); color:var(--t1); }
-.sg-card-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; }
-.sg-amounts { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
-.sg-saved { font-family:'DM Mono',monospace; font-size:22px; font-weight:400; letter-spacing:-1px; line-height:1; }
-.sg-target { font-size:12px; color:var(--t3); }
-.sg-prog-track { height:7px; background:var(--bg-2); border-radius:999px; overflow:hidden; margin-bottom:8px; }
+.sg-card-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; }
+.sg-amounts { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+.sg-saved { font-family:'DM Mono',monospace; font-size:14px; font-weight:400; letter-spacing:-.5px; color:var(--t1); }
+.sg-target { font-size:11px; color:var(--t3); }
+.sg-prog-track { height:4px; background:var(--bg-2); border-radius:999px; overflow:hidden; margin-bottom:4px; }
 .sg-prog-fill  { height:100%; border-radius:999px; transition:width 1s cubic-bezier(.16,1,.3,1); }
 .sg-prog-done  { background:var(--green) !important; }
 .sg-card-footer { display:flex; justify-content:space-between; align-items:center; }
-.sg-pct   { font-size:11px; font-weight:600; }
-.sg-meta  { font-size:10.5px; color:var(--t3); }
-.sg-deadline-chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:500; padding:2px 8px; border-radius:999px; background:var(--bg-2); color:var(--t3); margin-top:6px; }
+.sg-pct   { font-size:10px; font-weight:600; }
+.sg-meta  { font-size:10px; color:var(--t3); }
+.sg-deadline-chip { display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:500; padding:1px 7px; border-radius:999px; background:var(--bg-2); color:var(--t3); margin-top:4px; }
 .sg-deadline-chip.urgent { background:var(--red-s); color:var(--red); }
 .sg-deadline-chip.close  { background:var(--amber-s); color:var(--amber); }
 .sg-deadline-chip.done   { background:var(--green-s); color:var(--green); }
-.sg-monthly-hint { font-size:10.5px; color:var(--t3); margin-top:5px; }
+.sg-monthly-hint { font-size:10px; color:var(--t3); margin-top:3px; }
 .sg-monthly-hint strong { color:var(--blue); }
-.sg-empty { padding:32px 20px; text-align:center; color:var(--t3); font-size:13px; }
+.sg-empty { padding:24px 16px; text-align:center; color:var(--t3); font-size:13px; }
 .sg-empty-ico { font-size:32px; margin-bottom:10px; opacity:.4; }
-.sg-log-btn { width:100%; margin-top:12px; padding:7px; border-radius:var(--r-sm); border:1.5px dashed var(--border2); background:transparent; color:var(--blue); font-size:12px; font-weight:500; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all var(--dur-fast); }
+.sg-log-btn { width:100%; margin-top:6px; padding:5px; border-radius:var(--r-sm); border:1px dashed var(--border2); background:transparent; color:var(--blue); font-size:11px; font-weight:500; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all var(--dur-fast); }
 .sg-log-btn:hover { background:var(--blue-s); border-color:rgba(37,99,235,.3); }
 
 
@@ -2334,28 +2365,6 @@ input[type="date"], input[type="number"] {
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon" id="logo-icon-wrap">
-      <svg width="34" height="34" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="sb-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
-          <linearGradient id="sb-sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>
-          <clipPath id="sb-clip"><rect width="110" height="110" rx="26"/></clipPath>
-        </defs>
-        <rect id="icon-bg" width="110" height="110" rx="26" fill="url(#sb-bg)"/>
-        <g transform="rotate(-8 55 55)">
-          <rect x="24" y="18" width="13" height="72" rx="5" fill="rgba(255,255,255,0.9)"/>
-          <rect x="24" y="18" width="52" height="13" rx="5" fill="rgba(255,255,255,0.9)"/>
-          <rect x="24" y="46" width="36" height="12" rx="5" fill="rgba(255,255,255,0.9)"/>
-        </g>
-        <rect x="52" y="-8" width="14" height="130" rx="7" fill="url(#sb-sl)" transform="rotate(30 55 55)" clip-path="url(#sb-clip)" opacity="0.95"/>
-      </svg>
-    </div>
-    <div>
-      <div class="logo-sub" style="font-size:11px;letter-spacing:0.06em">Track. Manage. Grow.</div>
-    </div>
-  </div>
-  <div class="sidebar-divider"></div>
   <nav class="nav">
     <div class="nav-section">Overview</div>
     <button class="nav-btn active" data-panel="dashboard"><span class="nav-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</button>
@@ -2389,7 +2398,7 @@ input[type="date"], input[type="number"] {
   <div class="topbar">
     <div class="topbar-left">
       <div class="topbar-logo" id="topbar-logo-btn">
-        <svg width="28" height="28" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+        <svg width="24" height="24" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="tb-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
             <linearGradient id="tb-sl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient>
@@ -2411,7 +2420,7 @@ input[type="date"], input[type="number"] {
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
       <div class="tb-chip tb-chip-hide" id="date-badge"></div>
-      <div id="spill" style="display:none"></div>
+      <div id="spill" class="tb-chip tb-chip-hide" style="font-size:10px">auto-save on</div>
       <button class="tb-btn" id="ham-btn" title="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
@@ -3104,9 +3113,11 @@ input[type="date"], input[type="number"] {
         <div class="bn-active-dot"></div>
       </button>
       <!-- Quick Add (+) -->
-      <button class="bn-add" id="bn-add-btn" title="Log transaction">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
+      <div class="bn-add-slot">
+        <button class="bn-add" id="bn-add-btn" title="Log transaction">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
       <!-- Plans (Bills + Subs + Budget) -->
       <button class="bn-item" data-panel="bills" id="bn-bills">
         <div class="bn-ico">
@@ -3241,7 +3252,7 @@ function save(){
   try{
     localStorage.setItem(SK,JSON.stringify(S));
     var el=ge('spill');
-    if(el){el.textContent='saved ✓';el.className='tb-chip ok';setTimeout(function(){el.textContent='auto-save on';el.className='tb-chip';},2000);}
+    if(el){el.textContent='saved ✓';el.className='tb-chip ok';setTimeout(function(){el.textContent='auto-save on';el.className='tb-chip tb-chip-hide';},2000);}
     // FIX: Check storage quota after each save; warn at 80% usage
     checkStorageUsage();
   }catch(e){toast('⚠ Save failed — storage may be full. Export a backup!','error');}
@@ -3432,14 +3443,11 @@ function goPanel(name){
   ge('panel-'+name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
   var btn=document.querySelector('.nav-btn[data-panel="'+name+'"]');if(btn)btn.classList.add('active');
-  st('topbar-title',TITLES[name]||name);
-  // Hide topbar on all panels except dashboard
-  var tb=document.querySelector('.topbar');
-  if(tb){tb.classList.toggle('tb-hidden',name!=='dashboard');}
+  // Topbar always shows "Fintra" — static brand, no panel title
   var cont2=document.querySelector('.content');
-  if(cont2){cont2.classList.toggle('no-topbar',name!=='dashboard');}
+  if(cont2){cont2.classList.remove('no-topbar');}
   // Reset scroll state when switching panels
-  var bn=ge('bottom-nav');if(bn)bn.classList.remove('scrolled');
+  var bn=ge('bottom-nav');if(bn){bn.classList.remove('scrolled');bn.classList.remove('bn-hidden');}
   var cont=document.querySelector('.content');if(cont)cont.scrollTop=0;
   closeSidebar();
   if(name==='dashboard'){renderDash();renderAlerts();renderDashSpending();renderDashGoals();renderDashBudget();updateDashHero();}
@@ -3561,8 +3569,22 @@ document.querySelectorAll('.theme-chip').forEach(function(btn){
 
 // ── SIDEBAR ──────────────────────────────────────────────
 var _sideOpen=false;
-function openSidebar(){_sideOpen=true;ge('sidebar').classList.add('open');ge('ham-btn').classList.add('open');ge('sidebar-overlay').classList.add('show');}
-function closeSidebar(){_sideOpen=false;ge('sidebar').classList.remove('open');ge('ham-btn').classList.remove('open');ge('sidebar-overlay').classList.remove('show');}
+function openSidebar(){
+  _sideOpen=true;
+  ge('sidebar').classList.add('open');
+  ge('ham-btn').classList.add('open');
+  ge('sidebar-overlay').classList.add('show');
+  // Hide bottom nav while sidebar is open
+  var bn=ge('bottom-nav');if(bn)bn.classList.add('bn-hidden');
+}
+function closeSidebar(){
+  _sideOpen=false;
+  ge('sidebar').classList.remove('open');
+  ge('ham-btn').classList.remove('open');
+  ge('sidebar-overlay').classList.remove('show');
+  // Restore bottom nav
+  var bn=ge('bottom-nav');if(bn)bn.classList.remove('bn-hidden');
+}
 ge('ham-btn').addEventListener('click',function(){_sideOpen?closeSidebar():openSidebar();});
 
 // ── SCROLL-HIDE BOTTOM NAV ──────────────────────────────
@@ -3573,8 +3595,13 @@ ge('ham-btn').addEventListener('click',function(){_sideOpen?closeSidebar():openS
   var lastY=0,ticking=false;
   function onScroll(){
     var y=content.scrollTop;
-    var going=y>lastY&&y>40;
-    bn.classList.toggle('scrolled',going);
+    var scrollingDown=y>lastY;
+    // Show scrolled state when going down past 40px; restore when going up or near top
+    if(scrollingDown&&y>40){
+      bn.classList.add('scrolled');
+    } else if(!scrollingDown||y<=40){
+      bn.classList.remove('scrolled');
+    }
     lastY=y;
     ticking=false;
   }
