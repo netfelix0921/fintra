@@ -1980,7 +1980,7 @@ html[data-theme="dark"] .bn-sheet-btn { background: var(--bg); border-color: var
 
 /* ── 1. SCROLL FIX: content never hidden behind bottom nav ── */
 .content {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 16px)) !important;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
 }
 @media(min-width:901px) {
   /* desktop: no bottom nav */
@@ -2220,7 +2220,7 @@ input[type="date"], input[type="number"] {
 /* Content padding — same tight value everywhere */
 .content {
   padding: 16px !important;
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 16px)) !important;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
 }
 @media(min-width:901px) {
   .content { padding: 20px !important; padding-bottom: 20px !important; }
