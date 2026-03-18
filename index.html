@@ -105,8 +105,14 @@
 /* ── RESET & BASE ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+html {
   height: 100%;
+  height: -webkit-fill-available;
+}
+body {
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
@@ -136,7 +142,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 /* ═══════════════════════════════════════════════════════════════
    APP SHELL
    ═══════════════════════════════════════════════════════════════ */
-.app { display: flex; height: 100vh; overflow: hidden; background: var(--bg); width: 100%; max-width: 100vw; }
+.app { display: flex; height: 100vh; height: -webkit-fill-available; overflow: hidden; background: var(--bg); width: 100%; max-width: 100vw; }
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBAR
@@ -1940,9 +1946,6 @@ html[data-theme="dark"] .bn-sheet-btn { background: var(--bg); border-color: var
    ══════════════════════════════════════════════════════════════ */
 
 /* ── 1. SCROLL FIX: content never hidden behind bottom nav ── */
-@media(max-width:900px) {
-  .content { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
-}
 @media(min-width:901px) {
   .content { padding-bottom: 24px !important; }
 }
