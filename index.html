@@ -7852,35 +7852,6 @@ document.addEventListener('keydown',function(e){
     });
   }
 </script>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDZhdJ1Auyl__3VK89OA6dyjIpziINAT9w",
-    authDomain: "fintra-8e4ee.firebaseapp.com",
-    projectId: "fintra-8e4ee",
-    storageBucket: "fintra-8e4ee.firebasestorage.app",
-    messagingSenderId: "848393934556",
-    appId: "1:848393934556:web:19f838bb32e53b58874619",
-    measurementId: "G-HT58CNSN40"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-
-  const messaging = firebase.messaging();
-
-  Notification.requestPermission().then(permission => {
-    if (permission === "granted") {
-      messaging.getToken().then(token => {
-        console.log("✅ Push Token:", token);
-      });
-    } else {
-      console.log("❌ Permission denied");
-    }
-  });
-</script>
    
 </script>
 <div id="onboard-ov" class="ob-overlay" style="display:none">
