@@ -108,6 +108,7 @@
 html {
   height: 100%;
   height: -webkit-fill-available;
+  background: #F4F6F9; /* matches --bg, fills below nav on iOS */
 }
 body {
   height: 100%;
@@ -1655,6 +1656,18 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   flex-shrink: 0;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
+/* Fill the home indicator zone below the nav — prevents white gap on iOS PWA */
+.bottom-nav::after {
+  content: '';
+  position: fixed;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 34px));
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-bottom, 34px) + 20px);
+  background: #ffffff;
+  z-index: 149;
+  pointer-events: none;
+}
 .bn-bar {
   display: grid;
   grid-template-columns: 1fr 1fr 64px 1fr 1fr;
@@ -1797,7 +1810,7 @@ html[data-theme="dark"] .bottom-nav {
   border-top-color: var(--border);
 }
 html[data-theme="dark"] .bottom-nav::after {
-  background: rgba(19,23,32,0.96);
+  background: #0B0F1A;
 }
 html[data-theme="dark"] .bn-sheet { background: var(--surface); }
 html[data-theme="dark"] .bn-sheet-btn { background: var(--bg); border-color: var(--border); }
