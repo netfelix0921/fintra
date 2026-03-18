@@ -1688,11 +1688,8 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   z-index: 150;
-  /* Total height = 54px icons row + safe area. Nothing else. */
-  padding: 0;
-  margin: 0;
   box-sizing: border-box;
-  overflow: hidden;
+  /* No padding here — bn-bar handles its own height */
 }
 .bn-bar {
   display: flex;
@@ -1700,17 +1697,18 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   align-items: center;
   justify-content: space-around;
   width: 100%;
-  /* Fixed icon row height only — safe area is extra space BELOW this */
   height: 54px;
   box-sizing: border-box;
   padding: 0 4px;
 }
-/* This pseudo-element fills the safe area below the bar with the nav background */
-.bottom-nav::after {
-  content: '';
-  display: block;
-  height: env(safe-area-inset-bottom);
-  width: 100%;
+/* Only in standalone PWA: push icons above home indicator */
+@media all and (display-mode: standalone) {
+  .bn-bar {
+    height: calc(54px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    align-items: flex-start;
+    padding-top: 8px;
+  }
 }
 .bn-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -1798,7 +1796,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 /* On mobile: show bottom nav */
 @media (max-width: 900px) {
   .bottom-nav { display: flex; flex-direction: column; }
-  .content { padding-bottom: calc(54px + env(safe-area-inset-bottom)) !important; }
+  .content { padding-bottom: calc(54px + env(safe-area-inset-bottom, 0px)) !important; }
 }
 
 /* Scroll: hide everything except + button, remove background */
@@ -1810,7 +1808,6 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   -webkit-backdrop-filter: none !important;
   border-top-color: transparent !important;
 }
-.bottom-nav.scrolled::after { display: none; }
 .bottom-nav.scrolled .bn-item {
   opacity: 0; pointer-events: none; transform: translateY(6px);
 }
@@ -2272,7 +2269,7 @@ input[type="date"], input[type="number"] {
 .content {
   padding: 16px !important;
   padding-top: calc(46px + env(safe-area-inset-top) + 14px) !important;
-  padding-bottom: calc(54px + env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(54px + env(safe-area-inset-bottom, 0px)) !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   flex: 1 !important;
