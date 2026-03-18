@@ -494,7 +494,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
    CONTENT AREA
    ═══════════════════════════════════════════════════════════════ */
 .content {
-  flex: 1; overflow-y: auto;
+  flex: 1; overflow-y: auto; overflow-x: hidden;
   padding: 18px 20px;
   padding-top: calc(50px + env(safe-area-inset-top) + 16px);
   padding-bottom: calc(18px + env(safe-area-inset-bottom));
@@ -504,9 +504,9 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .content.no-topbar {
   padding-top: calc(env(safe-area-inset-top) + 16px);
 }
-.panel { display: none; }
+.panel { display: none; overflow: hidden; }
 .panel.active {
-  display: block;
+  display: block; overflow: visible;
   animation: panelFadeIn 220ms var(--ease-out) both;
 }
 @keyframes panelFadeIn {
@@ -830,8 +830,8 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
    BANK / ACCOUNT CARDS
    ═══════════════════════════════════════════════════════════════ */
 .bgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-#bank-grid { display: flex !important; flex-direction: column !important; gap: 0 !important; grid-template-columns: unset !important; }
-.bank-grid { display: flex !important; flex-direction: column !important; gap: 0 !important; }
+#bank-grid { display: flex !important; flex-direction: column !important; gap: 0 !important; grid-template-columns: unset !important; overflow-x: hidden !important; }
+.bank-grid { display: flex !important; flex-direction: column !important; gap: 0 !important; overflow-x: hidden !important; }
 
 /* ═══════════════════════════════════════════════════════════
    ACCOUNT CARDS — Original logo-based style, single column, swipe actions
@@ -843,6 +843,10 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   border-radius: var(--r-lg);
   position: relative;
   transition: opacity 0.18s, transform 0.18s;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .bcard-wrap.dragging { opacity: 0.40; transform: scale(0.97); }
 .bcard-wrap.drag-over { box-shadow: 0 0 0 2px var(--blue); border-radius: var(--r-lg); }
@@ -1215,21 +1219,23 @@ select option { background: var(--surface); }
   display: flex; align-items: center; gap: 12px;
   padding: 10px 14px; background: var(--surface);
   border: none; border-radius: var(--r);
-  margin-bottom: 6px; transition: all var(--dur-fast); position: relative; overflow: hidden;
+  margin-bottom: 6px; transition: box-shadow var(--dur-fast), opacity var(--dur-fast);
+  position: relative; overflow: hidden;
+  max-width: 100%; box-sizing: border-box; width: 100%;
 }
-.bill-card:hover { box-shadow: var(--sh-sm); transform: translateX(2px); }
+.bill-card:hover { box-shadow: var(--sh-sm); }
 .bill-card.bc-overdue { border-left: 3px solid var(--red); }
 .bill-card.bc-soon { border-left: 3px solid var(--amber); }
 .bill-card.bc-upcoming { border-left: 3px solid transparent; }
 .bill-card.bc-paid { opacity: .55; }
 .bill-icon { width: 40px; height: 40px; border-radius: var(--r); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
 .bill-icon svg { width: 18px; height: 18px; }
-.bill-body { flex: 1; min-width: 0; }
+.bill-body { flex: 1; min-width: 0; overflow: hidden; }
 .bill-name { font-size: 13.5px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bill-meta { font-size: 11.5px; color: var(--t3); margin-top: 2px; }
-.bill-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+.bill-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; max-width: 42%; }
 .bill-amt { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--t1); }
-.bill-actions { display: flex; gap: 5px; }
+.bill-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .bill-pay-btn, .bill-edit-btn, .bill-del-btn {
   padding: 4px 10px; border-radius: var(--r-sm); font-size: 11px; font-weight: 500;
   font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: 1px solid; transition: all var(--dur-fast);
@@ -1240,6 +1246,8 @@ select option { background: var(--surface); }
 .bill-edit-btn:hover { background: var(--blue); color: #fff; }
 .bill-del-btn { background: var(--red-s); color: var(--red); border-color: rgba(220,38,38,.22); }
 .bill-del-btn:hover { background: var(--red); color: #fff; }
+#bills-list { overflow-x: hidden; }
+#panel-accounts, #panel-bills { overflow-x: hidden; max-width: 100%; }
 .bills-section-label { font-size: 10.5px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--t3); margin: 16px 0 8px; }
 .bill-amt.paid-amt { color: var(--green); }
 .bft {
@@ -1521,7 +1529,7 @@ html[data-theme="dark"] .top-exp-item:hover { background: rgba(255,255,255,0.025
 html[data-theme="dark"] .bcard { border-color: rgba(255,255,255,0.09); }
 html[data-theme="dark"] .bcard-foot { background: var(--bg-2) !important; border-color: var(--border) !important; }
 html[data-theme="dark"] .bview { background: var(--bg-2); color: var(--t3); border-color: var(--border); }
-.bcard-wrap { width: 100%; box-sizing: border-box; }
+.bcard-wrap { width: 100%; box-sizing: border-box; overflow: hidden; max-width: 100%; }
 
 /* Override the .card base styles that add background/border to bcard */
 /* .card.bcard override removed */
@@ -2285,13 +2293,14 @@ input[type="date"], input[type="number"] {
 .sg-card-btn { width:24px; height:24px; border-radius:6px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t3); transition:all var(--dur-fast); }
 .sg-card-btn:hover { background:var(--bg); color:var(--t1); }
 .sg-card-btn svg { width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; }
-.sg-amounts { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
-.sg-saved { font-family:'DM Mono',monospace; font-size:14px; font-weight:400; letter-spacing:-.5px; color:var(--t1); }
+.sg-amounts { display:flex; align-items:center; gap:6px; margin-bottom:5px; width:100%; }
+.sg-saved { font-family:'DM Mono',monospace; font-size:16px; font-weight:400; letter-spacing:-.5px; color:var(--t1); }
 .sg-target { font-size:11px; color:var(--t3); }
-.sg-prog-track { height:4px; background:var(--bg-2); border-radius:999px; overflow:hidden; margin-bottom:4px; }
+.sg-prog-track { height:4px; background:var(--bg-2); border-radius:999px; overflow:hidden; margin-bottom:0; }
 .sg-prog-fill  { height:100%; border-radius:999px; transition:width 1s cubic-bezier(.16,1,.3,1); }
 .sg-prog-done  { background:var(--green) !important; }
-.sg-card-footer { display:flex; justify-content:space-between; align-items:center; }
+/* sg-card-footer no longer used in new layout */
+.sg-card-footer { display:none; }
 .sg-pct   { font-size:10px; font-weight:600; }
 .sg-meta  { font-size:10px; color:var(--t3); }
 .sg-deadline-chip { display:inline-flex; align-items:center; gap:3px; font-size:9.5px; font-weight:500; padding:1px 7px; border-radius:999px; background:var(--bg-2); color:var(--t3); margin-top:4px; }
@@ -2304,6 +2313,16 @@ input[type="date"], input[type="number"] {
 .sg-empty-ico { font-size:32px; margin-bottom:10px; opacity:.4; }
 .sg-log-btn { width:100%; margin-top:6px; padding:5px; border-radius:var(--r-sm); border:1px dashed var(--border2); background:transparent; color:var(--blue); font-size:11px; font-weight:500; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all var(--dur-fast); }
 .sg-log-btn:hover { background:var(--blue-s); border-color:rgba(37,99,235,.3); }
+/* Compact pct inline with amount row */
+.sg-pct-inline { font-family:'DM Mono',monospace; }
+/* Compact balance breakdown — replaces the big renderSavingsGoalSync box */
+.sg-balance-rows { margin-top:6px; border-top:1px solid var(--border); padding-top:5px; display:flex; flex-direction:column; gap:2px; }
+.sg-bal-row { display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--t3); }
+.sg-bal-row span:last-child { font-family:'DM Mono',monospace; font-size:11px; color:var(--t2); }
+.sg-bal-divider { border-top:1px solid var(--border); padding-top:3px; margin-top:2px; }
+.sg-bal-divider span:first-child { font-weight:500; color:var(--t2); }
+/* Deadline + monthly hint on one row */
+.sg-footer-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:5px; }
 
 
 /* ── BULK SELECT ── */
@@ -6125,13 +6144,14 @@ function renderSavingsGoals(){
       var fillCol=isDone?'var(--green)':col.fill;
 
       return'<div class="sg-card">'
+        // ── Row 1: icon · name · note · actions ──
         +'<div class="sg-card-head">'
           +'<div class="sg-card-ico" style="background:'+col.bg+';color:'+col.text+'">'
             +'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>'
           +'</div>'
           +'<div class="sg-card-info">'
             +'<div class="sg-card-name">'+esc(g.name)+'</div>'
-            +(g.note?'<div class="sg-card-sub">'+g.note+'</div>':'')
+            +(g.note?'<div class="sg-card-sub">'+esc(g.note)+'</div>':'')
           +'</div>'
           +'<div class="sg-card-actions">'
             +'<button class="sg-card-btn sg-log-trigger" data-goal="'+esc(g.name)+'" title="Log deposit/withdrawal"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg></button>'
@@ -6139,26 +6159,35 @@ function renderSavingsGoals(){
             +'<button class="sg-card-btn sg-del-btn" data-id="'+g.id+'" title="Delete goal"><svg viewBox="0 0 16 16"><polyline points="2.5,4 4,4 13.5,4"/><path d="M5.5 4V2.5h5V4"/><path d="M4 4l1 9.5h6L12 4"/></svg></button>'
           +'</div>'
         +'</div>'
+        // ── Row 2: saved amount + target ──
         +'<div class="sg-amounts">'
           +'<span class="sg-saved" style="color:'+col.text+'">'+fmt(saved)+'</span>'
           +(hasTarget?'<span class="sg-target">of '+fmt(g.target)+'</span>':'<span class="sg-target">saved</span>')
+          +(hasTarget?'<span class="sg-pct-inline" style="margin-left:auto;font-size:10px;font-weight:600;color:'+col.text+'">'+pct+'%'+(isDone?' ✓':'')+'</span>':'')
         +'</div>'
+        // ── Row 3: progress bar ──
         +(hasTarget
           ?'<div class="sg-prog-track"><div class="sg-prog-fill'+(isDone?' sg-prog-done':'')+'" style="width:0%;background:'+fillCol+'" data-w="'+pct+'%"></div></div>'
           :'')
-        +'<div class="sg-card-footer">'
-          +(hasTarget
-            ?'<span class="sg-pct" style="color:'+col.text+'">'+pct+'%'+(isDone?' ✓':'')+'</span>'
-            :'<span class="sg-pct" style="color:var(--t3)">No target set</span>')
-          +(function(){
-        var acc=g.account?findAcc(g.account):null;
-        if(!acc) return '<span class="sg-meta" style="color:var(--t3)">No linked account</span>';
-        return '<span class="sg-meta">'+acc.name+' · <span style="color:var(--t2);font-family:DM Mono,monospace">'+fmt(acc.balance)+'</span></span>';
-      }())
-      +renderSavingsGoalSync(g)
-        +'</div>'
-        +deadlineHtml
-        +monthlyHint
+        // ── Row 4: inline balance breakdown (compact 2-col rows, no big box) ──
+        +(function(){
+          var acc=g.account?findAcc(g.account):null;
+          if(!acc)return'';
+          var accBal=acc.isCC?-(acc.usedCredit||0):acc.balance;
+          var free=accBal-saved;
+          var target2=g.target||0;
+          return'<div class="sg-balance-rows">'
+            +'<div class="sg-bal-row"><span>'+esc(acc.name)+' balance</span><span>'+fmt(accBal)+'</span></div>'
+            +'<div class="sg-bal-row"><span>Earmarked for goal</span><span style="color:var(--blue)">'+fmt(saved)+'</span></div>'
+            +'<div class="sg-bal-row sg-bal-divider"><span>Free to spend</span><span style="color:'+(free<0?'var(--red)':'var(--green)')+'">'+fmt(free)+'</span></div>'
+            +(target2>0?'<div class="sg-bal-row"><span>Goal target</span><span>'+fmt(target2)+'</span></div>':'')
+            +'</div>';
+        }())
+        // ── Row 5: deadline chip + monthly hint on same line ──
+        +(deadlineHtml||monthlyHint
+          ?'<div class="sg-footer-row">'+deadlineHtml+monthlyHint+'</div>'
+          :'')
+        // ── Log button ──
         +'<button class="sg-log-btn sg-log-trigger" data-goal="'+esc(g.name)+'">+ Log deposit / withdrawal</button>'
         +'</div>';
     }).join('')
