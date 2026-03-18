@@ -16,6 +16,9 @@
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- FIX: Consolidated 3 @import rules into a single non-blocking <link> tag.
+     @import inside <style> is render-blocking; <link rel="stylesheet"> is not. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap">
 <title>Fintra — Your Financial Control Center</title>
 <style>
 /* ═══════════════════════════════════════════════════════════════
@@ -23,10 +26,6 @@
    "Quiet Luxury" — A refined, minimal fintech aesthetic
    Inspired by Linear, Stripe, and Apple Wallet
    ═══════════════════════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
 
 /* ── DESIGN TOKENS ───────────────────────────────────────────── */
 :root {
@@ -145,7 +144,9 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  transition: left var(--dur-slow) var(--ease);
+  /* FIX: was `transition: left` but sidebar uses position:fixed + right on mobile.
+     Using `right` here so the transition actually fires on mobile slide-in. */
+  transition: right var(--dur-slow) var(--ease);
   overflow: hidden;
   padding-top: env(safe-area-inset-top);
   position: relative;
@@ -613,6 +614,8 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .alert-banner.info { background: var(--blue-s); border: 1px solid rgba(37,99,235,0.18); color: var(--blue); }
 .alert-banner.danger { background: var(--red-s); border: 1px solid rgba(220,38,38,0.20); color: var(--red); }
 .alert-banner svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 2px; }
+/* FIX: was using inline onmouseover/onmouseout — replaced with CSS */
+.alert-dismiss:hover { opacity: 1 !important; }
 
 /* ═══════════════════════════════════════════════════════════════
    GREETING — compact single-row Apple HIG style
@@ -2385,7 +2388,7 @@ input[type="date"], input[type="number"] {
 <div class="main">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="topbar-logo" onclick="goPanel('dashboard')">
+      <div class="topbar-logo" id="topbar-logo-btn">
         <svg width="28" height="28" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="tb-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0A0618"/><stop offset="100%" stop-color="#120D30"/></linearGradient>
@@ -2488,7 +2491,7 @@ input[type="date"], input[type="number"] {
       <!-- ③ SPENDING BREAKDOWN (full width) -->
       <div class="d-mb">
         <div class="card d-spend-card" style="grid-column:1/-1">
-          <div class="wtitle">Spending Breakdown <button class="wlink" id="go-charts" onclick="goPanel('charts')">View charts →</button></div>
+          <div class="wtitle">Spending Breakdown <button class="wlink" id="go-charts">View charts →</button></div>
           <div id="d-spend-list" style="padding:4px 0"></div>
         </div>
       </div>
@@ -2519,7 +2522,7 @@ input[type="date"], input[type="number"] {
         <div class="card d-goals-card">
           <div class="wtitle">
             Savings Goals
-            <button class="wlink" onclick="goPanel('savings')">+ Add goal</button>
+            <button class="wlink" id="dash-add-goal">+ Add goal</button>
           </div>
           <div id="d-goals-list" style="padding:4px 0"></div>
         </div>
@@ -2528,11 +2531,11 @@ input[type="date"], input[type="number"] {
       <!-- ⑤ UPCOMING BILLS + RECENT TRANSACTIONS (2 col) -->
       <div class="d-row2">
         <div class="card wid">
-          <div class="wtitle">Upcoming Bills <button class="wlink" onclick="goPanel('bills')">View all →</button></div>
+          <div class="wtitle">Upcoming Bills <button class="wlink" id="dash-view-bills">View all →</button></div>
           <div id="dash-bills-list"><div class="empty" style="padding:1.5rem">No upcoming bills.</div></div>
         </div>
         <div class="card wid">
-          <div class="wtitle">Recent Transactions <button class="wlink" onclick="goPanel('expense')">View all →</button></div>
+          <div class="wtitle">Recent Transactions <button class="wlink" id="dash-view-expense">View all →</button></div>
           <div id="recent-list"></div>
         </div>
       </div>
@@ -3029,15 +3032,15 @@ input[type="date"], input[type="number"] {
         <div class="srow" style="align-items:center">
           <label style="font-size:12.5px;color:var(--t2);flex-shrink:0">Theme</label>
           <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-            <button class="theme-chip" data-pref="light" onclick="setThemePref('light')"
+            <button class="theme-chip" data-pref="light"
               style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
               Light
             </button>
-            <button class="theme-chip" data-pref="dark" onclick="setThemePref('dark')"
+            <button class="theme-chip" data-pref="dark"
               style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
               Dark
             </button>
-            <button class="theme-chip" data-pref="system" onclick="setThemePref('system')"
+            <button class="theme-chip" data-pref="system"
               style="font-size:11.5px;font-weight:500;padding:5px 14px;border-radius:999px;border:1.5px solid var(--border2);background:transparent;color:var(--t2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;white-space:nowrap">
               System
             </button>
@@ -3065,7 +3068,7 @@ input[type="date"], input[type="number"] {
             <div style="font-size:13px;font-weight:500;color:var(--blue)">Restart onboarding</div>
             <div style="font-size:11.5px;color:var(--t2);margin-top:3px">Walk through the setup steps again.</div>
           </div>
-          <button class="btn-ghost" onclick="resetOnboarding()" style="font-size:12px;padding:7px 16px;white-space:nowrap;color:var(--blue);border-color:rgba(37,99,235,0.28)">Restart setup</button>
+          <button class="btn-ghost" id="btn-restart-onboard" style="font-size:12px;padding:7px 16px;white-space:nowrap;color:var(--blue);border-color:rgba(37,99,235,0.28)">Restart setup</button>
         </div>
       </div>
       <div class="dzone" style="padding:16px 20px">
@@ -3239,7 +3242,9 @@ function save(){
     localStorage.setItem(SK,JSON.stringify(S));
     var el=ge('spill');
     if(el){el.textContent='saved ✓';el.className='tb-chip ok';setTimeout(function(){el.textContent='auto-save on';el.className='tb-chip';},2000);}
-  }catch(e){toast('⚠ Save failed — storage may be full.','error');}
+    // FIX: Check storage quota after each save; warn at 80% usage
+    checkStorageUsage();
+  }catch(e){toast('⚠ Save failed — storage may be full. Export a backup!','error');}
 }
 S=loadState();
 
@@ -3266,10 +3271,55 @@ function cur(){return S.profile.currency||'₱';}
 function fmt(n){return cur()+Number(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function nxtId(){return S.nextId++;}
 function toast(msg,type){var t=ge('toast');t.textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(function(){t.className='toast';},2800);}
+
+// ── XSS PROTECTION ───────────────────────────────────────────────────────────
+// FIX: All user-supplied strings must be passed through esc() before being
+// inserted into innerHTML. This prevents stored XSS from crafted descriptions,
+// names, notes, etc. (e.g. <img src=x onerror=alert(1)>).
+var _escDiv=document.createElement('div');
+function esc(str){
+  _escDiv.textContent=String(str==null?'':str);
+  return _escDiv.innerHTML;
+}
+
+// ── INPUT VALIDATION ─────────────────────────────────────────────────────────
+// FIX: Validate amounts and dates consistently. Returns true if valid, else
+// shows a toast and returns false.
+function validateAmt(val,fieldLabel){
+  var n=parseFloat(val);
+  if(isNaN(n)||n<=0){toast((fieldLabel||'Amount')+' must be greater than 0.','error');return false;}
+  if(n>1e12){toast((fieldLabel||'Amount')+' seems too large. Please check.','error');return false;}
+  if(!isFinite(n)){toast('Invalid '+(fieldLabel||'amount')+'.','error');return false;}
+  return true;
+}
+function validateDate(val,fieldLabel){
+  if(!val||!/^\d{4}-\d{2}-\d{2}$/.test(val)){toast((fieldLabel||'Date')+' is required.','error');return false;}
+  var d=new Date(val);
+  if(isNaN(d.getTime())){toast('Invalid '+(fieldLabel||'date')+'.','error');return false;}
+  return true;
+}
+function sanitizeText(str){
+  // Trim whitespace, cap at 200 chars for free-text fields
+  return String(str==null?'':str).trim().slice(0,200);
+}
+
+// ── STORAGE SIZE MONITOR ─────────────────────────────────────────────────────
+// FIX: localStorage is ~5MB on most browsers and can be silently evicted on iOS.
+// Warn the user when usage exceeds 80% of the estimated 5MB quota.
+function checkStorageUsage(){
+  try{
+    var used=new Blob([JSON.stringify(S)]).size;
+    var pct=used/(5*1024*1024);
+    if(pct>0.8){
+      var kb=Math.round(used/1024);
+      toast('⚠ Storage '+Math.round(pct*100)+'% full ('+kb+'KB). Export a backup soon.','error');
+    }
+  }catch(e){}
+}
 // ── CONFIRM MODAL ──────────────────────────────────────────────
 function confirmModal(msg, onConfirm, danger){
   var html='<div style="font-size:13.5px;color:var(--t1);line-height:1.55;margin-bottom:20px">'+msg+'</div>'
-    +'<div class="fa"><button class="'+(danger?'btn-danger':'btn-add')+' modal-save">Confirm</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="'+(danger?'btn-danger':'btn-add')+' modal-save">Confirm</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Are you sure?',html,onConfirm);
 }
 function accName(id){var a=S.accounts.find(function(x){return String(x.id)===String(id);});return a?a.name:'—';}
@@ -3309,7 +3359,7 @@ function setGreeting(){
     var dueDate=thisMonth<=now2?new Date(now2.getFullYear(),now2.getMonth()+1,a.billingDay):thisMonth;
     return Math.ceil((dueDate-now2)/(864e5))<=5;
   });
-  if(ccDueSoon.length>0)pills.push('<span class="g-pill amber">CC: '+ccDueSoon[0].name+' due soon</span>');
+  if(ccDueSoon.length>0)pills.push('<span class="g-pill amber">CC: '+esc(ccDueSoon[0].name)+' due soon</span>');
   var ins=ge('g-insights');if(ins)ins.innerHTML=pills.join('');
 }
 
@@ -3321,22 +3371,22 @@ function renderAlerts(){
   S.goals.forEach(function(g){
     var spent=S.expense.filter(function(e){return e.date.startsWith(ym)&&e.category===g.category;}).reduce(function(s,e){return s+e.amt;},0);
     var pct=spent/g.limit;
-    if(pct>=1)alerts.push({key:'bud-over-'+g.id,type:'danger',msg:'<b>'+g.name+'</b> budget exceeded — spent '+fmt(spent)+' of '+fmt(g.limit)});
-    else if(pct>=0.8)alerts.push({key:'bud-warn-'+g.id,type:'warn',msg:'<b>'+g.name+'</b> at '+Math.round(pct*100)+'% — '+fmt(g.limit-spent)+' remaining'});
+    if(pct>=1)alerts.push({key:'bud-over-'+g.id,type:'danger',msg:'<b>'+esc(g.name)+'</b> budget exceeded — spent '+fmt(spent)+' of '+fmt(g.limit)});
+    else if(pct>=0.8)alerts.push({key:'bud-warn-'+g.id,type:'warn',msg:'<b>'+esc(g.name)+'</b> at '+Math.round(pct*100)+'% — '+fmt(g.limit-spent)+' remaining'});
   });
   // Overdue bills
   (S.bills||[]).filter(function(b){return!b.isPaid&&b.dueDate&&b.dueDate<today();}).slice(0,2).forEach(function(b){
     var daysAgo=Math.ceil((new Date()-new Date(b.dueDate))/(864e5));
-    alerts.push({key:'bill-ov-'+b.id,type:'danger',msg:'Bill overdue: <b>'+b.name+'</b> — '+fmt(b.amt)+' (was due '+b.dueDate+', '+daysAgo+'d ago)'});
+    alerts.push({key:'bill-ov-'+b.id,type:'danger',msg:'Bill overdue: <b>'+esc(b.name)+'</b> — '+fmt(b.amt)+' (was due '+esc(b.dueDate)+', '+daysAgo+'d ago)'});
   });
   // Bills due soon (within 3 days)
   (S.bills||[]).filter(function(b){if(b.isPaid)return false;var d=Math.ceil((new Date(b.dueDate)-new Date())/(864e5));return d>=0&&d<=3;}).slice(0,2).forEach(function(b){
     var d=Math.ceil((new Date(b.dueDate)-new Date())/(864e5));
-    alerts.push({key:'bill-soon-'+b.id,type:'warn',msg:'Bill due '+(d===0?'today':'in '+d+'d')+': <b>'+b.name+'</b> — '+fmt(b.amt)});
+    alerts.push({key:'bill-soon-'+b.id,type:'warn',msg:'Bill due '+(d===0?'today':'in '+d+'d')+': <b>'+esc(b.name)+'</b> — '+fmt(b.amt)});
   });
   // Overdue credit transactions
   S.credit.filter(function(e){return e.type==='Charge'&&!e.isPaid&&e.due&&e.due<today();}).slice(0,2).forEach(function(e){
-    alerts.push({key:'cr-ov-'+e.id,type:'danger',msg:'Credit charge overdue: <b>'+e.desc+'</b> — '+fmt(e.amt)+' (was due '+e.due+')'});
+    alerts.push({key:'cr-ov-'+e.id,type:'danger',msg:'Credit charge overdue: <b>'+esc(e.desc)+'</b> — '+fmt(e.amt)+' (was due '+esc(e.due)+')'});
   });
   // CC billing due soon
   var now=new Date();
@@ -3344,7 +3394,7 @@ function renderAlerts(){
     var thisMonth=new Date(now.getFullYear(),now.getMonth(),a.billingDay);
     var dueDate=thisMonth<=now?new Date(now.getFullYear(),now.getMonth()+1,a.billingDay):thisMonth;
     var daysLeft=Math.ceil((dueDate-now)/(864e5));
-    if(daysLeft<=5)alerts.push({key:'cc-due-'+a.id,type:daysLeft<=1?'danger':'warn',msg:'<b>'+a.name+'</b> payment due '+(daysLeft<=0?'today':'in '+daysLeft+'d')+' — owed: '+fmt(a.usedCredit||0)});
+    if(daysLeft<=5)alerts.push({key:'cc-due-'+a.id,type:daysLeft<=1?'danger':'warn',msg:'<b>'+esc(a.name)+'</b> payment due '+(daysLeft<=0?'today':'in '+daysLeft+'d')+' — owed: '+fmt(a.usedCredit||0)});
   });
   if(!S.dismissedAlerts)S.dismissedAlerts=[];
   // Auto-clear dismissed keys that are no longer in active alerts
@@ -3357,8 +3407,8 @@ function renderAlerts(){
     var icon=a.type==='danger'
       ?'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
       :'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-    var dismissBtn='<button class="alert-dismiss" data-key="'+a.key+'" title="Dismiss" style="margin-left:auto;flex-shrink:0;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;color:currentColor;opacity:0.6;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg></button>';
-    return'<div class="alert-banner '+a.type+'" style="align-items:center">'+icon+'<span style="flex:1">'+a.msg+'</span>'+dismissBtn+'</div>';
+    var dismissBtn='<button class="alert-dismiss" data-key="'+esc(a.key)+'" title="Dismiss" style="margin-left:auto;flex-shrink:0;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;color:currentColor;opacity:0.6;transition:opacity .15s"><svg viewBox="0 0 16 16" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="3" x2="13" y2="13"/><line x1="13" y1="3" x2="3" y2="13"/></svg></button>';
+    return'<div class="alert-banner '+esc(a.type)+'" style="align-items:center">'+icon+'<span style="flex:1">'+a.msg+'</span>'+dismissBtn+'</div>';
   }).join('');
   // Wire dismiss buttons
   el.querySelectorAll('.alert-dismiss').forEach(function(btn){
@@ -3415,6 +3465,22 @@ function goPanel(name){
 document.querySelectorAll('.nav-btn').forEach(function(b){b.addEventListener('click',function(){goPanel(this.dataset.panel);});});
 ge('profile-chip').addEventListener('click',function(){goPanel('profile');});
 ge('go-charts').addEventListener('click',function(){goPanel('charts');});
+
+// FIX: Replaced inline onclick attributes with JS event listeners
+var _topbarLogo=ge('topbar-logo-btn');
+if(_topbarLogo)_topbarLogo.addEventListener('click',function(){goPanel('dashboard');});
+var _dashAddGoal=ge('dash-add-goal');
+if(_dashAddGoal)_dashAddGoal.addEventListener('click',function(){goPanel('savings');});
+var _dashViewBills=ge('dash-view-bills');
+if(_dashViewBills)_dashViewBills.addEventListener('click',function(){goPanel('bills');});
+var _dashViewExpense=ge('dash-view-expense');
+if(_dashViewExpense)_dashViewExpense.addEventListener('click',function(){goPanel('expense');});
+var _restartOnboard=ge('btn-restart-onboard');
+if(_restartOnboard)_restartOnboard.addEventListener('click',function(){resetOnboarding();});
+// Theme chips
+document.querySelectorAll('.theme-chip').forEach(function(btn){
+  btn.addEventListener('click',function(){setThemePref(this.dataset.pref);});
+});
 
 // ── BOTTOM NAV ──────────────────────────────────────────────
 (function(){
@@ -3570,6 +3636,17 @@ function openModal(title,html,onSave){
     var saveBtn=ge('modal-body').querySelector('.modal-save');
     if(saveBtn)saveBtn.addEventListener('click',function(){onSave();});
   }
+  // FIX: Wire Cancel buttons via event delegation (replaces inline onclick="closeModal()")
+  ge('modal-body').querySelectorAll('[data-action="close-modal"]').forEach(function(btn){
+    btn.addEventListener('click',function(){closeModal();});
+  });
+  // FIX: Wire logo upload triggers (replaces onclick="ge('...').click()")
+  var baLogoTrigger=ge('modal-body').querySelector('[data-action="trigger-logo-ba"]');
+  if(baLogoTrigger)baLogoTrigger.addEventListener('click',function(){var inp=ge('ba-logo-input');if(inp)inp.click();});
+  var eaLogoTrigger=ge('modal-body').querySelector('[data-action="trigger-logo-ea"]');
+  if(eaLogoTrigger)eaLogoTrigger.addEventListener('click',function(){var inp=ge('ea-logo-input');if(inp)inp.click();});
+  var eaLogoRemove=ge('modal-body').querySelector('[data-action="remove-acc-logo"]');
+  if(eaLogoRemove)eaLogoRemove.addEventListener('click',function(){removeAccLogo();});
   // auto set dates
   ge('modal-body').querySelectorAll('input[type="date"]').forEach(function(d){if(!d.value)d.value=today();});
   fillSelects();
@@ -3589,9 +3666,9 @@ function doSearch(q,resultsEl){
   S.expense.forEach(function(e){if(e.desc.toLowerCase().includes(q)||e.category.toLowerCase().includes(q)||(e.note&&e.note.toLowerCase().includes(q)))results.push({dot:catIcon(e.category),bg:catColor(e.category),title:e.desc,sub:e.date+' · '+e.category,amt:'-'+fmt(e.amt),cls:'neg',panel:'expense'});});
   S.credit.forEach(function(e){if(e.desc.toLowerCase().includes(q)||(e.card&&e.card.toLowerCase().includes(q)))results.push({dot:catIcon(e.category),bg:catColor(e.category),title:e.desc,sub:e.date+' · '+e.card,amt:(e.type==='Charge'?'-':'+')+fmt(e.amt),cls:e.type==='Charge'?'neg':'pos',panel:'credit'});});
   S.savings.forEach(function(e){if(e.goal.toLowerCase().includes(q))results.push({dot:catIcon('Savings'),bg:'rgba(59,107,255,0.12)',title:e.goal,sub:e.date+' · '+e.type,amt:(e.type==='Deposit'?'+':'-')+fmt(e.amt),cls:e.type==='Deposit'?'pos':'neg',panel:'savings'});});
-  if(!results.length){resultsEl.innerHTML='<div class="sr-empty">No results for "'+q+'"</div>';resultsEl.classList.add('show');return;}
+  if(!results.length){resultsEl.innerHTML='<div class="sr-empty">No results for "'+esc(q)+'"</div>';resultsEl.classList.add('show');return;}
   resultsEl.innerHTML=results.slice(0,8).map(function(r,i){
-    return'<div class="sr-item" data-i="'+i+'"><div class="sr-dot" style="background:'+r.bg+'">'+r.dot+'</div><div><div class="sr-title">'+r.title+'</div><div class="sr-sub">'+r.sub+'</div></div><div class="sr-amt '+r.cls+'">'+r.amt+'</div></div>';
+    return'<div class="sr-item" data-i="'+i+'"><div class="sr-dot" style="background:'+esc(r.bg)+'">'+r.dot+'</div><div><div class="sr-title">'+esc(r.title)+'</div><div class="sr-sub">'+esc(r.sub)+'</div></div><div class="sr-amt '+esc(r.cls)+'">'+esc(r.amt)+'</div></div>';
   }).join('');
   resultsEl.classList.add('show');
   resultsEl.querySelectorAll('.sr-item').forEach(function(el,i){
@@ -3759,14 +3836,14 @@ function refreshCrCard(){
 
 function fillSelects(){
   // regular accounts (non-CC) for income/expense/transfer/savings
-  var regOpts='<option value="">— select account —</option>'+S.accounts.filter(function(a){return!a.isCC;}).map(function(a){return'<option value="'+a.id+'">'+a.name+(a.archived?' (archived)':'')+'</option>';}).join('');
+  var regOpts='<option value="">— select account —</option>'+S.accounts.filter(function(a){return!a.isCC;}).map(function(a){return'<option value="'+esc(a.id)+'">'+esc(a.name)+(a.archived?' (archived)':'')+'</option>';}).join('');
   ['in-acc','ex-acc','tr-from','tr-to','sub-acc'].forEach(function(id){var el=ge(id);if(el)el.innerHTML=regOpts;});
   // credit card dropdown — shows available credit so user knows what's left
   var ccAccounts=S.accounts.filter(function(a){return a.isCC&&!a.archived;});
   var cardOpts=ccAccounts.length
     ? ccAccounts.map(function(a){
         var avail=Math.max(0,(a.creditLimit||0)-(a.usedCredit||0));
-        return'<option value="cc:'+a.id+'">'+a.name+' — '+fmt(avail)+' available</option>';
+        return'<option value="cc:'+esc(a.id)+'">'+esc(a.name)+' — '+fmt(avail)+' available</option>';
       }).join('')+'<option value="manual">Other / Manual</option>'
     : '<option value="manual">Manual (no CC account linked)</option>';
   var cc=ge('cr-card');if(cc)cc.innerHTML=cardOpts;
@@ -3863,11 +3940,11 @@ ge('btn-open-acc').addEventListener('click',function(){
     +'<label>Bank logo <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — PNG/JPG, max 500KB)</span></label>'
     +'<div style="display:flex;align-items:center;gap:10px;margin-top:4px">'
     +'<div id="ba-logo-preview" style="width:44px;height:44px;border-radius:10px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;background:var(--bg);color:var(--t3)"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1.5" y="5" width="13" height="9" rx="1"/><path d="M5 5V3.5A1.5 1.5 0 0 1 6.5 2h3A1.5 1.5 0 0 1 11 3.5V5"/><line x1="1.5" y1="10" x2="14.5" y2="10"/></svg></div>'
-    +'<div><button type="button" class="btn-ghost" onclick="ge(\'ba-logo-input\').click()" style="font-size:11.5px">Upload logo</button>'
+    +'<div><button type="button" class="btn-ghost" data-action="trigger-logo-ba" style="font-size:11.5px">Upload logo</button>'
     +'<div style="font-size:10px;color:var(--t3);margin-top:3px" id="ba-logo-name">No file chosen</div></div>'
     +'<input type="file" id="ba-logo-input" accept="image/*" style="display:none">'
     +'</div></div>'
-    +'<div class="fa"><button class="btn-add modal-save">Save account</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
+    +'<div class="fa"><button class="btn-add modal-save">Save account</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
   function(){
     var name=gv('ba-name').trim();if(!name){toast('Enter a bank name.','error');return;}
     var type=gv('ba-type');
@@ -4051,7 +4128,7 @@ function renderAccounts(){
         +'<div class="bcard-glow" style="background:radial-gradient(circle,'+(isDark?'rgba(52,211,153,0.15)':'rgba(56,142,60,0.12)')+',transparent 70%);opacity:1"></div>'
         +'<div class="bcard-stripe" style="background:'+(isDark?'#4ade80':'#4caf50')+';opacity:0.5"></div>'
         +'<div class="bcard-head" style="position:relative;z-index:1"><div class="bcard-icon" style="background:'+(isDark?'rgba(52,211,153,0.12)':'rgba(56,142,60,0.10)')+';'+cashText+'">'+cashIcon+'</div>'+cashBadge+'</div>'
-        +'<div class="bname" style="'+cashText+'">'+a.name+'</div>'
+        +'<div class="bname" style="'+cashText+'">'+esc(a.name)+'</div>'
         +'<div class="btype" style="background:'+(isDark?'rgba(52,211,153,0.12)':'rgba(56,142,60,0.10)')+';'+cashText+'">Cash</div>'
         +'<div class="bbal" style="'+cashBal+'">'+fmt(a.balance)+'</div>'
         +earmarkBadge(a.id,a.balance)
@@ -4095,7 +4172,7 @@ function renderAccounts(){
         +'<div class="bcard-stripe" style="'+stripeStyle+'"></div>'
         +'<div class="bcard-head"><div class="bcard-icon" style="'+logoBg+';color:'+col+'">'+accLogoHtml(a)+'</div>'
         +(a.archived?'<span class="badge bx">Archived</span>':dueBadge)+'</div>'
-        +'<div class="bname">'+a.name+'</div>'
+        +'<div class="bname">'+esc(a.name)+'</div>'
         +'<div class="bnum" style="margin-bottom:10px">•••• '+(a.num||'––––')+'</div>'
         +'<div class="cc-limit-row"><span class="cc-limit-lbl">Credit Limit</span><span class="cc-limit-val">'+fmt(limit)+'</span></div>'
         +'<div class="cc-avail-lbl">Available Credit</div>'
@@ -4117,8 +4194,8 @@ function renderAccounts(){
       +'<div class="bcard-stripe" style="'+stripeStyle+'"></div>'
       +'<div class="bcard-head"><div class="bcard-icon" style="'+logoBg+';color:'+col+'">'+accLogoHtml(a)+'</div>'
       +(a.archived?'<span class="badge bx">Archived</span>':'')+'</div>'
-      +'<div class="bname">'+a.name+'</div>'
-      +'<div class="btype" style="background:'+hexA(col,isDark?.20:.10)+';color:'+col+'">'+a.type+'</div>'
+      +'<div class="bname">'+esc(a.name)+'</div>'
+      +'<div class="btype" style="background:'+hexA(col,isDark?.20:.10)+';color:'+col+'">'+esc(a.type)+'</div>'
       +'<div class="bbal">'+fmt(a.balance)+'</div>'
       +earmarkBadge(a.id,a.balance)
       +'<div style="display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1"><div class="bnum" style="padding-top:0">•••• '+(a.num||'––––')+'</div>'+netBadge+'</div>'
@@ -4346,16 +4423,16 @@ function openEditAccount(id){
     +'<div id="ea-logo-preview" style="width:52px;height:52px;border-radius:11px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;flex-shrink:0;'+(a.logo?'background:#fff;padding:3px':'background:var(--bg)')+';">'
     +(a.logo?'<img src="'+a.logo+'" style="width:100%;height:100%;object-fit:contain;border-radius:9px">':'<span>'+(isCC?'💳':'🏦')+'</span>')
     +'</div>'
-    +'<div><button type="button" class="btn-ghost" onclick="ge(\'ea-logo-input\').click()" style="font-size:11.5px">Upload logo</button>'
-    +(a.logo?'<button type="button" class="btn-ghost" onclick="removeAccLogo()" style="font-size:11.5px;margin-left:6px;color:var(--red)">Remove logo</button>':'')
+    +'<div><button type="button" class="btn-ghost" data-action="trigger-logo-ea" style="font-size:11.5px">Upload logo</button>'
+    +(a.logo?'<button type="button" class="btn-ghost" data-action="remove-acc-logo" style="font-size:11.5px;margin-left:6px;color:var(--red)">Remove logo</button>':'')
     +'<div style="font-size:10px;color:var(--t3);margin-top:4px">PNG/JPG, max 500KB</div>'
     +'</div>'
     +'<input type="file" id="ea-logo-input" accept="image/*" style="display:none">'
     +'</div>'
     +'<div class="fr3">'
-    +'<div class="fg"><label>Bank name</label><input type="text" id="ea-name" value="'+a.name+'"></div>'
-    +'<div class="fg"><label>Last 4 digits</label><input type="text" id="ea-num" maxlength="4" value="'+(a.num||'')+'"></div>'
-    +'<div class="fg"><label>Account type</label><input type="text" id="ea-type" value="'+a.type+'" readonly style="background:var(--bg);cursor:default"></div>'
+    +'<div class="fg"><label>Bank name</label><input type="text" id="ea-name" value="'+esc(a.name)+'"></div>'
+    +'<div class="fg"><label>Last 4 digits</label><input type="text" id="ea-num" maxlength="4" value="'+esc(a.num||'')+'"></div>'
+    +'<div class="fg"><label>Account type</label><input type="text" id="ea-type" value="'+esc(a.type)+'" readonly style="background:var(--bg);cursor:default"></div>'
     +'</div>'
     +(isCC
       ?'<div class="fr3">'
@@ -4365,7 +4442,7 @@ function openEditAccount(id){
         +'</div>'
       :'<div class="fr3" style="grid-template-columns:1fr 1fr"><div class="fg"><label>Current balance</label><input type="number" id="ea-bal" value="'+a.balance+'"></div><div class="fg"><label>Opening balance</label><input type="number" id="ea-opening" value="'+(a._openingBalance!==undefined?a._openingBalance:a.balance)+'"></div></div>'
     )
-    +'<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Edit — '+a.name,html,function(){
     var newName=gv('ea-name').trim()||a.name;
     a.name=newName;a.num=gv('ea-num');
@@ -4426,7 +4503,8 @@ function renderCCSummary(){
   var el=ge('cc-summary-row');if(!el)return;
   var ccCards=S.accounts.filter(function(a){return a.isCC&&!a.archived;});
   if(!ccCards.length){
-    el.innerHTML='<div style="font-size:12.5px;color:var(--t3);padding:6px 0 2px">No credit card accounts linked yet. <button class="btn-ghost" style="font-size:11px;padding:3px 10px;margin-left:6px" onclick="goPanel(\'accounts\')">Add in Accounts →</button></div>';
+    el.innerHTML='<div style="font-size:12.5px;color:var(--t3);padding:6px 0 2px">No credit card accounts linked yet. <button class="btn-ghost" id="cc-goto-accounts" style="font-size:11px;padding:3px 10px;margin-left:6px">Add in Accounts →</button></div>';
+    var _ccBtn=ge('cc-goto-accounts');if(_ccBtn)_ccBtn.addEventListener('click',function(){goPanel('accounts');});
     return;
   }
   el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">'+ccCards.map(function(a){
@@ -4447,7 +4525,7 @@ function renderCCSummary(){
     }
     return'<div class="card" style="padding:14px 16px;border-left:3px solid '+col+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
-      +'<div><div style="font-size:13px;font-weight:500;color:var(--t1)">'+a.name+'</div>'
+      +'<div><div style="font-size:13px;font-weight:500;color:var(--t1)">'+esc(a.name)+'</div>'
       +(dueTxt?'<div style="font-size:10px;color:var(--t3);margin-top:1px">📅 '+dueTxt+'</div>':'')
       +'</div>'
       +'<div style="text-align:right"><div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">Available</div>'
@@ -4474,7 +4552,7 @@ function creditDueStatus(due){
 
 // ── SUBSCRIPTIONS ──────────────────────────────────────────────
 ge('btn-open-sub').addEventListener('click',function(){
-  openModal('New Subscription','<div class="fr3"><div class="fg"><label>Name</label><input type="text" id="sub-name" placeholder="Netflix"></div><div class="fg"><label>Category</label><select id="sub-cat"><option>Entertainment</option><option>Software</option><option>Utilities</option><option>Cloud</option><option>Subscription</option><option>Insurance</option><option>Other</option></select></div><div class="fg"><label>Billing cycle</label><select id="sub-cycle"><option value="Weekly">Weekly</option><option value="Bi-weekly">Bi-weekly</option><option value="Monthly" selected>Monthly</option><option value="Quarterly">Quarterly</option><option value="Yearly">Yearly</option></select></div></div><div class="fr3"><div class="fg"><label>Amount</label><input type="number" id="sub-amt" placeholder="0.00"></div><div class="fg"><label>Account</label><select id="sub-acc"></select></div><div class="fg"><label>First billing date</label><input type="date" id="sub-date"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
+  openModal('New Subscription','<div class="fr3"><div class="fg"><label>Name</label><input type="text" id="sub-name" placeholder="Netflix"></div><div class="fg"><label>Category</label><select id="sub-cat"><option>Entertainment</option><option>Software</option><option>Utilities</option><option>Cloud</option><option>Subscription</option><option>Insurance</option><option>Other</option></select></div><div class="fg"><label>Billing cycle</label><select id="sub-cycle"><option value="Weekly">Weekly</option><option value="Bi-weekly">Bi-weekly</option><option value="Monthly" selected>Monthly</option><option value="Quarterly">Quarterly</option><option value="Yearly">Yearly</option></select></div></div><div class="fr3"><div class="fg"><label>Amount</label><input type="number" id="sub-amt" placeholder="0.00"></div><div class="fg"><label>Account</label><select id="sub-acc"></select></div><div class="fg"><label>First billing date</label><input type="date" id="sub-date"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
   function(){
     var name=gv('sub-name').trim();if(!name){toast('Enter a name.','error');return;}
     var amt=parseFloat(gv('sub-amt'));if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
@@ -4529,11 +4607,11 @@ function renderSubs(){
       :'<span class="badge bx">Paused</span>';
     var rowStyle=isActive?'':'opacity:0.55';
     return'<tr style="'+rowStyle+'">'
-      +'<td><strong>'+s.name+'</strong></td>'
-      +'<td class="hide-sm"><span class="badge bbl">'+s.category+'</span></td>'
-      +'<td>'+s.cycle+'</td>'
-      +'<td class="hide-sm">'+accName(s.account)+'</td>'
-      +'<td>'+(s.nextDate||'—')+'</td>'
+      +'<td><strong>'+esc(s.name)+'</strong></td>'
+      +'<td class="hide-sm"><span class="badge bbl">'+esc(s.category)+'</span></td>'
+      +'<td>'+esc(s.cycle)+'</td>'
+      +'<td class="hide-sm">'+esc(accName(s.account))+'</td>'
+      +'<td>'+esc(s.nextDate||'—')+'</td>'
       +'<td class="hide-sm">'+status+'</td>'
       +'<td class="neg mono" style="text-align:right">'+fmt(s.amt)+'</td>'
       +'<td style="text-align:right;white-space:nowrap">'
@@ -4568,11 +4646,11 @@ function renderSubs(){
       return '<div class="sub-card'+(isActive?'':' paused')+'" data-id="'+s.id+'">'
         +'<div class="sub-card-icon">'+icon+'</div>'
         +'<div class="sub-card-body">'
-          +'<div class="sub-card-name">'+s.name+'</div>'
+          +'<div class="sub-card-name">'+esc(s.name)+'</div>'
           +'<div class="sub-card-meta">'
             +'<span>'+s.cycle+'</span>'
             +'<span style="color:var(--t4)">·</span>'
-            +'<span>'+nextLbl+'</span>'
+            +'<span>'+esc(nextLbl)+'</span>'
             +(statusDot?' '+statusDot:'')
           +'</div>'
         +'</div>'
@@ -4623,7 +4701,7 @@ function editSubscription(id){
   if(!s)return;
   var html=
     '<div class="fr3">'
-    +'<div class="fg"><label>Name</label><input type="text" id="se-name" value="'+s.name+'"></div>'
+    +'<div class="fg"><label>Name</label><input type="text" id="se-name" value="'+esc(s.name)+'"></div>'
     +'<div class="fg"><label>Category</label><select id="se-cat"><option>Entertainment</option><option>Software</option><option>Utilities</option><option>Cloud</option><option>Subscription</option><option>Insurance</option><option>Other</option></select></div>'
     +'<div class="fg"><label>Billing cycle</label><select id="se-cycle"><option value="Weekly">Weekly</option><option value="Bi-weekly">Bi-weekly</option><option value="Monthly">Monthly</option><option value="Quarterly">Quarterly</option><option value="Yearly">Yearly</option></select></div>'
     +'</div>'
@@ -4632,7 +4710,7 @@ function editSubscription(id){
     +'<div class="fg"><label>Account</label><select id="se-acc"></select></div>'
     +'<div class="fg"><label>Next billing date</label><input type="date" id="se-next" value="'+(s.nextDate||today())+'"></div>'
     +'</div>'
-    +'<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Edit Subscription — '+s.name, html, function(){
     var newAmt=parseFloat(gv('se-amt'));
     if(isNaN(newAmt)||newAmt<=0){toast('Enter a valid amount.','error');return;}
@@ -4655,7 +4733,7 @@ function editSubscription(id){
 
 // ── BUDGET ──────────────────────────────────────────────
 ge('btn-open-budget').addEventListener('click',function(){
-  openModal('New Budget Goal','<div class="fr3"><div class="fg"><label>Category</label><select id="bg-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Other</option></select></div><div class="fg"><label>Label</label><input type="text" id="bg-name" placeholder="e.g. Groceries"></div><div class="fg"><label>Monthly limit</label><input type="number" id="bg-lim" min="0" placeholder="5000"></div></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><label style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="bg-rollover" style="accent-color:var(--blue);width:14px;height:14px"> Carry unused budget to next month</label></div><div class="fa"><button class="btn-add modal-save">Save goal</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
+  openModal('New Budget Goal','<div class="fr3"><div class="fg"><label>Category</label><select id="bg-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Other</option></select></div><div class="fg"><label>Label</label><input type="text" id="bg-name" placeholder="e.g. Groceries"></div><div class="fg"><label>Monthly limit</label><input type="number" id="bg-lim" min="0" placeholder="5000"></div></div><div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><label style="font-size:12px;color:var(--t2);display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="bg-rollover" style="accent-color:var(--blue);width:14px;height:14px"> Carry unused budget to next month</label></div><div class="fa"><button class="btn-add modal-save">Save goal</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
   function(){
     var lim=parseFloat(gv('bg-lim'));if(isNaN(lim)||lim<=0){toast('Enter a valid limit.','error');return;}
     var _roll=document.getElementById('bg-rollover')&&document.getElementById('bg-rollover').checked;S.goals.push({id:nxtId(),category:gv('bg-cat'),name:gv('bg-name').trim()||gv('bg-cat'),limit:lim,rollover:_roll,rolloverAmt:0});
@@ -4673,7 +4751,7 @@ function renderBudget(){
     var spent=S.expense.filter(function(e){return e.date.startsWith(curYM())&&e.category===g.category;}).reduce(function(s,e){return s+e.amt;},0);
     var effLim=g.limit+(g.rollover&&g.rolloverAmt>0?g.rolloverAmt:0);
     var pct=Math.min(100,(spent/effLim)*100),over=spent>effLim,warn=pct>=80&&!over;
-    return'<div class="card gcard"><div class="gcard-h"><div><div class="gn">'+g.name+'</div><div class="gc">'+g.category+'</div></div><div class="gp" style="color:'+(over?'var(--red)':warn?'var(--amber)':'var(--blue)')+'">'+Math.round(pct)+'%</div></div><div class="gtrack"><div class="gfill'+(over?' over':warn?' warn':'')+'" style="width:'+pct.toFixed(0)+'%"></div></div><div class="gamts"><span>Spent: <strong>'+fmt(spent)+'</strong></span><span>Limit: <strong>'+fmt(g.limit)+'</strong></span></div><div style="margin-top:8px;display:flex;gap:5px"><button class="btn-icon danger" data-id="'+g.id+'"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></div>';
+    return'<div class="card gcard"><div class="gcard-h"><div><div class="gn">'+esc(g.name)+'</div><div class="gc">'+esc(g.category)+'</div></div><div class="gp" style="color:'+(over?'var(--red)':warn?'var(--amber)':'var(--blue)')+'">'+Math.round(pct)+'%</div></div><div class="gtrack"><div class="gfill'+(over?' over':warn?' warn':'')+'" style="width:'+pct.toFixed(0)+'%"></div></div><div class="gamts"><span>Spent: <strong>'+fmt(spent)+'</strong></span><span>Limit: <strong>'+fmt(g.limit)+'</strong></span></div><div style="margin-top:8px;display:flex;gap:5px"><button class="btn-icon danger" data-id="'+esc(g.id)+'"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button></div></div>';
   }).join(''):'<div style="color:var(--t3);font-size:13px;padding:1rem 0">No budget goals yet.</div>';
   grid.querySelectorAll('.btn-icon.danger').forEach(function(btn){btn.addEventListener('click',function(){
     var id=this.dataset.id;
@@ -5143,7 +5221,7 @@ function renderDash(){
   S.transfer.forEach(function(e){all.push({date:e.date,desc:accName(e.from)+' → '+accName(e.to),type:'Transfer',amt:e.amt,cls:'neu',sign:'',dot:'rgba(8,145,178,0.12)',icon:'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M3 5l3-3M3 5l3 3"/><path d="M13 11H3m10 0l-3-3m3 3l-3 3"/></svg>'});});
   S.credit.forEach(function(e){all.push({date:e.date,desc:e.desc,type:'Credit',amt:e.amt,cls:e.type==='Charge'?'neg':'pos',sign:e.type==='Charge'?'-':'+',dot:catColor(e.category),icon:catIcon(e.category)});});
   all.sort(function(a,b){return b.date.localeCompare(a.date);});
-  ge('recent-list').innerHTML=all.slice(0,7).map(function(e){return'<div class="ri"><div class="rl"><div class="rdot" style="background:'+e.dot+'">'+e.icon+'</div><div><div class="rdesc">'+e.desc+'</div><div class="rdate">'+e.date+' · '+e.type+'</div></div></div><div class="ramt '+e.cls+'">'+e.sign+fmt(e.amt)+'</div></div>';}).join('')||'<div style="color:var(--t3);font-size:12.5px;padding:2rem 0;text-align:center;width:100%">No activity yet.</div>';
+  ge('recent-list').innerHTML=all.slice(0,7).map(function(e){return'<div class="ri"><div class="rl"><div class="rdot" style="background:'+esc(e.dot)+'">'+e.icon+'</div><div><div class="rdesc">'+esc(e.desc)+'</div><div class="rdate">'+esc(e.date)+' · '+esc(e.type)+'</div></div></div><div class="ramt '+esc(e.cls)+'">'+esc(e.sign)+fmt(e.amt)+'</div></div>';}).join('')||'<div style="color:var(--t3);font-size:12.5px;padding:2rem 0;text-align:center;width:100%">No activity yet.</div>';
   // Top expenses
   var ym=curYM();var mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   st('top-exp-month',mn[parseInt(ym.split('-')[1])-1]+' '+ym.slice(0,4));
@@ -5226,7 +5304,7 @@ function renderNetWorth(){
         var free=+(a.balance-earmark).toFixed(2);
         var sub=earmark>0?'<div style="font-size:10px;color:var(--blue);margin-top:1px">₱'+earmark.toLocaleString()+' earmarked</div>':'';
         return'<div class="nw-line" style="flex-direction:column;align-items:flex-start;gap:1px">'
-          +'<div style="display:flex;justify-content:space-between;width:100%"><span>'+a.name+' <span style="font-size:9.5px;color:var(--t3)">'+a.type+'</span></span>'
+          +'<div style="display:flex;justify-content:space-between;width:100%"><span>'+esc(a.name)+' <span style="font-size:9.5px;color:var(--t3)">'+esc(a.type)+'</span></span>'
           +'<span style="color:var(--green)">'+fmt(a.balance)+'</span></div>'
           +(earmark>0?'<div style="display:flex;justify-content:space-between;width:100%;font-size:10px;color:var(--t3)"><span>Free to spend</span><span style="color:'+(free<0?'var(--red)':'var(--t2)')+'">'+fmt(free)+'</span></div>':'')
           +'</div>';
@@ -5242,7 +5320,7 @@ function renderNetWorth(){
   if(investEl){
     if(investAccs.length){
       investEl.innerHTML=investAccs.map(function(a){
-        return'<div class="nw-line"><span>'+a.name+'</span><span style="color:var(--blue)">'+fmt(a.balance)+'</span></div>';
+        return'<div class="nw-line"><span>'+esc(a.name)+'</span><span style="color:var(--blue)">'+fmt(a.balance)+'</span></div>';
       }).join('')
       +'<div class="nw-line" style="font-weight:600"><span>Total Investments</span><span style="color:var(--blue)">'+fmt(tInvest)+'</span></div>';
     } else {
@@ -5258,7 +5336,7 @@ function renderNetWorth(){
         var utilPct=a.creditLimit>0?Math.round(((a.usedCredit||0)/a.creditLimit)*100):0;
         var utilColor=utilPct>=90?'var(--red)':utilPct>=70?'var(--amber)':'var(--t3)';
         return'<div class="nw-line">'
-          +'<span>'+a.name+' <span style="font-size:9.5px;color:'+utilColor+'">'+utilPct+'% used</span></span>'
+          +'<span>'+esc(a.name)+' <span style="font-size:9.5px;color:'+utilColor+'">'+utilPct+'% used</span></span>'
           +'<span style="color:var(--red)">'+fmt(a.usedCredit||0)+'</span>'
           +'</div>';
       }).join('')
@@ -5279,7 +5357,7 @@ function renderNetWorth(){
         var saved=+(dep-wit).toFixed(2);
         var pct=g.target>0?Math.min(100,Math.round((saved/g.target)*100)):0;
         return'<div class="nw-line" style="flex-direction:column;align-items:flex-start;gap:3px">'
-          +'<div style="display:flex;justify-content:space-between;width:100%"><span>'+g.name+'</span><span style="color:var(--purple)">'+fmt(saved)+'</span></div>'
+          +'<div style="display:flex;justify-content:space-between;width:100%"><span>'+esc(g.name)+'</span><span style="color:var(--purple)">'+fmt(saved)+'</span></div>'
           +(g.target>0?'<div style="width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--purple);border-radius:2px"></div></div>':'')
           +(g.target>0?'<div style="font-size:10px;color:var(--t3)">'+pct+'% of '+fmt(g.target)+'</div>':'')
           +'</div>';
@@ -5356,6 +5434,7 @@ var LOG_CFG={
     icon:function(e){return e.isPaid?'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5,8 6,12 13.5,4"/></svg>':catIcon(e.category);},
     dotBg:function(e){return e.isPaid?'rgba(14,168,96,0.12)':catColor(e.category);},
     title:function(e){return e.desc;},
+    // NOTE: sub for credit embeds a <span> for paid status — it is safe (static HTML, no user data inside the span)
     sub:function(e){return e.date+' · '+e.card+(e.isPaid?' · <span style="color:var(--green);font-weight:500">Paid</span>':(e.due&&e.type==='Charge'?' · Due '+e.due:''));},
     amt:function(e){return{sign:e.type==='Charge'?'-':'+',cls:e.type==='Charge'?(e.isPaid?'neu':'neg'):'pos',val:fmt(e.amt)};}
   },
@@ -5413,20 +5492,20 @@ function renderLog(type){
     var delBtn='<button class="btn-icon danger" data-type="'+type+'" data-id="'+e.id+'"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg></button>';
     var editBtn='<button class="btn-icon" data-type="'+type+'" data-id="'+e.id+'" style="margin-right:2px"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
     var runCell=running?'<td class="running-bal hide-sm" style="text-align:right">'+(running[e.id]>=0?'+':'')+fmt(running[e.id])+'</td>':'';
-    if(type==='income')return'<tr><td>'+e.date+'</td><td>'+e.source+'</td><td class="hide-sm"><span class="badge bg">'+e.category+'</span></td><td class="hide-sm">'+accName(e.account)+'</td><td class="hide-sm" style="color:var(--t3)">'+(e.note||'—')+'</td><td class="pos mono" style="text-align:right">+'+fmt(e.amt)+'</td><td style="text-align:right;white-space:nowrap">'+editBtn+delBtn+'</td></tr>';
-    if(type==='expense')return'<tr><td>'+e.date+'</td><td>'+e.desc+'</td><td class="hide-sm"><span class="badge br">'+e.category+'</span></td><td class="hide-sm">'+accName(e.account)+'</td><td class="hide-sm" style="color:var(--t3)">'+(e.note||'—')+'</td><td class="neg mono" style="text-align:right">-'+fmt(e.amt)+'</td>'+runCell+'<td style="text-align:right;white-space:nowrap">'+editBtn+delBtn+'</td></tr>';
-    if(type==='transfer')return'<tr><td>'+e.date+'</td><td>'+accName(e.from)+'</td><td class="hide-sm">'+accName(e.to)+'</td><td class="hide-sm" style="color:var(--t3)">'+(e.note||'—')+'</td><td class="neu mono" style="text-align:right">'+fmt(e.amt)+'</td><td style="text-align:right">'+delBtn+'</td></tr>';
+    if(type==='income')return'<tr><td>'+esc(e.date)+'</td><td>'+esc(e.source)+'</td><td class="hide-sm"><span class="badge bg">'+esc(e.category)+'</span></td><td class="hide-sm">'+esc(accName(e.account))+'</td><td class="hide-sm" style="color:var(--t3)">'+esc(e.note||'—')+'</td><td class="pos mono" style="text-align:right">+'+fmt(e.amt)+'</td><td style="text-align:right;white-space:nowrap">'+editBtn+delBtn+'</td></tr>';
+    if(type==='expense')return'<tr><td>'+esc(e.date)+'</td><td>'+esc(e.desc)+'</td><td class="hide-sm"><span class="badge br">'+esc(e.category)+'</span></td><td class="hide-sm">'+esc(accName(e.account))+'</td><td class="hide-sm" style="color:var(--t3)">'+esc(e.note||'—')+'</td><td class="neg mono" style="text-align:right">-'+fmt(e.amt)+'</td>'+runCell+'<td style="text-align:right;white-space:nowrap">'+editBtn+delBtn+'</td></tr>';
+    if(type==='transfer')return'<tr><td>'+esc(e.date)+'</td><td>'+esc(accName(e.from))+'</td><td class="hide-sm">'+esc(accName(e.to))+'</td><td class="hide-sm" style="color:var(--t3)">'+esc(e.note||'—')+'</td><td class="neu mono" style="text-align:right">'+fmt(e.amt)+'</td><td style="text-align:right">'+delBtn+'</td></tr>';
     if(type==='credit'){
       var ccA=e.cardId?findAcc(e.cardId):null;
-      var cardLabel=ccA?'<span class="badge bbl">'+e.card+'</span>':('<span class="badge bx">'+e.card+'</span>');
+      var cardLabel=ccA?'<span class="badge bbl">'+esc(e.card)+'</span>':('<span class="badge bx">'+esc(e.card)+'</span>');
       var isCharge=e.type==='Charge';
       var paidBadge=e.isPaid?'<span class="badge bg">✓ Paid</span>':(isCharge?creditDueStatus(e.due||''):'');
       var payBtn=isCharge&&!e.isPaid?'<button class="btn-pay" data-id="'+e.id+'" style="margin-right:3px">Pay</button>':'';
       var rowStyle=e.isPaid?'opacity:0.65':'';
-      return'<tr style="'+rowStyle+'"><td>'+e.date+'</td><td>'+e.desc+(e.isPaid?'':'' )+'</td><td class="hide-sm">'+cardLabel+'</td><td class="hide-sm"><span class="badge ba">'+e.category+'</span></td><td class="hide-sm"><span class="badge '+(isCharge?'br':'bg')+'">'+e.type+'</span></td><td class="hide-sm">'+(e.due||'—')+'</td><td class="hide-sm">'+paidBadge+'</td><td class="'+(isCharge?'neg':'pos')+' mono" style="text-align:right">'+(isCharge?'-':'+')+fmt(e.amt)+'</td><td style="text-align:right;white-space:nowrap">'+payBtn+editBtn+delBtn+'</td></tr>';
+      return'<tr style="'+rowStyle+'"><td>'+esc(e.date)+'</td><td>'+esc(e.desc)+'</td><td class="hide-sm">'+cardLabel+'</td><td class="hide-sm"><span class="badge ba">'+esc(e.category)+'</span></td><td class="hide-sm"><span class="badge '+(isCharge?'br':'bg')+'">'+esc(e.type)+'</span></td><td class="hide-sm">'+esc(e.due||'—')+'</td><td class="hide-sm">'+paidBadge+'</td><td class="'+(isCharge?'neg':'pos')+' mono" style="text-align:right">'+(isCharge?'-':'+')+fmt(e.amt)+'</td><td style="text-align:right;white-space:nowrap">'+payBtn+editBtn+delBtn+'</td></tr>';
     }
     if(type==='savings'){
-      return'<tr><td>'+e.date+'</td><td>'+e.goal+'</td><td class="hide-sm"><span class="badge '+(e.type==='Deposit'?'bg':'ba')+'">'+e.type+'</span></td><td class="hide-sm">'+accName(e.account)+'</td><td class="hide-sm" style="color:var(--t3)">'+(e.note||'—')+'</td><td class="'+(e.type==='Deposit'?'pos':'neg')+' mono" style="text-align:right">'+(e.type==='Deposit'?'+':'-')+fmt(e.amt)+'</td><td style="text-align:right">'+editBtn+delBtn+'</td></tr>';
+      return'<tr><td>'+esc(e.date)+'</td><td>'+esc(e.goal)+'</td><td class="hide-sm"><span class="badge '+(e.type==='Deposit'?'bg':'ba')+'">'+esc(e.type)+'</span></td><td class="hide-sm">'+esc(accName(e.account))+'</td><td class="hide-sm" style="color:var(--t3)">'+esc(e.note||'—')+'</td><td class="'+(e.type==='Deposit'?'pos':'neg')+' mono" style="text-align:right">'+(e.type==='Deposit'?'+':'-')+fmt(e.amt)+'</td><td style="text-align:right">'+editBtn+delBtn+'</td></tr>';
     }
     return'';
   }).join('');
@@ -5436,7 +5515,7 @@ function renderLog(type){
       var extraAction=(type==='credit'&&e.type==='Charge'&&!e.isPaid)
         ?'<button class="mob-pay" data-id="'+e.id+'">Pay</button>'
         :'';
-      return'<div class="mob-card'+(type==='credit'&&e.isPaid?' mob-paid':'')+'"><div class="mob-dot" style="background:'+cfg.dotBg(e)+'">'+cfg.icon(e)+'</div><div class="mob-body"><div class="mob-title">'+cfg.title(e)+'</div><div class="mob-sub">'+cfg.sub(e)+'</div></div><div class="mob-right"><div class="mob-amt '+a.cls+'">'+a.sign+a.val+'</div><div class="mob-actions">'+extraAction+'<button class="mob-edit" data-type="'+type+'" data-id="'+e.id+'">Edit</button><button class="mob-del" data-type="'+type+'" data-id="'+e.id+'">Remove</button></div></div></div>';
+      return'<div class="mob-card'+(type==='credit'&&e.isPaid?' mob-paid':'')+'"><div class="mob-dot" style="background:'+esc(cfg.dotBg(e))+'">'+cfg.icon(e)+'</div><div class="mob-body"><div class="mob-title">'+esc(cfg.title(e))+'</div><div class="mob-sub">'+esc(cfg.sub(e))+'</div></div><div class="mob-right"><div class="mob-amt '+esc(a.cls)+'">'+esc(a.sign)+a.val+'</div><div class="mob-actions">'+extraAction+'<button class="mob-edit" data-type="'+type+'" data-id="'+e.id+'">Edit</button><button class="mob-del" data-type="'+type+'" data-id="'+e.id+'">Remove</button></div></div></div>';
     }).join('');
     mob.querySelectorAll('.mob-del').forEach(function(btn){btn.addEventListener('click',function(){deleteEntry(this.dataset.type,this.dataset.id);});});
     mob.querySelectorAll('.mob-edit').forEach(function(btn){btn.addEventListener('click',function(){editEntry(this.dataset.type,this.dataset.id);});});
@@ -5491,26 +5570,26 @@ function editEntry(type,id){
   var html='';
 
   if(type==='income')
-    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Source</label><input type="text" id="ed-src" value="'+e.source+'"></div><div class="fg"><label>Category</label><select id="ed-cat"><option>Salary</option><option>Freelance</option><option>Business</option><option>Investment</option><option>Gift</option><option>Bonus</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'"></div></div>';
+    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Source</label><input type="text" id="ed-src" value="'+esc(e.source)+'"></div><div class="fg"><label>Category</label><select id="ed-cat"><option>Salary</option><option>Freelance</option><option>Business</option><option>Investment</option><option>Gift</option><option>Bonus</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+esc(e.note||'')+'"></div></div>';
 
   if(type==='expense')
-    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Description</label><input type="text" id="ed-src" value="'+e.desc+'"></div><div class="fg"><label>Category</label><select id="ed-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Subscription</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'"></div></div>';
+    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Description</label><input type="text" id="ed-src" value="'+esc(e.desc)+'"></div><div class="fg"><label>Category</label><select id="ed-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Subscription</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+esc(e.note||'')+'"></div></div>';
 
   if(type==='transfer')
-    html='<div class="fr"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">From <strong style="color:var(--t1)">'+accName(e.from)+'</strong> → To <strong style="color:var(--t1)">'+accName(e.to)+'</strong></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'"></div>';
+    html='<div class="fr"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">From <strong style="color:var(--t1)">'+accName(e.from)+'</strong> → To <strong style="color:var(--t1)">'+accName(e.to)+'</strong></div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+esc(e.note||'')+'"></div>';
 
   if(type==='credit')
-    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Description</label><input type="text" id="ed-src" value="'+e.desc+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"'+(e.isPaid?' disabled':'')+'></div></div><div class="fr"><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'"></div><div class="fg"><label>Due date</label><input type="date" id="ed-due" value="'+(e.due||'')+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">Card: <strong style="color:var(--t1)">'+e.card+'</strong> · Type: <strong style="color:var(--t1)">'+e.type+'</strong>'+(e.isPaid?' · <span style="color:var(--green)">✓ Paid</span>':'')+'</div>';
+    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Description</label><input type="text" id="ed-src" value="'+esc(e.desc)+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"'+(e.isPaid?' disabled':'')+'></div></div><div class="fr"><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+esc(e.note||'')+'"></div><div class="fg"><label>Due date</label><input type="date" id="ed-due" value="'+(e.due||'')+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">Card: <strong style="color:var(--t1)">'+e.card+'</strong> · Type: <strong style="color:var(--t1)">'+e.type+'</strong>'+(e.isPaid?' · <span style="color:var(--green)">✓ Paid</span>':'')+'</div>';
 
   if(type==='savings'){
     var accInfo=e.type==='Withdrawal'&&e.toAccount
       ?'From <strong>'+accName(e.account)+'</strong> → To <strong>'+accName(e.toAccount)+'</strong>'
       :'From <strong>'+accName(e.account)+'</strong>';
-    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Goal</label><input type="text" id="ed-src" value="'+e.goal+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">Type: <strong style="color:var(--t1)">'+e.type+'</strong> · '+accInfo+'</div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+(e.note||'')+'"></div>';
+    html='<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ed-date" value="'+e.date+'"></div><div class="fg"><label>Goal</label><input type="text" id="ed-src" value="'+esc(e.goal)+'"></div><div class="fg"><label>Amount</label><input type="number" id="ed-amt" value="'+e.amt+'"></div></div><div style="font-size:11px;color:var(--t3);padding:6px 10px;background:var(--bg);border-radius:8px;margin-bottom:8px">Type: <strong style="color:var(--t1)">'+e.type+'</strong> · '+accInfo+'</div><div class="fg"><label>Note</label><input type="text" id="ed-note" value="'+esc(e.note||'')+'"></div>';
   }
 
   if(!html){toast('Edit not supported for this type.','error');return;}
-  html+='<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+  html+='<div class="fa"><button class="btn-add modal-save">Save changes</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
 
   openModal('Edit Entry',html,function(){
     var newAmt=parseFloat(gv('ed-amt'));
@@ -5767,7 +5846,7 @@ function openAddInstallment(){
   if(!ccAccounts.length){toast('Add a credit card account first.','error');return;}
   var ccOpts=ccAccounts.map(function(a){
     var avail=Math.max(0,(a.creditLimit||0)-(a.usedCredit||0));
-    return'<option value="'+a.id+'">'+a.name+' — '+fmt(avail)+' available</option>';
+    return'<option value="'+esc(a.id)+'">'+esc(a.name)+' — '+fmt(avail)+' available</option>';
   }).join('');
   var html=
     '<div style="background:var(--blue-s);border-radius:9px;padding:9px 12px;margin-bottom:14px;font-size:11.5px;color:var(--blue)">'+
@@ -5784,7 +5863,7 @@ function openAddInstallment(){
     '</div>'+
     '<div id="ip-calc" style="padding:10px 14px;background:var(--bg);border-radius:9px;border:1px solid var(--border);margin-bottom:12px;font-size:12px;display:none"></div>'+
     '<div class="fg"><label>Note (optional)</label><input type="text" id="ip-note" placeholder="e.g. 0% interest, 12 months"></div>'+
-    '<div class="fa"><button class="btn-add modal-save">Create plan</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    '<div class="fa"><button class="btn-add modal-save">Create plan</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('New Installment Plan',html,function(){
     var name=gv('ip-name').trim();if(!name){toast('Enter a description.','error');return;}
     var cardId=gv('ip-card');if(!cardId){toast('Select a credit card.','error');return;}
@@ -5870,7 +5949,7 @@ function openEditInstallment(id){
     +'📊 <strong>'+fmt(p.monthlyAmt)+'</strong>/mo · <strong>'+p.paidMonths+'</strong>/'+p.months+' paid · '+(p.paidMonths>=p.months?'<span style="color:var(--green)">✓ Done</span>':'<span style="color:var(--blue)">'+(p.months-p.paidMonths)+' left</span>')+'</div>'
     +'<div class="fr"><div class="fg"><label>Next billing date</label><input type="date" id="ie-next" value="'+(p.nextDate||today())+'"></div>'
     +'<div class="fg"><label>Category</label><select id="ie-cat"><option>Shopping</option><option>Health</option><option>Education</option><option>Travel</option><option>Utilities</option><option>Other</option></select></div></div>'
-    +'<div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Edit — '+p.name,html,function(){
     p.name=gv('ie-name').trim()||p.name;p.note=gv('ie-note');p.nextDate=gv('ie-next')||p.nextDate;p.category=gv('ie-cat');
     save();renderInstallments();closeModal();toast('Updated ✓','success');
@@ -5886,7 +5965,7 @@ function payCharge(id){
   if(!e||e.type!=='Charge')return;
   // Build account options — non-CC accounts for paying from
   var accOpts=S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){
-    return'<option value="'+a.id+'">'+a.name+' ('+fmt(a.balance)+')</option>';
+    return'<option value="'+esc(a.id)+'">'+esc(a.name)+' ('+fmt(a.balance)+')</option>';
   }).join('');
   var html=
     '<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:14px">'
@@ -5900,7 +5979,7 @@ function payCharge(id){
     +'<div class="fg"><label>Payment date</label><input type="date" id="pay-date" value="'+today()+'"></div>'
     +'</div>'
     +(accOpts?'<div class="fg" style="margin-bottom:12px"><label>Pay from account</label><select id="pay-acc"><option value="">— no account deduction —</option>'+accOpts+'</select></div>':'')
-    +'<div class="fa"><button class="btn-add modal-save">Confirm Payment</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Confirm Payment</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Pay Charge',html,function(){
     var amt=parseFloat(gv('pay-amt'));
     if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
@@ -6024,11 +6103,11 @@ function renderSavingsGoals(){
             +'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>'
           +'</div>'
           +'<div class="sg-card-info">'
-            +'<div class="sg-card-name">'+g.name+'</div>'
+            +'<div class="sg-card-name">'+esc(g.name)+'</div>'
             +(g.note?'<div class="sg-card-sub">'+g.note+'</div>':'')
           +'</div>'
           +'<div class="sg-card-actions">'
-            +'<button class="sg-card-btn sg-log-trigger" data-goal="'+g.name+'" title="Log deposit/withdrawal"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg></button>'
+            +'<button class="sg-card-btn sg-log-trigger" data-goal="'+esc(g.name)+'" title="Log deposit/withdrawal"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/></svg></button>'
             +'<button class="sg-card-btn sg-edit-btn" data-id="'+g.id+'" title="Edit goal"><svg viewBox="0 0 16 16"><path d="M11 2.5l2.5 2.5L5 13.5H2.5V11L11 2.5z"/></svg></button>'
             +'<button class="sg-card-btn sg-del-btn" data-id="'+g.id+'" title="Delete goal"><svg viewBox="0 0 16 16"><polyline points="2.5,4 4,4 13.5,4"/><path d="M5.5 4V2.5h5V4"/><path d="M4 4l1 9.5h6L12 4"/></svg></button>'
           +'</div>'
@@ -6053,7 +6132,7 @@ function renderSavingsGoals(){
         +'</div>'
         +deadlineHtml
         +monthlyHint
-        +'<button class="sg-log-btn sg-log-trigger" data-goal="'+g.name+'">+ Log deposit / withdrawal</button>'
+        +'<button class="sg-log-btn sg-log-trigger" data-goal="'+esc(g.name)+'">+ Log deposit / withdrawal</button>'
         +'</div>';
     }).join('')
     +'</div>';
@@ -6084,7 +6163,7 @@ function renderSavingsGoals(){
       var id=this.dataset.id;
       var g=S.savingsGoals.find(function(x){return String(x.id)===String(id);});
       if(!g)return;
-      confirmModal('Delete goal <strong>'+g.name+'</strong>? Logged savings entries for this goal will remain.',function(){
+      confirmModal('Delete goal <strong>'+esc(g.name)+'</strong>? Logged savings entries for this goal will remain.',function(){
         S.savingsGoals=S.savingsGoals.filter(function(x){return String(x.id)!==String(id);});
         save();renderSavingsGoals();closeModal();toast('Goal deleted.');
       },true);
@@ -6112,7 +6191,7 @@ function openSavingsGoalModal(editId){
       +'<div class="fg"><label>Note <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><input type="text" id="sg-note" placeholder="e.g. Medical emergency" value="'+(g&&g.note?g.note:'')+'"></div>'
     +'</div>'
     +'<div id="sg-calc-hint" style="font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:12px;display:none;color:var(--t2)"></div>'
-    +'<div class="fa"><button class="btn-add modal-save">'+(g?'Save changes':'Create goal')+'</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">'+(g?'Save changes':'Create goal')+'</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
 
   openModal(g?'Edit Goal — '+g.name:'New Savings Goal', html, function(){
     var name=gv('sg-name').trim();
@@ -6174,7 +6253,7 @@ function updateSgHint(){
 function logSavingsToGoal(presetGoal){
   var td=today();
   var goalOpts=(S.savingsGoals||[]).map(function(g){
-    return'<option value="'+g.name+'"'+(g.name===presetGoal?' selected':'')+'>'+g.name+'</option>';
+    return'<option value="'+esc(g.name)+'"'+(g.name===presetGoal?' selected':'')+'>'+esc(g.name)+'</option>';
   }).join('');
   var noGoals=!S.savingsGoals||!S.savingsGoals.length;
   var html=
@@ -6192,7 +6271,7 @@ function logSavingsToGoal(presetGoal){
     +'</div>'
     +'<div id="sv-goal-status" style="font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:10px;display:none;color:var(--t2)"></div>'
     +'<div class="fg"><label>Note <span style="font-weight:400;font-size:10px;color:var(--t3)">(optional)</span></label><input type="text" id="sv-note" placeholder="Optional"></div>'
-    +'<div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
 
   openModal('Log Savings', html, function(){saveEntry('savings');});
   setTimeout(function(){
@@ -6250,11 +6329,11 @@ function logSavingsToGoal(presetGoal){
 function logForm(type){
   var td=today();
   var forms={
-    income:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="in-date" value="'+td+'"></div><div class="fg"><label>Source</label><input type="text" id="in-src" placeholder="e.g. Salary"></div><div class="fg"><label>Category</label><select id="in-cat"><option>Salary</option><option>Freelance</option><option>Business</option><option>Investment</option><option>Gift</option><option>Bonus</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="in-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Deposit to account</label><select id="in-acc" onchange="showAccBal(\'in-acc\',\'in-bal-hint\')"></select></div></div><div id="in-bal-hint" style="font-size:11.5px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 6px;display:none"></div><div class="fg"><label>Note</label><input type="text" id="in-note" placeholder="Optional"></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
-    expense:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ex-date" value="'+td+'"></div><div class="fg"><label>Description</label><input type="text" id="ex-desc" placeholder="e.g. Groceries"></div><div class="fg"><label>Category</label><select id="ex-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Subscription</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ex-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Paid from account</label><select id="ex-acc" onchange="showAccBal(\'ex-acc\',\'ex-bal-hint\')"></select></div></div><div id="ex-bal-hint" style="font-size:11.5px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 6px;display:none"></div><div class="fg"><label>Note</label><input type="text" id="ex-note" placeholder="Optional"></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
-    transfer:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="tr-date" value="'+td+'"></div><div class="fg"><label>From account</label><select id="tr-from" onchange="showTransferBal()"></select></div><div class="fg"><label>To account</label><select id="tr-to"></select></div></div><div id="tr-bal-hint" style="font-size:11.5px;margin:-4px 0 6px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);display:none"></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="tr-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Note</label><input type="text" id="tr-note" placeholder="Optional"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
-    credit:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="cr-date" value="'+td+'"></div><div class="fg"><label>Description</label><input type="text" id="cr-desc" placeholder="e.g. Online order"></div><div class="fg"><label>Type</label><select id="cr-type" onchange="refreshCrCard()"><option>Charge</option><option>Payment</option></select></div></div><div class="fr3"><div class="fg"><label>Credit Card</label><select id="cr-card" onchange="refreshCrCard()"></select></div><div class="fg"><label>Category</label><select id="cr-cat"><option>Shopping</option><option>Food</option><option>Travel</option><option>Health</option><option>Utilities</option><option>Subscription</option><option>Other</option></select></div><div class="fg"><label>Amount</label><input type="number" id="cr-amt" min="0" placeholder="0.00" oninput="refreshCrCard()"></div></div><div id="cr-avail-info" style="margin:-4px 0 8px;font-size:11.5px;font-weight:500;padding:7px 11px;border-radius:8px;display:none"></div><div class="fr"><div class="fg"><label>Payment due date</label><input type="date" id="cr-due"></div><div class="fg"><label>Note</label><input type="text" id="cr-note" placeholder="Optional"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>',
-    savings:'<div style=\"background:var(--blue-s);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11.5px;color:var(--blue)\">💡 <strong>Savings = goal tracker.</strong> No money moves. Log what you\'ve set aside toward a goal. To move money between banks, use <strong>Transfer</strong>.</div><div class=\"fr3\"><div class=\"fg\"><label>Date</label><input type=\"date\" id=\"sv-date\" value=\"'+td+'\"></div><div class=\"fg\"><label>Goal / label</label><input type=\"text\" id=\"sv-goal\" placeholder=\"e.g. Travel, Emergency Fund\"></div><div class=\"fg\"><label>Type</label><select id=\"sv-type\" onchange=\"showSavingsHint()\"><option value=\"Deposit\">💰 Deposit (saving toward goal)</option><option value=\"Withdrawal\">📤 Withdrawal (used from goal)</option></select></div></div><div class=\"fr\"><div class=\"fg\"><label>Amount</label><input type=\"number\" id=\"sv-amt\" min=\"0\" placeholder=\"0.00\"></div><div class=\"fg\"><label>Linked account <span style=\"font-weight:400;font-size:10px;color:var(--t3)\">(for reference)</span></label><select id=\"sv-acc\"></select></div></div><div id=\"sv-hint\" style=\"font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 8px;display:none\"></div><div class=\"fg\"><label>Note</label><input type=\"text\" id=\"sv-note\" placeholder=\"Optional\"></div><div class=\"fa\"><button class=\"btn-add modal-save\">Save</button><button class=\"btn-ghost\" onclick=\"closeModal()\">Cancel</button></div>'
+    income:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="in-date" value="'+td+'"></div><div class="fg"><label>Source</label><input type="text" id="in-src" placeholder="e.g. Salary"></div><div class="fg"><label>Category</label><select id="in-cat"><option>Salary</option><option>Freelance</option><option>Business</option><option>Investment</option><option>Gift</option><option>Bonus</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="in-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Deposit to account</label><select id="in-acc" onchange="showAccBal(\'in-acc\',\'in-bal-hint\')"></select></div></div><div id="in-bal-hint" style="font-size:11.5px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 6px;display:none"></div><div class="fg"><label>Note</label><input type="text" id="in-note" placeholder="Optional"></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
+    expense:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="ex-date" value="'+td+'"></div><div class="fg"><label>Description</label><input type="text" id="ex-desc" placeholder="e.g. Groceries"></div><div class="fg"><label>Category</label><select id="ex-cat"><option>Food</option><option>Transport</option><option>Utilities</option><option>Health</option><option>Shopping</option><option>Entertainment</option><option>Rent</option><option>Education</option><option>Subscription</option><option>Other</option></select></div></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="ex-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Paid from account</label><select id="ex-acc" onchange="showAccBal(\'ex-acc\',\'ex-bal-hint\')"></select></div></div><div id="ex-bal-hint" style="font-size:11.5px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 6px;display:none"></div><div class="fg"><label>Note</label><input type="text" id="ex-note" placeholder="Optional"></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
+    transfer:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="tr-date" value="'+td+'"></div><div class="fg"><label>From account</label><select id="tr-from" onchange="showTransferBal()"></select></div><div class="fg"><label>To account</label><select id="tr-to"></select></div></div><div id="tr-bal-hint" style="font-size:11.5px;margin:-4px 0 6px;padding:7px 11px;background:var(--bg);border-radius:8px;border:1px solid var(--border);display:none"></div><div class="fr"><div class="fg"><label>Amount</label><input type="number" id="tr-amt" min="0" placeholder="0.00"></div><div class="fg"><label>Note</label><input type="text" id="tr-note" placeholder="Optional"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
+    credit:'<div class="fr3"><div class="fg"><label>Date</label><input type="date" id="cr-date" value="'+td+'"></div><div class="fg"><label>Description</label><input type="text" id="cr-desc" placeholder="e.g. Online order"></div><div class="fg"><label>Type</label><select id="cr-type" onchange="refreshCrCard()"><option>Charge</option><option>Payment</option></select></div></div><div class="fr3"><div class="fg"><label>Credit Card</label><select id="cr-card" onchange="refreshCrCard()"></select></div><div class="fg"><label>Category</label><select id="cr-cat"><option>Shopping</option><option>Food</option><option>Travel</option><option>Health</option><option>Utilities</option><option>Subscription</option><option>Other</option></select></div><div class="fg"><label>Amount</label><input type="number" id="cr-amt" min="0" placeholder="0.00" oninput="refreshCrCard()"></div></div><div id="cr-avail-info" style="margin:-4px 0 8px;font-size:11.5px;font-weight:500;padding:7px 11px;border-radius:8px;display:none"></div><div class="fr"><div class="fg"><label>Payment due date</label><input type="date" id="cr-due"></div><div class="fg"><label>Note</label><input type="text" id="cr-note" placeholder="Optional"></div></div><div class="fa"><button class="btn-add modal-save">Save</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>',
+    savings:'<div style=\"background:var(--blue-s);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:11.5px;color:var(--blue)\">💡 <strong>Savings = goal tracker.</strong> No money moves. Log what you\'ve set aside toward a goal. To move money between banks, use <strong>Transfer</strong>.</div><div class=\"fr3\"><div class=\"fg\"><label>Date</label><input type=\"date\" id=\"sv-date\" value=\"'+td+'\"></div><div class=\"fg\"><label>Goal / label</label><input type=\"text\" id=\"sv-goal\" placeholder=\"e.g. Travel, Emergency Fund\"></div><div class=\"fg\"><label>Type</label><select id=\"sv-type\" onchange=\"showSavingsHint()\"><option value=\"Deposit\">💰 Deposit (saving toward goal)</option><option value=\"Withdrawal\">📤 Withdrawal (used from goal)</option></select></div></div><div class=\"fr\"><div class=\"fg\"><label>Amount</label><input type=\"number\" id=\"sv-amt\" min=\"0\" placeholder=\"0.00\"></div><div class=\"fg\"><label>Linked account <span style=\"font-weight:400;font-size:10px;color:var(--t3)\">(for reference)</span></label><select id=\"sv-acc\"></select></div></div><div id=\"sv-hint\" style=\"font-size:11.5px;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);margin:-4px 0 8px;display:none\"></div><div class=\"fg\"><label>Note</label><input type=\"text\" id=\"sv-note\" placeholder=\"Optional\"></div><div class=\"fa\"><button class=\"btn-add modal-save\">Save</button><button class=\"btn-ghost\" data-action=\"close-modal\">Cancel</button></div>'
   };
   var titles={income:'Log Income',expense:'Log Expense',transfer:'Log Transfer',credit:'Log Credit',savings:'Log Savings'};
   openModal(titles[type],forms[type],function(){saveEntry(type);});
@@ -6283,7 +6362,7 @@ function showAccBal(selectId,hintId){
   if(!a){hint.style.display='none';return;}
   var col=a.balance<0?'var(--red)':a.balance===0?'var(--amber)':'var(--green)';
   hint.style.display='block';
-  hint.innerHTML='<strong>'+a.name+'</strong> current balance: <span style="font-family:DM Mono,monospace;font-weight:500;color:'+col+'">'+fmt(a.balance)+'</span>';
+  hint.innerHTML='<strong>'+esc(a.name)+'</strong> current balance: <span style="font-family:DM Mono,monospace;font-weight:500;color:'+col+'">'+fmt(a.balance)+'</span>';
 }
 
 function showTransferBal(){
@@ -6294,7 +6373,7 @@ function showTransferBal(){
   if(!a){hint.style.display='none';return;}
   var col=a.balance<0?'var(--red)':a.balance===0?'var(--amber)':'var(--green)';
   hint.style.display='block';
-  hint.innerHTML='💰 <strong>'+a.name+'</strong> available: <span style="font-family:DM Mono,monospace;font-weight:500;color:'+col+'">'+fmt(a.balance)+'</span>';
+  hint.innerHTML='💰 <strong>'+esc(a.name)+'</strong> available: <span style="font-family:DM Mono,monospace;font-weight:500;color:'+col+'">'+fmt(a.balance)+'</span>';
 }
 
 function showSavingsHint(){
@@ -6311,35 +6390,37 @@ function showSavingsHint(){
 function saveEntry(type){
   if(type==='income'){
     var amt=parseFloat(gv('in-amt'));
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!gv('in-date')){toast('Select a date.','error');return;}
-    if(!gv('in-src').trim()){toast('Enter an income source.','error');return;}
+    if(!validateAmt(amt,'Income amount'))return;
+    if(!validateDate(gv('in-date'),'Date'))return;
+    var inSrc=sanitizeText(gv('in-src'));
+    if(!inSrc){toast('Enter an income source.','error');return;}
     if(!gv('in-acc')){toast('Select an account to deposit into.','error');return;}
     var acc=findAcc(gv('in-acc'));
     if(!acc){toast('Selected account not found.','error');return;}
-    var _taxRate=parseFloat(gv('in-taxrate'))||0;var _taxAmt=+( amt*_taxRate).toFixed(2);var e={id:nxtId(),date:gv('in-date'),source:gv('in-src').trim(),category:gv('in-cat'),account:gv('in-acc'),note:gv('in-note'),amt:amt,taxRate:_taxRate,taxAmt:_taxAmt};
+    var _taxRate=parseFloat(gv('in-taxrate'))||0;var _taxAmt=+( amt*_taxRate).toFixed(2);var e={id:nxtId(),date:gv('in-date'),source:inSrc,category:gv('in-cat'),account:gv('in-acc'),note:sanitizeText(gv('in-note')),amt:amt,taxRate:_taxRate,taxAmt:_taxAmt};
     acc.balance=+(acc.balance+amt).toFixed(2);
     saveCatMem(e.source,e.category);S.income.push(e);save();renderLog('income');statIncome();updateProfileStats();renderAccounts();renderDash();closeModal();toast('Income saved ✓','success');
   }
 
   if(type==='expense'){
     var amt=parseFloat(gv('ex-amt'));
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!gv('ex-date')){toast('Select a date.','error');return;}
-    if(!gv('ex-desc').trim()){toast('Enter a description.','error');return;}
+    if(!validateAmt(amt,'Expense amount'))return;
+    if(!validateDate(gv('ex-date'),'Date'))return;
+    var exDesc=sanitizeText(gv('ex-desc'));
+    if(!exDesc){toast('Enter a description.','error');return;}
     if(!gv('ex-acc')){toast('Select the account used for this expense.','error');return;}
     var acc=findAcc(gv('ex-acc'));
     if(!acc){toast('Selected account not found.','error');return;}
     if(acc.balance<amt){
-      var _expData={id:nxtId(),date:gv('ex-date'),desc:gv('ex-desc').trim(),category:gv('ex-cat'),account:gv('ex-acc'),note:gv('ex-note'),amt:amt};
+      var _expData={id:nxtId(),date:gv('ex-date'),desc:exDesc,category:gv('ex-cat'),account:gv('ex-acc'),note:sanitizeText(gv('ex-note')),amt:amt};
       var _acc=acc;
-      confirmModal('⚠ This expense ('+fmt(amt)+') exceeds your <strong>'+acc.name+'</strong> balance ('+fmt(acc.balance)+'). Log anyway?',function(){
+      confirmModal('⚠ This expense ('+fmt(amt)+') exceeds your <strong>'+esc(acc.name)+'</strong> balance ('+fmt(acc.balance)+'). Log anyway?',function(){
         _acc.balance=+(_acc.balance-_expData.amt).toFixed(2);
         saveCatMem(_expData.desc,_expData.category);S.expense.push(_expData);save();renderLog('expense');statExpense();updateProfileStats();renderAccounts();renderDash();closeModal();toast('Expense saved ✓','success');
       });
       return;
     }
-    var e={id:nxtId(),date:gv('ex-date'),desc:gv('ex-desc').trim(),category:gv('ex-cat'),account:gv('ex-acc'),note:gv('ex-note'),amt:amt};
+    var e={id:nxtId(),date:gv('ex-date'),desc:exDesc,category:gv('ex-cat'),account:gv('ex-acc'),note:sanitizeText(gv('ex-note')),amt:amt};
     acc.balance=+(acc.balance-amt).toFixed(2);
     var _spTog=document.getElementById('ex-split-tog');
     if(_spTog&&_spTog.checked){
@@ -6359,8 +6440,8 @@ function saveEntry(type){
 
   if(type==='transfer'){
     var amt=parseFloat(gv('tr-amt'));
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!gv('tr-date')){toast('Select a date.','error');return;}
+    if(!validateAmt(amt,'Transfer amount'))return;
+    if(!validateDate(gv('tr-date'),'Date'))return;
     var from=gv('tr-from'),to=gv('tr-to');
     if(!from){toast('Select the account to transfer FROM.','error');return;}
     if(!to){toast('Select the account to transfer TO.','error');return;}
@@ -6371,15 +6452,16 @@ function saveEntry(type){
     if(fa.balance<amt){toast('⚠ Insufficient balance in '+fa.name+' ('+fmt(fa.balance)+').','error');return;}
     fa.balance=+(fa.balance-amt).toFixed(2);
     ta.balance=+(ta.balance+amt).toFixed(2);
-    S.transfer.push({id:nxtId(),date:gv('tr-date'),from:from,to:to,note:gv('tr-note'),amt:amt});
+    S.transfer.push({id:nxtId(),date:gv('tr-date'),from:from,to:to,note:sanitizeText(gv('tr-note')),amt:amt});
     save();renderLog('transfer');statTransfer();renderAccounts();renderDash();closeModal();toast('Transfer saved ✓','success');
   }
 
   if(type==='credit'){
     var amt=parseFloat(gv('cr-amt'));
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!gv('cr-date')){toast('Select a date.','error');return;}
-    if(!gv('cr-desc').trim()){toast('Enter a description.','error');return;}
+    if(!validateAmt(amt,'Credit amount'))return;
+    if(!validateDate(gv('cr-date'),'Date'))return;
+    var crDesc=sanitizeText(gv('cr-desc'));
+    if(!crDesc){toast('Enter a description.','error');return;}
     var cardVal=gv('cr-card');
     if(!cardVal){toast('Select a credit card.','error');return;}
     var crType=gv('cr-type');
@@ -6397,18 +6479,19 @@ function saveEntry(type){
       ccAcc.usedCredit=+Math.max(0,(ccAcc.usedCredit||0)-amt).toFixed(2);
     }
     var cardName=ccAcc?ccAcc.name:(cardVal==='manual'?'Manual':'Other');
-    S.credit.push({id:nxtId(),date:gv('cr-date'),desc:gv('cr-desc').trim(),card:cardName,cardId:ccAcc?ccAcc.id:null,category:gv('cr-cat'),type:crType,due:gv('cr-due'),note:gv('cr-note'),amt:amt});
+    S.credit.push({id:nxtId(),date:gv('cr-date'),desc:crDesc,card:cardName,cardId:ccAcc?ccAcc.id:null,category:gv('cr-cat'),type:crType,due:gv('cr-due'),note:sanitizeText(gv('cr-note')),amt:amt});
     save();renderLog('credit');statCredit();renderAccounts();renderCCSummary();renderDash();renderAlerts();closeModal();toast('Credit saved ✓','success');
   }
 
   if(type==='savings'){
     var amt=parseFloat(gv('sv-amt'));
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!gv('sv-date')){toast('Select a date.','error');return;}
-    if(!gv('sv-goal').trim()){toast('Enter a goal or label (e.g. Travel, Emergency Fund).','error');return;}
+    if(!validateAmt(amt,'Amount'))return;
+    if(!validateDate(gv('sv-date'),'Date'))return;
+    var svGoal=sanitizeText(gv('sv-goal'));
+    if(!svGoal){toast('Enter a goal or label (e.g. Travel, Emergency Fund).','error');return;}
     var stype=gv('sv-type');
     var svAcc=gv('sv-acc'); // linked account — reference only, no balance change
-    var e={id:nxtId(),date:gv('sv-date'),goal:gv('sv-goal').trim(),type:stype,account:svAcc,toAccount:null,note:gv('sv-note'),amt:amt};
+    var e={id:nxtId(),date:gv('sv-date'),goal:svGoal,type:stype,account:svAcc,toAccount:null,note:sanitizeText(gv('sv-note')),amt:amt};
     // ── SAVINGS IS A GOAL TRACKER — no account balance changes ──
     // If you want to physically move money between banks, use Transfer.
     S.savings.push(e);
@@ -6937,7 +7020,7 @@ function renderBills(){
       html+='<div class="bill-card '+cardCls+'">'
         +'<div class="bill-icon" style="background:'+ci.color+';color:'+ci.stroke+'">'+ci.icon+'</div>'
         +'<div class="bill-body">'
-          +'<div class="bill-name">'+b.name+'</div>'
+          +'<div class="bill-name">'+esc(b.name)+'</div>'
           +'<div class="bill-meta">'+(b.isPaid?'Paid '+b.paidDate:'Due '+b.dueDate)+'</div>'
           +'<div style="display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap">'
             +'<span class="'+st2.cls+'" style="font-size:10px;padding:2px 8px">'+st2.label+'</span>'
@@ -6979,26 +7062,26 @@ function billFormHTML(b){
   var td2=today();
   var catOpts=BILL_CATS.map(function(c){return'<option'+(b&&b.category===c.name?' selected':'')+'>'+c.name+'</option>';}).join('');
   var recOpts=['One-time','Weekly','Bi-weekly','Monthly','Quarterly','Yearly'].map(function(r){return'<option'+(b&&b.recurrence===r?' selected':r==='Monthly'&&!b?' selected':'')+'>'+r+'</option>';}).join('');
-  var accOpts='<option value="">— no account —</option>'+S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+a.id+'"'+(b&&String(b.account)===String(a.id)?' selected':'')+'>'+a.name+'</option>';}).join('');
-  return '<div class="fr3"><div class="fg"><label>Bill name</label><input type="text" id="bl-name" placeholder="e.g. Meralco" value="'+(b?b.name:'')+'"></div>'
+  var accOpts='<option value="">— no account —</option>'+S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+a.id+'"'+(b&&String(b.account)===String(a.id)?' selected':'')+'>'+esc(a.name)+'</option>';}).join('');
+  return '<div class="fr3"><div class="fg"><label>Bill name</label><input type="text" id="bl-name" placeholder="e.g. Meralco" value="'+(b?esc(b.name):'')+'"></div>'
     +'<div class="fg"><label>Category</label><select id="bl-cat">'+catOpts+'</select></div>'
     +'<div class="fg"><label>Amount</label><input type="number" id="bl-amt" min="0" placeholder="0.00" value="'+(b?b.amt:'')+'"></div></div>'
     +'<div class="fr3"><div class="fg"><label>Due date</label><input type="date" id="bl-due" value="'+(b?b.dueDate:td2)+'"></div>'
     +'<div class="fg"><label>Recurrence</label><select id="bl-rec">'+recOpts+'</select></div>'
     +'<div class="fg"><label>Pay from account</label><select id="bl-acc">'+accOpts+'</select></div></div>'
-    +'<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="bl-note" placeholder="Reference number, provider, etc." value="'+(b&&b.note?b.note:'')+'"></div>'
-    +'<div class="fa"><button class="btn-add modal-save">'+(b?'Save changes':'Add bill')+'</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fg" style="margin-bottom:12px"><label>Note (optional)</label><input type="text" id="bl-note" placeholder="Reference number, provider, etc." value="'+(b&&b.note?esc(b.note):'')+'"></div>'
+    +'<div class="fa"><button class="btn-add modal-save">'+(b?'Save changes':'Add bill')+'</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
 }
 
 ge('btn-open-bill').addEventListener('click',function(){
   openModal('Add Bill',billFormHTML(null),function(){
-    var name=ge('bl-name').value.trim();
+    var name=sanitizeText(ge('bl-name').value);
     var amt=parseFloat(ge('bl-amt').value);
     var due=ge('bl-due').value;
     if(!name){toast('Enter a bill name.','error');return;}
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!due){toast('Select a due date.','error');return;}
-    S.bills.push({id:nxtId(),name:name,category:ge('bl-cat').value,amt:amt,dueDate:due,recurrence:ge('bl-rec').value,account:ge('bl-acc').value||null,note:ge('bl-note').value,isPaid:false,paidDate:null});
+    if(!validateAmt(amt,'Bill amount'))return;
+    if(!validateDate(due,'Due date'))return;
+    S.bills.push({id:nxtId(),name:name,category:ge('bl-cat').value,amt:amt,dueDate:due,recurrence:ge('bl-rec').value,account:ge('bl-acc').value||null,note:sanitizeText(ge('bl-note').value),isPaid:false,paidDate:null});
     save();renderBills();renderAlerts();renderDashBills();closeModal();toast('Bill added ✓','success');
   });
 });
@@ -7007,14 +7090,14 @@ function editBill(id){
   var b=S.bills.find(function(x){return String(x.id)===String(id);});
   if(!b)return;
   openModal('Edit Bill',billFormHTML(b),function(){
-    var name=ge('bl-name').value.trim();
+    var name=sanitizeText(ge('bl-name').value);
     var amt=parseFloat(ge('bl-amt').value);
     var due=ge('bl-due').value;
     if(!name){toast('Enter a bill name.','error');return;}
-    if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
-    if(!due){toast('Select a due date.','error');return;}
+    if(!validateAmt(amt,'Bill amount'))return;
+    if(!validateDate(due,'Due date'))return;
     b.name=name;b.category=ge('bl-cat').value;b.amt=amt;b.dueDate=due;
-    b.recurrence=ge('bl-rec').value;b.account=ge('bl-acc').value||null;b.note=ge('bl-note').value;
+    b.recurrence=ge('bl-rec').value;b.account=ge('bl-acc').value||null;b.note=sanitizeText(ge('bl-note').value);
     // If bill was already paid, update the matching expense entry amount and account balance
     if(b.isPaid&&b.paidAmt!==undefined){
       var oldAmt=b.paidAmt;
@@ -7047,17 +7130,17 @@ function editBill(id){
 function payBill(id){
   var b=S.bills.find(function(x){return String(x.id)===String(id);});
   if(!b)return;
-  var accOpts='<option value="">— no account deduction —</option>'+S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+a.id+'"'+(b.account&&String(b.account)===String(a.id)?' selected':'')+'>'+a.name+' ('+fmt(a.balance)+')</option>';}).join('');
+  var accOpts='<option value="">— no account deduction —</option>'+S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+a.id+'"'+(b.account&&String(b.account)===String(a.id)?' selected':'')+'>'+esc(a.name)+' ('+fmt(a.balance)+')</option>';}).join('');
   var html='<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:14px">'
     +'<div style="font-size:11px;color:var(--t3);text-transform:uppercase;font-weight:500;letter-spacing:.05em;margin-bottom:4px">Bill to pay</div>'
-    +'<div style="font-size:14px;font-weight:500;color:var(--t1)">'+b.name+'</div>'
-    +'<div style="font-size:12px;color:var(--t3);margin-top:2px">Due '+b.dueDate+(b.note?' · '+b.note:'')+'</div>'
+    +'<div style="font-size:14px;font-weight:500;color:var(--t1)">'+esc(b.name)+'</div>'
+    +'<div style="font-size:12px;color:var(--t3);margin-top:2px">Due '+esc(b.dueDate)+(b.note?' · '+esc(b.note):'')+'</div>'
     +'<div style="font-family:DM Mono,monospace;font-size:20px;font-weight:500;color:var(--red);margin-top:6px">'+fmt(b.amt)+'</div>'
     +'</div>'
     +'<div class="fr"><div class="fg"><label>Payment amount</label><input type="number" id="bp-amt" value="'+b.amt+'" min="0" step="0.01"></div>'
     +'<div class="fg"><label>Payment date</label><input type="date" id="bp-date" value="'+today()+'"></div></div>'
     +(accOpts?'<div class="fg" style="margin-bottom:12px"><label>Pay from account</label><select id="bp-acc">'+accOpts+'</select></div>':'')
-    +'<div class="fa"><button class="btn-add modal-save">Confirm Payment</button><button class="btn-ghost" onclick="closeModal()">Cancel</button></div>';
+    +'<div class="fa"><button class="btn-add modal-save">Confirm Payment</button><button class="btn-ghost" data-action="close-modal">Cancel</button></div>';
   openModal('Pay Bill',html,function(){
     var amt=parseFloat(ge('bp-amt').value);
     if(isNaN(amt)||amt<=0){toast('Enter a valid amount.','error');return;}
@@ -7102,8 +7185,8 @@ function renderDashBills(){
     var st2=billStatus(b);
     return'<div class="dash-bills-item">'
       +'<div class="dbi-dot" style="background:'+st2.color+'"></div>'
-      +'<div class="dbi-name">'+b.name+'</div>'
-      +'<div class="dbi-due" style="color:'+st2.color+'">'+st2.label+'</div>'
+      +'<div class="dbi-name">'+esc(b.name)+'</div>'
+      +'<div class="dbi-due" style="color:'+st2.color+'">'+esc(st2.label)+'</div>'
       +'<div class="dbi-amt">'+fmt(b.amt)+'</div>'
       +'</div>';
   }).join('');
@@ -7178,7 +7261,7 @@ function renderDashSpending(){
     return'<div>'
       +'<div class="d-spend-item">'
         +'<div class="d-spend-ico" style="background:'+st.bg+';color:'+st.col+'">'+catIcon(cat)+'</div>'
-        +'<span class="d-spend-name">'+cat+'</span>'
+        +'<span class="d-spend-name">'+esc(cat)+'</span>'
         +'<div class="d-spend-right">'
           +'<span class="d-spend-amt">'+fmt(amt)+'</span>'
           +'<span class="d-spend-pct" style="background:'+st.tag+';color:'+st.tagc+'">'+pct+'%</span>'
@@ -7198,7 +7281,8 @@ function renderDashSpending(){
 function renderDashGoals(){
   var el=ge('d-goals-list'); if(!el)return;
   if(!S.savingsGoals||!S.savingsGoals.length){
-    el.innerHTML='<div class="empty" style="padding:1.5rem;font-size:12px">No savings goals yet. <button class="wlink" onclick="goPanel(\'savings\')" style="background:none;border:none;cursor:pointer;color:var(--blue);font-size:12px;padding:0">Create one →</button></div>';
+    el.innerHTML='<div class="empty" style="padding:1.5rem;font-size:12px">No savings goals yet. <button class="wlink" id="dash-goto-savings" style="background:none;border:none;cursor:pointer;color:var(--blue);font-size:12px;padding:0">Create one →</button></div>';
+    var _sgBtn=ge('dash-goto-savings');if(_sgBtn)_sgBtn.addEventListener('click',function(){goPanel('savings');});
     return;
   }
   // Build actuals
@@ -7220,7 +7304,7 @@ function renderDashGoals(){
       +'<div class="d-goal-head">'
         +'<div class="d-goal-ico" style="background:'+col.bg+';color:'+col.text+'"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg></div>'
         +'<div>'
-          +'<div class="d-goal-name">'+g.name+'</div>'
+          +'<div class="d-goal-name">'+esc(g.name)+'</div>'
           +'<div class="d-goal-sub">'+fmt(saved)+(hasTarget?' of '+fmt(g.target):' saved')+'</div>'
         +'</div>'
         +(hasTarget?'<span class="d-goal-pct" style="background:'+col.bg+';color:'+col.text+'">'+pct+'%'+(isDone?' ✓':'')+'</span>':'<span class="d-goal-pct" style="color:var(--t3)">—</span>')
@@ -7517,7 +7601,7 @@ function toggleSplitUI(){
   panel.style.display=tog.checked?'':'none';
   if(tog.checked){
     var acc2=document.getElementById('ex-acc2');
-    if(acc2)acc2.innerHTML=S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+a.id+'">'+a.name+'</option>';}).join('');
+    if(acc2)acc2.innerHTML=S.accounts.filter(function(a){return!a.isCC&&!a.archived;}).map(function(a){return'<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>';}).join('');
     updateSplitPreview();
   }
 }
@@ -7703,8 +7787,7 @@ wireLogFilters();
 wireDashButtons();
 processBudgetRollovers();
 recordBalanceHistory();
-maybeShowOnboard();
-maybeShowOnboard();
+maybeShowOnboard(); // FIX: was called twice (copy-paste bug) — removed duplicate
 
 // ── BULK SELECT ──────────────────────────────────────────────
 function wireBulkSelect(type){
@@ -7760,8 +7843,10 @@ function wireBulkSelect(type){
       ids.forEach(function(id){
         var e=S[type]&&S[type].find(function(x){return String(x.id)===String(id);});
         if(e){
-          if(type==='income'){var a=findAcc(e.account);if(a)a.balance=+(a.balance-e.amt).toFixed(2);}
-          if(type==='expense'){var a=findAcc(e.account);if(a)a.balance=+(a.balance+e.amt).toFixed(2);}
+          // FIX: was `var a` declared twice in same scope (income + expense branches)
+          // changed to separate names to avoid var-hoisting confusion
+          if(type==='income'){var accInc=findAcc(e.account);if(accInc)accInc.balance=+(accInc.balance-e.amt).toFixed(2);}
+          if(type==='expense'){var accExp=findAcc(e.account);if(accExp)accExp.balance=+(accExp.balance+e.amt).toFixed(2);}
         }
         if(S[type])S[type]=S[type].filter(function(x){return String(x.id)!==String(id);});
       });
