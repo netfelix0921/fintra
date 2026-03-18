@@ -1643,8 +1643,8 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   z-index: 150;
-  padding: 6px 0 0;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Use max() so iOS always gets at least 20px for home indicator even if env() returns 0 */
+  padding: 6px 0 max(env(safe-area-inset-bottom, 20px), 20px);
   flex-shrink: 0;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -1653,9 +1653,9 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   content: '';
   display: block;
   position: absolute;
-  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  bottom: calc(-1 * env(safe-area-inset-bottom, 20px));
   left: 0; right: 0;
-  height: env(safe-area-inset-bottom, 0px);
+  height: env(safe-area-inset-bottom, 20px);
   background: rgba(255,255,255,0.96);
   pointer-events: none;
   z-index: -1;
@@ -2253,7 +2253,8 @@ input[type="date"], input[type="number"] {
   max-width: 100% !important;
 }
 @media(max-width:900px) {
-  .content { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
+  /* 72px nav height + safe-area so content never hides under nav on iOS */
+  .content { padding-bottom: calc(80px + env(safe-area-inset-bottom, 34px)) !important; }
 }
 @media(min-width:901px) {
   .content {
