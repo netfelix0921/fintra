@@ -1827,7 +1827,7 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), background var(--dur-fast);
 }
 .bn-add {
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background var(--dur-fast);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), opacity 0.25s var(--ease), background var(--dur-fast);
 }
 
 /* Dark mode */
@@ -3574,8 +3574,8 @@ ge('go-charts').addEventListener('click',function(){goPanel('charts');});
 
 // ── SIDEBAR ──────────────────────────────────────────────
 var _sideOpen=false;
-function openSidebar(){_sideOpen=true;ge('sidebar').classList.add('open');ge('ham-btn').classList.add('open');ge('sidebar-overlay').classList.add('show');}
-function closeSidebar(){_sideOpen=false;ge('sidebar').classList.remove('open');ge('ham-btn').classList.remove('open');ge('sidebar-overlay').classList.remove('show');}
+function openSidebar(){_sideOpen=true;ge('sidebar').classList.add('open');ge('ham-btn').classList.add('open');ge('sidebar-overlay').classList.add('show');var add=ge('bn-add-btn');if(add){add.style.opacity='0';add.style.pointerEvents='none';add.style.transform='scale(0.8)';}}
+function closeSidebar(){_sideOpen=false;ge('sidebar').classList.remove('open');ge('ham-btn').classList.remove('open');ge('sidebar-overlay').classList.remove('show');var add=ge('bn-add-btn');if(add){add.style.opacity='';add.style.pointerEvents='';add.style.transform='';}}
 ge('ham-btn').addEventListener('click',function(){_sideOpen?closeSidebar():openSidebar();});
 
 // ── SCROLL-HIDE BOTTOM NAV ──────────────────────────────
