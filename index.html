@@ -2315,14 +2315,21 @@ input[type="date"], input[type="number"] {
 .sg-log-btn:hover { background:var(--blue-s); border-color:rgba(37,99,235,.3); }
 /* Compact pct inline with amount row */
 .sg-pct-inline { font-family:'DM Mono',monospace; }
-/* Compact balance breakdown — replaces the big renderSavingsGoalSync box */
-.sg-balance-rows { margin-top:6px; border-top:1px solid var(--border); padding-top:5px; display:flex; flex-direction:column; gap:2px; }
+/* Compact balance breakdown — collapsible */
+.sg-balance-rows { margin-top:5px; border-top:1px solid var(--border); padding-top:5px; display:flex; flex-direction:column; gap:2px; overflow:hidden; max-height:0; opacity:0; transition:max-height .25s var(--ease), opacity .2s var(--ease); }
+.sg-balance-rows.open { max-height:120px; opacity:1; }
 .sg-bal-row { display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--t3); }
 .sg-bal-row span:last-child { font-family:'DM Mono',monospace; font-size:11px; color:var(--t2); }
 .sg-bal-divider { border-top:1px solid var(--border); padding-top:3px; margin-top:2px; }
 .sg-bal-divider span:first-child { font-weight:500; color:var(--t2); }
 /* Deadline + monthly hint on one row */
 .sg-footer-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:5px; }
+/* Compact toggle row */
+.sg-expand-row { display:flex; align-items:center; justify-content:space-between; margin-top:4px; cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent; }
+.sg-free-preview { font-size:10.5px; color:var(--t3); }
+.sg-free-preview strong { font-family:'DM Mono',monospace; font-weight:500; }
+.sg-chevron { width:14px; height:14px; color:var(--t4); transition:transform .2s var(--ease); flex-shrink:0; }
+.sg-chevron.open { transform:rotate(180deg); }
 
 
 /* ── BULK SELECT ── */
@@ -6169,17 +6176,22 @@ function renderSavingsGoals(){
         +(hasTarget
           ?'<div class="sg-prog-track"><div class="sg-prog-fill'+(isDone?' sg-prog-done':'')+'" style="width:0%;background:'+fillCol+'" data-w="'+pct+'%"></div></div>'
           :'')
-        // ── Row 4: inline balance breakdown (compact 2-col rows, no big box) ──
+        // ── Row 4: collapsible balance breakdown ──
         +(function(){
           var acc=g.account?findAcc(g.account):null;
           if(!acc)return'';
           var accBal=acc.isCC?-(acc.usedCredit||0):acc.balance;
           var free=accBal-saved;
           var target2=g.target||0;
-          return'<div class="sg-balance-rows">'
+          var freeCol=free<0?'var(--red)':'var(--green)';
+          return'<div class="sg-expand-row" data-expand="sg-bal-'+g.id+'">'
+            +'<span class="sg-free-preview">Free to spend: <strong style="color:'+freeCol+'">'+fmt(free)+'</strong></span>'
+            +'<svg class="sg-chevron" id="sg-chv-'+g.id+'" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><polyline points="4,6 8,10 12,6"/></svg>'
+            +'</div>'
+            +'<div class="sg-balance-rows" id="sg-bal-'+g.id+'">'
             +'<div class="sg-bal-row"><span>'+esc(acc.name)+' balance</span><span>'+fmt(accBal)+'</span></div>'
             +'<div class="sg-bal-row"><span>Earmarked for goal</span><span style="color:var(--blue)">'+fmt(saved)+'</span></div>'
-            +'<div class="sg-bal-row sg-bal-divider"><span>Free to spend</span><span style="color:'+(free<0?'var(--red)':'var(--green)')+'">'+fmt(free)+'</span></div>'
+            +'<div class="sg-bal-row sg-bal-divider"><span>Free to spend</span><span style="color:'+freeCol+'">'+fmt(free)+'</span></div>'
             +(target2>0?'<div class="sg-bal-row"><span>Goal target</span><span>'+fmt(target2)+'</span></div>':'')
             +'</div>';
         }())
@@ -6197,6 +6209,19 @@ function renderSavingsGoals(){
   setTimeout(function(){
     el.querySelectorAll('.sg-prog-fill').forEach(function(b){b.style.width=b.dataset.w;});
   },80);
+
+  // Wire expand/collapse for balance rows
+  el.querySelectorAll('.sg-expand-row').forEach(function(row){
+    row.addEventListener('click',function(){
+      var targetId=row.dataset.expand;
+      var panel=document.getElementById(targetId);
+      var chv=row.querySelector('.sg-chevron');
+      if(!panel)return;
+      var isOpen=panel.classList.contains('open');
+      panel.classList.toggle('open',!isOpen);
+      if(chv)chv.classList.toggle('open',!isOpen);
+    });
+  });
 
   // Wire log trigger buttons
   el.querySelectorAll('.sg-log-trigger').forEach(function(btn){
