@@ -1643,9 +1643,22 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
   -webkit-backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   z-index: 150;
-  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+  padding: 6px 0 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   flex-shrink: 0;
   transition: opacity 0.25s ease, transform 0.25s ease;
+}
+/* Extend nav background behind iOS home indicator bar */
+.bottom-nav::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  left: 0; right: 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: rgba(255,255,255,0.96);
+  pointer-events: none;
+  z-index: -1;
 }
 .bn-bar { display: flex; align-items: center; justify-content: space-around; width: 100%; }
 .bn-item {
@@ -1777,6 +1790,9 @@ html[data-theme="dark"] .twrap::-webkit-scrollbar-thumb { background: rgba(255,2
 html[data-theme="dark"] .bottom-nav {
   background: rgba(19,23,32,0.96);
   border-top-color: var(--border);
+}
+html[data-theme="dark"] .bottom-nav::after {
+  background: rgba(19,23,32,0.96);
 }
 html[data-theme="dark"] .bn-sheet { background: var(--surface); }
 html[data-theme="dark"] .bn-sheet-btn { background: var(--bg); border-color: var(--border); }
