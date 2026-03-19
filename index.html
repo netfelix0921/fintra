@@ -351,7 +351,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
 .topbar {
   height: calc(50px + env(safe-area-inset-top));
   flex-shrink: 0;
-  position: fixed; top: 0; left: 0; right: 0;
+  position: fixed; top: 0; left: 0; right: 0; /* left overridden per breakpoint */
   background: rgba(255,255,255,0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -450,6 +450,39 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   box-shadow: none !important;
 }
 
+/* Inline search bar in topbar — sits between logo and ham */
+.topbar-search-inline {
+  flex: 1;
+  position: relative;
+  margin: 0 10px;
+  min-width: 0;
+}
+.topbar-search-inline .search-input {
+  width: 100%;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--t1);
+  outline: none;
+  transition: border-color var(--dur-med);
+}
+.topbar-search-inline .search-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.09);
+  background: var(--surface);
+}
+.topbar-search-inline .search-input::placeholder { color: var(--t3); font-size: 12px; }
+.topbar-search-inline .search-results {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-md); box-shadow: var(--sh-lg);
+  z-index: 500; max-height: 280px; overflow-y: auto; display: none;
+}
+.topbar-search-inline .search-results.show { display: block; }
+
 /* Hide date/save chips on small screens so title stays visible */
 @media (max-width: 600px) {
   .tb-chip-hide { display: none !important; }
@@ -491,7 +524,7 @@ button,.nav-btn,.pchip,.df-btn,.bft,.cr-btn,.tb-btn,.tb-chip,.wlink,.modal-close
   z-index: 500; max-height: 280px; overflow-y: auto; display: none;
 }
 .search-results.show { display: block; }
-.search-mob-btn { display: none; width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--border); cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--dur-fast); }
+.search-mob-btn { display: flex; width: 32px; height: 32px; border-radius: var(--r-sm); background: transparent; border: none; cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--dur-fast); }
 .search-mob-btn svg { width: 15px; height: 15px; stroke: var(--t2); fill: none; stroke-width: 1.75; stroke-linecap: round; }
 .search-mob-btn:hover { background: var(--surface); }
 .search-mob-bar { display: none !important; padding: 8px 14px; gap: 8px; background: var(--surface); border-bottom: 1px solid var(--border); position: fixed; top: calc(50px + env(safe-area-inset-top)); left: 0; right: 0; z-index: 399; }
@@ -1450,19 +1483,76 @@ select option { background: var(--surface); }
 /* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
+
+/* ── DESKTOP (901px+) — sidebar always visible in normal flow ── */
+@media (min-width: 901px) {
+  /* Sidebar sits in the flex row — NOT fixed/absolute */
+  .sidebar {
+    position: relative !important;
+    top: auto !important; right: auto !important; left: auto !important;
+    width: 232px !important;
+    height: 100% !important;
+    flex-shrink: 0 !important;
+    z-index: 10 !important;
+    box-shadow: none !important;
+    /* Always visible — never slides away */
+    transition: none !important;
+  }
+  /* Sidebar overlay never needed on desktop */
+  .sidebar-overlay { display: none !important; pointer-events: none !important; }
+  /* Ham button hidden — sidebar is permanently visible */
+  .ham-btn { display: none !important; }
+  /* Topbar spans only the main area (right of sidebar) */
+  .topbar { left: 232px !important; }
+  /* Show desktop search bar, hide mobile search button */
+  .search-wrap { display: flex !important; }
+  .search-mob-btn { display: none !important; }
+  .search-mob-bar { display: none !important; }
+  /* Content padding */
+  .content {
+    padding: 18px 28px !important;
+    padding-top: calc(50px + env(safe-area-inset-top) + 20px) !important;
+  }
+  /* 4-column KPI grid on desktop */
+  .krow { grid-template-columns: repeat(4, 1fr) !important; }
+  /* Desktop table always visible */
+  .tcard   { display: block !important; }
+  .mob-log { display: none !important; }
+}
+
+/* ── TABLET / iPAD (601px – 900px) — sidebar as right-side drawer ── */
 @media (max-width: 900px) {
-  /* Sidebar slides in from right only when .open — hidden by default */
-  .sidebar { position: fixed; top: calc(50px + env(safe-area-inset-top)); right: -280px; left: auto; height: calc(100% - 50px - env(safe-area-inset-top)); z-index: 100; box-shadow: var(--sh-xl); padding-top: 0; transition: right var(--dur-slow) var(--ease); }
+  .sidebar {
+    position: fixed;
+    top: calc(50px + env(safe-area-inset-top));
+    right: -280px;
+    left: auto;
+    width: 260px;
+    height: calc(100% - 50px - env(safe-area-inset-top));
+    z-index: 100;
+    box-shadow: var(--sh-xl);
+    padding-top: 0;
+    transition: right var(--dur-slow) var(--ease);
+  }
   .sidebar.open { right: 0; }
-  /* FIX: sidebar nav section hidden — not visible behind the sidebar on mobile */
   .nav { display: flex; flex-direction: column; }
   .ham-btn { display: flex; }
-  .search-wrap { display: none; }
-  .search-mob-btn { display: flex; }
+  .topbar { left: 0; }
   .search-mob-bar.show { display: flex !important; align-items: center; }
   .search-mob-bar.open { display: flex !important; align-items: center; }
-  .krow { grid-template-columns: 1fr 1fr; }
-  .content { padding: 16px 18px; }
+  .krow { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+/* ── TABLET only (601px – 900px) — keep desktop table, hide mobile cards ── */
+@media (min-width: 601px) and (max-width: 900px) {
+  .search-wrap { display: none !important; }
+  .search-mob-btn { display: flex !important; }
+  .content { padding: 16px 20px; padding-top: calc(50px + env(safe-area-inset-top) + 16px); }
+  .tcard   { display: block !important; }
+  .mob-log { display: none !important; }
+  .nw-grid { grid-template-columns: 1fr 1fr; }
+  .prof-2col { grid-template-columns: 1fr 1fr; }
+  .ggrid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 
 @media (max-width: 600px) {
@@ -1493,7 +1583,9 @@ select option { background: var(--surface); }
 }
 
 @media (min-width: 1440px) {
-  .content { max-width: 1320px; margin: 0 auto; }
+  /* Don't center with margin:auto — sidebar handles left positioning.
+     Just widen the content padding on very large screens. */
+  .content { padding-left: 48px; padding-right: 48px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2509,15 +2601,16 @@ input[type="date"], input[type="number"] {
       </div>
     </div>
     <div class="topbar-right">
+      <div class="tb-chip tb-chip-hide" id="date-badge"></div>
+      <div id="spill" class="tb-chip tb-chip-hide" style="font-size:10px">auto-save on</div>
+      <div id="av-topbar" style="display:none!important;width:0!important;overflow:hidden!important"><span id="av-topbar-initial">Y</span></div>
       <button class="tb-btn search-mob-btn" id="search-mob-btn" title="Search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
       </button>
-      <div class="tb-chip tb-chip-hide" id="date-badge"></div>
-      <div id="spill" class="tb-chip tb-chip-hide" style="font-size:10px">auto-save on</div>
       <button class="tb-btn" id="ham-btn" title="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <div id="av-topbar" style="display:none!important;width:0!important;overflow:hidden!important"><span id="av-topbar-initial">Y</span></div>
+      <!-- Desktop search -->
       <div class="search-wrap" style="display:none">
         <input class="search-input" id="search-input" type="text" placeholder="Search transactions…">
         <div class="search-results" id="search-results"></div>
@@ -3705,7 +3798,9 @@ document.querySelectorAll('.theme-chip').forEach(function(btn){
 
 // ── SIDEBAR ──────────────────────────────────────────────
 var _sideOpen=false;
+function isDesktop(){ return window.innerWidth > 900; }
 function openSidebar(){
+  if(isDesktop()) return; // sidebar is always visible on desktop — nothing to open
   _sideOpen=true;
   ge('sidebar').classList.add('open');
   ge('ham-btn').classList.add('open');
@@ -3721,7 +3816,15 @@ function closeSidebar(){
   // Restore bottom nav
   var bn=ge('bottom-nav');if(bn)bn.classList.remove('bn-hidden');
 }
-ge('ham-btn').addEventListener('click',function(){_sideOpen?closeSidebar():openSidebar();});
+ge('ham-btn').addEventListener('click',function(){
+  if(isDesktop()) return;
+  _sideOpen?closeSidebar():openSidebar();
+});
+
+// Auto-close sidebar drawer when resizing to desktop
+window.addEventListener('resize', function(){
+  if(isDesktop() && _sideOpen) closeSidebar();
+});
 
 // ── SCROLL-HIDE BOTTOM NAV ──────────────────────────────
 (function(){
