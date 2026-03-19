@@ -7,7 +7,7 @@
      'unsafe-inline' on style-src is required for the inline <style> block and
      dynamically injected style attributes used throughout the app. -->
 <meta http-equiv="Content-Security-Policy"
-  content="default-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self';">
+  content="default-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; img-src 'self' data: blob: https://www.google-analytics.com; connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,6 +25,47 @@
 <!-- FIX: Consolidated 3 @import rules into a single non-blocking <link> tag.
      @import inside <style> is render-blocking; <link rel="stylesheet"> is not. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+<!-- ── GOOGLE ANALYTICS 4 ──────────────────────────────────────────
+     Tracks: page views, active users, countries, devices, and PWA installs.
+     Replace G-XXXXXXXXXX with your actual GA4 Measurement ID from:
+     analytics.google.com → Admin → Data Streams → your stream → Measurement ID
+     ──────────────────────────────────────────────────────────────── -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX', {
+    app_name: 'Fintra',
+    app_version: '1.0-beta',
+    // Don't send IP addresses — privacy-friendly
+    anonymize_ip: true
+  });
+
+  // Track PWA install prompt (Android Chrome "Add to Home Screen")
+  window.addEventListener('beforeinstallprompt', function(e) {
+    gtag('event', 'pwa_install_prompt', {
+      event_category: 'PWA',
+      event_label: 'Install prompt shown'
+    });
+  });
+
+  // Track when user actually installs the PWA
+  window.addEventListener('appinstalled', function() {
+    gtag('event', 'pwa_installed', {
+      event_category: 'PWA',
+      event_label: 'App installed to home screen'
+    });
+  });
+
+  // Track if already running as installed PWA (standalone mode)
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    gtag('event', 'pwa_launched', {
+      event_category: 'PWA',
+      event_label: 'Opened from home screen'
+    });
+  }
+</script>
 <title>Fintra — Your Financial Control Center</title>
 <style>
 /* ═══════════════════════════════════════════════════════════════
